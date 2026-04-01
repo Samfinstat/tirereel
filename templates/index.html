@@ -503,7 +503,7 @@ header {
           <div class="field">
             <label>Цвет плашки</label>
             <div class="color-row">
-              <input type="color" id="f_color" value="#BB1111" oninput="refreshPreview()">
+              <input type="color" id="f_color" value="#bb1111" oninput="refreshPreview()">
               <span class="color-label" id="colorLabel">#BB1111</span>
             </div>
           </div>
@@ -668,7 +668,9 @@ async function doGenerate() {
   fd.append('description',  document.getElementById('f_desc').value.trim());
   fd.append('logo',         document.getElementById('f_logo').value.trim());
   fd.append('logo_pos',     document.getElementById('f_logo_pos').value);
-  fd.append('banner_color', document.getElementById('f_color').value);
+  let bannerColor = document.getElementById('f_color').value || '#bb1111';
+  if (!/^#[0-9a-fA-F]{6}$/.test(bannerColor)) bannerColor = '#bb1111';
+  fd.append('banner_color', bannerColor);
 
   try {
     const r = await fetch('/generate', { method: 'POST', body: fd });
