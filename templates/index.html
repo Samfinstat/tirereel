@@ -502,10 +502,14 @@ header {
         <div class="row2">
           <div class="field">
             <label>Цвет плашки</label>
-            <div class="color-row">
-              <input type="color" id="f_color" value="#bb1111" oninput="refreshPreview()">
-              <span class="color-label" id="colorLabel">#BB1111</span>
-            </div>
+            <select id="f_color" onchange="refreshPreview()">
+              <option value="#bb1111">🔴 Красный</option>
+              <option value="#1a4dbb">🔵 Синий</option>
+              <option value="#1a7a2e">🟢 Зелёный</option>
+              <option value="#b87800">🟠 Оранжевый</option>
+              <option value="#222222">⚫ Чёрный</option>
+              <option value="#555555">⬛ Серый</option>
+            </select>
           </div>
           <div class="field">
             <label>Логотип — позиция</label>
@@ -625,9 +629,8 @@ function refreshPreview() {
   const brand = document.getElementById('f_brand').value.trim();
   const desc  = document.getElementById('f_desc').value.trim();
   const logo  = document.getElementById('f_logo').value.trim();
-  const color = document.getElementById('f_color').value;
+  const color = document.getElementById('f_color').value || '#bb1111';
   const lpos  = document.getElementById('f_logo_pos').value;
-  document.getElementById('colorLabel').textContent = color.toUpperCase();
 
   let html = '';
   if (logo) html += `<div class="pov-logo${lpos==='right'?' right':''}">${he(logo)}</div>`;
