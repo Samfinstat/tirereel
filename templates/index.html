@@ -662,24 +662,42 @@ async function doGenerate() {
   document.getElementById('dlArea').innerHTML = '';
   document.getElementById('progressWrap').style.display = 'block';
   animProgress();
+  setStatus('<div class="spinner"></div> Подготовка фото...', '');
+
+  // Конвертируем фото в base64
+  let photosB64 = [];
+  try {
+    photosB64 = await Promise.all(photoFiles.map(f => new Promise((res, rej) => {
+      const reader = new FileReader();
+      reader.onload  = () => res(reader.result.split(',')[1]);
+      reader.onerror = () => rej(new Error('Ошибка чтения файла: ' + f.name));
+      reader.readAsDataURL(f);
+    })));
+  } catch(e) {
+    setStatus('❌ ' + e.message, 'err');
+    btn.disabled = false;
+    clearInterval(progInterval);
+    return;
+  }
+
   setStatus('<div class="spinner"></div> Генерация видео (~40–80 сек)...', '');
 
-  const fd = new FormData();
-  photoFiles.forEach((f, i) => {
-    const ext = f.name.split('.').pop().toLowerCase().replace(/[^a-z0-9]/g, '') || 'jpg';
-    fd.append('photos', f, `photo_${i}.${ext}`);
-  });
-  fd.append('size',         size);
-  fd.append('brand',        document.getElementById('f_brand').value.trim());
-  fd.append('description',  document.getElementById('f_desc').value.trim());
-  fd.append('logo',         document.getElementById('f_logo').value.trim());
-  fd.append('logo_pos',     document.getElementById('f_logo_pos').value);
-  let bannerColor = document.getElementById('f_color').value || '#bb1111';
-  if (!/^#[0-9a-fA-F]{6}$/.test(bannerColor)) bannerColor = '#bb1111';
-  fd.append('banner_color', bannerColor);
+  const payload = {
+    photos:       photosB64,
+    size:         size,
+    brand:        document.getElementById('f_brand').value.trim(),
+    description:  document.getElementById('f_desc').value.trim(),
+    logo:         document.getElementById('f_logo').value.trim(),
+    logo_pos:     document.getElementById('f_logo_pos').value,
+    banner_color: document.getElementById('f_color').value || '#bb1111',
+  };
 
   try {
-    const r = await fetch('/generate', { method: 'POST', body: fd });
+    const r = await fetch('/generate', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify(payload),
+    });
     const d = await r.json();
     document.getElementById('progressBar').style.width = '100%';
     if (d.error) {
