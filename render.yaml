@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: tirereel
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: PORT
+        value: 10000
+    # Диск для временных файлов (можно убрать, если не нужен)
+    # disk:
+    #   name: tirereel-disk
+    #   mountPath: /app/output
+    #   sizeGB: 1
