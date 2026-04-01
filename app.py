@@ -1,4 +1,4 @@
-import os, uuid, time, threading, math
+import os, uuid, time, threading, math, re
 from pathlib import Path
 from flask import Flask, render_template, request, jsonify, send_file
 from werkzeug.utils import secure_filename
@@ -259,58 +259,58 @@ def index():
 
 @app.route('/generate', methods=['POST'])
 def generate():
-    # Получаем фото
-    files = request.files.getlist('photos')
-    if not files or not files[0].filename:
+    import base64 as b64mod
+
+    data = request.get_json(force=True, silent=True) or {}
+    photos_b64 = data.get('photos', [])
+
+    if not photos_b64:
         return jsonify({'error': 'Загрузите хотя бы одно фото шины'}), 400
 
-    # Сохраняем фото
-    session_id = uuid.uuid4().hex[:10]
+    session_id  = uuid.uuid4().hex[:10]
     session_dir = UPLOAD_DIR / session_id
     session_dir.mkdir()
 
     photo_paths = []
-    for f in files[:5]:   # максимум 5 фото
-        ext  = Path(f.filename).suffix.lower()
-        if ext not in ('.jpg', '.jpeg', '.png', '.webp'):
+    for i, b64str in enumerate(photos_b64[:5]):
+        try:
+            img_bytes = b64mod.b64decode(b64str)
+            dest = session_dir / f'photo_{i}.jpg'
+            dest.write_bytes(img_bytes)
+            photo_paths.append(str(dest))
+        except Exception as e:
             continue
-        name = f"{len(photo_paths):02d}{ext}"
-        dest = session_dir / name
-        f.save(str(dest))
-        photo_paths.append(str(dest))
 
     if not photo_paths:
-        return jsonify({'error': 'Неподдерживаемый формат. Используйте JPG или PNG'}), 400
+        return jsonify({'error': 'Не удалось обработать фото. Используйте JPG или PNG'}), 400
 
-    # Данные из формы
-    data = {
-        'size':         request.form.get('size', '').strip(),
-        'brand':        request.form.get('brand', '').strip(),
-        'description':  request.form.get('description', '').strip(),
-        'logo':         request.form.get('logo', '').strip(),
-        'logo_pos':     request.form.get('logo_pos', 'left'),
-        'banner_color': request.form.get('banner_color', '#BB1111'),
+    form = {
+        'size':         str(data.get('size',         '')).strip(),
+        'brand':        str(data.get('brand',        '')).strip(),
+        'description':  str(data.get('description',  '')).strip(),
+        'logo':         str(data.get('logo',         '')).strip(),
+        'logo_pos':     str(data.get('logo_pos',     'left')).strip(),
+        'banner_color': str(data.get('banner_color', '#bb1111')).strip(),
     }
+    if not re.match(r'^#[0-9a-fA-F]{6}$', form['banner_color']):
+        form['banner_color'] = '#bb1111'
 
-    if not data['size']:
+    if not form['size']:
         return jsonify({'error': 'Введите размер шины'}), 400
 
-    # Генерируем видео
-    safe_size = data['size'].replace('/', '-').replace(' ', '_')
+    safe_size = form['size'].replace('/', '-').replace(' ', '_')
     out_name  = f"{safe_size}_{session_id[:6]}.mp4"
     out_path  = str(OUTPUT_DIR / out_name)
 
     try:
-        generate_video(photo_paths, data, out_path)
+        generate_video(photo_paths, form, out_path)
     except Exception as e:
         import traceback
-        return jsonify({'error': str(e), 'trace': traceback.format_exc()[-600:]}), 500
+        return jsonify({'error': str(e), 'trace': traceback.format_exc()[-800:]}), 500
     finally:
-        # Удаляем загруженные фото
         import shutil
         shutil.rmtree(str(session_dir), ignore_errors=True)
 
-    # Планируем удаление через 2 часа
     def cleanup():
         time.sleep(7200)
         Path(out_path).unlink(missing_ok=True)
