@@ -461,7 +461,7 @@ header {
     <div>
       <div class="sec-title">01 — Фотографии шины</div>
       <div class="dropzone" id="dropzone">
-        <input type="file" id="fileInput" accept="image/*" multiple onchange="addFiles(this.files)">
+        <input type="file" id="fileInput" multiple onchange="addFiles(this.files)">
         <span class="dz-icon">📸</span>
         <div class="dz-title">Перетащите фото сюда</div>
         <div class="dz-sub">или нажмите для выбора файлов</div>
@@ -545,7 +545,7 @@ header {
     </div>
 
     <div class="gen-panel">
-      <button class="btn-gen" id="genBtn" onclick="doGenerate()">
+      <button type="button" class="btn-gen" id="genBtn" onclick="doGenerate()">
         ▶ Сгенерировать видео
       </button>
       <div class="progress" id="progressWrap" style="display:none">
@@ -605,7 +605,7 @@ function renderThumbs() {
   if (photoFiles.length < 5) {
     const add = document.createElement('label');
     add.className = 'photo-add';
-    add.innerHTML = `<input type="file" accept="image/*" multiple onchange="addFiles(this.files)"><span style="font-size:20px">+</span><span>Ещё</span>`;
+    add.innerHTML = `<input type="file" multiple onchange="addFiles(this.files)"><span style="font-size:20px">+</span><span>Ещё</span>`;
     grid.appendChild(add);
   }
   // Update preview bg
