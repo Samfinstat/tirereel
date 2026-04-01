@@ -1,332 +1,118 @@
-import os, uuid, time, threading, math, re
+import os, uuid, time, threading, re, subprocess
 from pathlib import Path
 from flask import Flask, render_template, request, jsonify, send_file
-from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
-app.config['MAX_CONTENT_LENGTH'] = 200 * 1024 * 1024  # 200 MB
+app.config['MAX_CONTENT_LENGTH'] = 200 * 1024 * 1024
 
 UPLOAD_DIR = Path('uploads')
 OUTPUT_DIR = Path('output')
 UPLOAD_DIR.mkdir(exist_ok=True)
 OUTPUT_DIR.mkdir(exist_ok=True)
 
-# ── Поиск шрифтов ─────────────────────────────────────────────────────────────
-FONT_CANDIDATES_BOLD = [
-    '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf',
-    '/usr/share/fonts/dejavu/DejaVuSans-Bold.ttf',
-    '/app/fonts/DejaVuSans-Bold.ttf',
-    'C:/Windows/Fonts/arialbd.ttf',
-]
-FONT_CANDIDATES_REG = [
-    '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf',
-    '/usr/share/fonts/dejavu/DejaVuSans.ttf',
-    '/app/fonts/DejaVuSans.ttf',
-    'C:/Windows/Fonts/arial.ttf',
-]
+FONT_BOLD = ['/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf',
+             '/usr/share/fonts/dejavu/DejaVuSans-Bold.ttf']
+FONT_REG  = ['/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf',
+             '/usr/share/fonts/dejavu/DejaVuSans.ttf']
 
-
-def find_font(candidates):
-    for p in candidates:
-        if os.path.exists(p):
-            return p
+def find_font(c):
+    for p in c:
+        if os.path.exists(p): return p
     return None
 
+def esc(t):
+    return str(t).strip().replace('\\','\\\\').replace("'","\\'").replace(':','\\:').replace('%','\\%')
 
-# ── Видео-генерация ───────────────────────────────────────────────────────────
+def fade_expr(t0, dur=0.45):
+    return f"if(lt(t\\,{t0:.2f})\\,0\\,min(1\\,(t-{t0:.2f})/{dur:.2f}))"
 
-def hex_to_rgb(hex_color: str):
-    h = hex_color.lstrip('#')
-    return tuple(int(h[i:i+2], 16) for i in (0, 2, 4))
-
-
-def ease_inout(t: float) -> float:
-    return t * t * (3 - 2 * t)
-
-
-def generate_video(photo_paths: list, data: dict, out_path: str):
-    """
-    Генерирует MP4 из фотографий шины с анимацией и текстом.
-    """
-    from PIL import Image, ImageDraw, ImageFilter, ImageEnhance
-    import numpy as np
-    from moviepy.editor import ImageSequenceClip
-
-    W, H = 540, 960
-    FPS = 24
-    DURATION = 10          # секунд на видео
-    TEXT_START = 0.58      # текст появляется в 58% длительности
-    FADE_IN_DUR = 0.55     # секунды на затухание текста
-
-    total_frames = FPS * DURATION
-    text_start_frame = int(total_frames * TEXT_START)
-    n_photos = len(photo_paths)
-    frames_per_photo = total_frames // n_photos
-    fade_frames = int(FPS * 0.55)
-
-    # Загружаем шрифты
-    font_bold_path = find_font(FONT_CANDIDATES_BOLD)
-    font_reg_path  = find_font(FONT_CANDIDATES_REG)
-
-    from PIL import ImageFont
-    def load_font(path, size):
-        if path:
-            try:
-                return ImageFont.truetype(path, size)
-            except Exception:
-                pass
-        return ImageFont.load_default()
-
-    fonts = {
-        'logo':  load_font(font_bold_path, 28),
-        'size':  load_font(font_bold_path, 64),
-        'desc':  load_font(font_bold_path, 26),
-        'brand': load_font(font_reg_path,  30),
-        'small': load_font(font_reg_path,  20),
-    }
-
-    # Данные для текста
-    logo        = data.get('logo', '').strip()
-    size_text   = data.get('size', '').strip()
-    brand       = data.get('brand', '').strip()
-    description = data.get('description', '').strip()
-    banner_hex  = data.get('banner_color', '#BB1111')
-    logo_pos    = data.get('logo_pos', 'left')
-
-    banner_rgb = hex_to_rgb(banner_hex)
-
-    # ── Подготовка каждого фото ──────────────────────────────────────────────
-    def prepare_photo(path):
-        img = Image.open(path).convert('RGB')
-        # Масштабируем чтобы заполнить кадр (с запасом 35% для зума)
-        ratio = max(W / img.width, H / img.height) * 1.35
-        new_w = int(img.width * ratio)
-        new_h = int(img.height * ratio)
-        return img.resize((new_w, new_h), Image.LANCZOS)
-
-    def make_bg(img):
-        """Тёмный размытый фон из фото."""
-        ratio = max(W / img.width, H / img.height)
-        bg = img.resize((int(img.width * ratio), int(img.height * ratio)), Image.LANCZOS)
-        x0 = (bg.width - W) // 2
-        y0 = (bg.height - H) // 2
-        bg = bg.crop((x0, y0, x0 + W, y0 + H))
-        bg = bg.filter(ImageFilter.GaussianBlur(radius=28))
-        bg = ImageEnhance.Brightness(bg).enhance(0.18)
-        # Тёплый оттенок
-        r, g, b = bg.split()
-        r = ImageEnhance.Brightness(r).enhance(1.2)
-        g = ImageEnhance.Brightness(g).enhance(1.05)
-        return Image.merge('RGB', (r, g, b))
-
-    def crop_frame(img, scale, pan_y_frac, W, H):
-        """Кадрирование для Ken Burns: scale=1.0 → оригинал, >1 → зум."""
-        sw = int(W / scale)
-        sh = int(H / scale)
-        # Центр + вертикальный сдвиг
-        cx = img.width // 2
-        cy = int(img.height * (0.5 - pan_y_frac * 0.08))
-        x0 = max(0, cx - sw // 2)
-        y0 = max(0, cy - sh // 2)
-        x0 = min(x0, img.width  - sw)
-        y0 = min(y0, img.height - sh)
-        cropped = img.crop((x0, y0, x0 + sw, y0 + sh))
-        return cropped.resize((W, H), Image.LANCZOS)
-
-    def make_vignette(W, H):
-        """Тёмная виньетка по краям."""
-        vig = Image.new('RGBA', (W, H), (0, 0, 0, 0))
-        d = ImageDraw.Draw(vig)
-        steps = 40
-        for i in range(steps):
-            t = i / steps
-            alpha = int(200 * (1 - t) ** 2.2)
-            margin = int(min(W, H) * 0.5 * t)
-            d.rectangle([margin, margin, W - margin, H - margin],
-                        outline=(0, 0, 0, alpha), width=3)
-        return vig
-
-    def add_text(frame_img, t_sec, total_sec):
-        """Накладывает текстовый оверлей на кадр."""
-        t0 = total_sec * TEXT_START
-        if t_sec < t0:
-            return frame_img
-
-        alpha_frac = min(1.0, (t_sec - t0) / FADE_IN_DUR)
-        a = int(255 * alpha_frac)
-
-        overlay = Image.new('RGBA', (W, H), (0, 0, 0, 0))
-        d = ImageDraw.Draw(overlay)
-
-        # Логотип
-        if logo:
-            lx = 18 if logo_pos == 'left' else None
-            d.text((lx or W - 18, 18), logo,
-                   font=fonts['logo'], fill=(255, 255, 255, a),
-                   anchor='la' if lx else 'ra')
-
-        # Баннер + описание
-        banner_y = int(H * 0.705)
-        banner_h = int(H * 0.155)
-        if description:
-            d.rectangle([0, banner_y, W, banner_y + banner_h],
-                        fill=(*banner_rgb, int(225 * alpha_frac)))
-            lines = description.replace('\\n', '\n').split('\n')[:3]
-            for li, line in enumerate(lines):
-                yp = banner_y + 14 + li * 34
-                bbox = d.textbbox((0, 0), line, font=fonts['desc'])
-                tw = bbox[2] - bbox[0]
-                d.text(((W - tw) / 2, yp), line,
-                       font=fonts['desc'], fill=(255, 255, 255, a))
-
-        # Размер (крупно)
-        if size_text:
-            bbox = d.textbbox((0, 0), size_text, font=fonts['size'])
-            tw = bbox[2] - bbox[0]
-            sy = banner_y + banner_h + 14 if description else int(H * 0.84)
-            d.text(((W - tw) / 2, sy), size_text,
-                   font=fonts['size'], fill=(255, 255, 255, a))
-
-        # Бренд
-        if brand:
-            bbox = d.textbbox((0, 0), brand, font=fonts['brand'])
-            tw = bbox[2] - bbox[0]
-            by = int(H * 0.935)
-            d.text(((W - tw) / 2, by), brand,
-                   font=fonts['brand'], fill=(255, 255, 255, int(210 * alpha_frac)))
-
-        return Image.alpha_composite(frame_img.convert('RGBA'), overlay)
-
-    # ── Генерация кадров ─────────────────────────────────────────────────────
-    photos_full = [prepare_photo(p) for p in photo_paths]
-    backgrounds = [make_bg(p) for p in photos_full]
-    vignette    = make_vignette(W, H)
-
-    frames_out = []
-
-    for f in range(total_frames):
-        # Какое фото?
-        raw_idx = f // frames_per_photo
-        photo_idx = min(raw_idx, n_photos - 1)
-        t_in_photo = (f % frames_per_photo) / frames_per_photo   # 0..1
-
-        # Ken Burns: масштаб 1.0 → 1.22, небольшой сдвиг вверх
-        scale   = 1.0  + 0.22  * ease_inout(t_in_photo)
-        pan_y   = 1.0  - t_in_photo                               # начинаем снизу
-
-        photo_frame = crop_frame(photos_full[photo_idx], scale, pan_y, W, H)
-        bg_frame    = backgrounds[photo_idx].copy()
-
-        # Кроссфейд между фотографиями
-        if n_photos > 1 and photo_idx < n_photos - 1:
-            frame_in_photo = f % frames_per_photo
-            if frame_in_photo >= frames_per_photo - fade_frames:
-                fade_t = (frame_in_photo - (frames_per_photo - fade_frames)) / fade_frames
-                next_idx = photo_idx + 1
-                scale_next = 1.0 + 0.22 * ease_inout(0)
-                pan_y_next = 1.0
-                next_frame = crop_frame(photos_full[next_idx], scale_next, pan_y_next, W, H)
-                next_bg    = backgrounds[next_idx].copy()
-                photo_frame = Image.blend(photo_frame, next_frame, fade_t)
-                bg_frame    = Image.blend(bg_frame,    next_bg,    fade_t)
-
-        # Сборка кадра
-        composite = Image.blend(bg_frame, photo_frame, 0.80)
-        composite = composite.convert('RGBA')
-        composite.paste(vignette, (0, 0), vignette)
-
-        # Текст
-        t_sec = f / FPS
-        composite = add_text(composite, t_sec, DURATION)
-        frames_out.append(np.array(composite.convert('RGB')))
-
-    # ── Кодирование ─────────────────────────────────────────────────────────
-    clip = ImageSequenceClip(frames_out, fps=FPS)
-    clip.write_videofile(
-        out_path, codec='libx264', audio=False,
-        verbose=False, logger=None,
-        ffmpeg_params=['-crf', '21', '-preset', 'fast', '-pix_fmt', 'yuv420p'],
-    )
-    clip.close()
-
-
-# ── Flask маршруты ────────────────────────────────────────────────────────────
+def generate_video(photo_path, data, out_path):
+    W,H,FPS,DUR = 540,960,24,10
+    T0 = DUR*0.58
+    FRAMES = FPS*DUR
+    fb = f"fontfile='{find_font(FONT_BOLD)}':" if find_font(FONT_BOLD) else ""
+    fr = f"fontfile='{find_font(FONT_REG)}':"  if find_font(FONT_REG)  else ""
+    logo        = data.get('logo','').strip()
+    size_text   = data.get('size','').strip()
+    brand       = data.get('brand','').strip()
+    description = data.get('description','').strip()
+    banner_hex  = data.get('banner_color','#bb1111').lstrip('#')
+    logo_pos    = data.get('logo_pos','left')
+    vf = []
+    vf.append(f"scale={W}:{H}:force_original_aspect_ratio=increase")
+    vf.append(f"crop={W}:{H}")
+    vf.append(f"zoompan=z='1.0+0.22*on/{FRAMES}':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d={FRAMES}:s={W}x{H}:fps={FPS}")
+    vf.append("vignette=PI/4:mode=backward")
+    if logo:
+        lx = '18' if logo_pos=='left' else 'w-tw-18'
+        vf.append(f"drawtext=text='{esc(logo)}':{fb}fontcolor=white:fontsize=28:x={lx}:y=18:shadowcolor=black@0.7:shadowx=1:shadowy=1:alpha='min(1\\,t/0.8)'")
+    if description:
+        vf.append(f"drawbox=x=0:y=ih*0.705:w=iw:h=ih*0.155:color=0x{banner_hex}@0.90:t=fill:enable='gte(t\\,{T0:.2f})'")
+        for i,line in enumerate(description.split('\n')[:2]):
+            yp=0.745+i*0.052
+            vf.append(f"drawtext=text='{esc(line)}':{fb}fontcolor=white:fontsize=27:x=(w-tw)/2:y=ih*{yp:.3f}:shadowcolor=black@0.5:shadowx=1:shadowy=1:alpha='{fade_expr(T0)}':enable='gte(t\\,{T0:.2f})'")
+    if size_text:
+        t1=T0+0.2; sy=0.875 if description else 0.845
+        vf.append(f"drawtext=text='{esc(size_text)}':{fb}fontcolor=white:fontsize=54:x=(w-tw)/2:y=ih*{sy:.3f}:shadowcolor=black@0.65:shadowx=2:shadowy=2:alpha='{fade_expr(t1)}':enable='gte(t\\,{t1:.2f})'")
+    if brand:
+        t1=T0+0.25
+        vf.append(f"drawtext=text='{esc(brand)}':{fr}fontcolor=white:fontsize=32:x=(w-tw)/2:y=ih*0.932:shadowcolor=black@0.55:shadowx=1:shadowy=1:alpha='{fade_expr(t1)}':enable='gte(t\\,{t1:.2f})'")
+    cmd = ['ffmpeg','-loop','1','-framerate',str(FPS),'-t',str(DUR+0.5),'-i',photo_path,
+           '-vf',','.join(vf),'-t',str(DUR),'-c:v','libx264','-crf','22','-preset','fast',
+           '-pix_fmt','yuv420p','-movflags','+faststart','-y',out_path]
+    r = subprocess.run(cmd, capture_output=True, text=True, timeout=240)
+    if r.returncode != 0:
+        raise RuntimeError(f"ffmpeg: {r.stderr[-600:]}")
 
 @app.route('/')
 def index():
     return render_template('index.html')
 
-
 @app.route('/generate', methods=['POST'])
 def generate():
     import base64 as b64mod
-
+    from PIL import Image
+    import io
     data = request.get_json(force=True, silent=True) or {}
     photos_b64 = data.get('photos', [])
-
     if not photos_b64:
         return jsonify({'error': 'Загрузите хотя бы одно фото шины'}), 400
-
     session_id  = uuid.uuid4().hex[:10]
     session_dir = UPLOAD_DIR / session_id
     session_dir.mkdir()
-
-    photo_paths = []
-    for i, b64str in enumerate(photos_b64[:5]):
+    photo_path = None
+    for b64str in photos_b64[:1]:
         try:
-            img_bytes = b64mod.b64decode(b64str)
-            dest = session_dir / f'photo_{i}.jpg'
-            dest.write_bytes(img_bytes)
-            photo_paths.append(str(dest))
-        except Exception as e:
-            continue
-
-    if not photo_paths:
-        return jsonify({'error': 'Не удалось обработать фото. Используйте JPG или PNG'}), 400
-
-    form = {
-        'size':         str(data.get('size',         '')).strip(),
-        'brand':        str(data.get('brand',        '')).strip(),
-        'description':  str(data.get('description',  '')).strip(),
-        'logo':         str(data.get('logo',         '')).strip(),
-        'logo_pos':     str(data.get('logo_pos',     'left')).strip(),
-        'banner_color': str(data.get('banner_color', '#bb1111')).strip(),
-    }
-    if not re.match(r'^#[0-9a-fA-F]{6}$', form['banner_color']):
-        form['banner_color'] = '#bb1111'
-
-    if not form['size']:
-        return jsonify({'error': 'Введите размер шины'}), 400
-
-    safe_size = form['size'].replace('/', '-').replace(' ', '_')
-    out_name  = f"{safe_size}_{session_id[:6]}.mp4"
-    out_path  = str(OUTPUT_DIR / out_name)
-
+            img = Image.open(io.BytesIO(b64mod.b64decode(b64str))).convert('RGB')
+            img.thumbnail((1200,1200), Image.LANCZOS)
+            dest = session_dir / 'photo.jpg'
+            img.save(str(dest), 'JPEG', quality=92)
+            photo_path = str(dest)
+            break
+        except: continue
+    if not photo_path:
+        return jsonify({'error': 'Не удалось обработать фото'}), 400
+    form = {k: str(data.get(k,'')).strip() for k in ('size','brand','description','logo','logo_pos','banner_color')}
+    if not re.match(r'^#[0-9a-fA-F]{6}$', form.get('banner_color','')): form['banner_color']='#bb1111'
+    if not form.get('size'): return jsonify({'error': 'Введите размер шины'}), 400
+    safe  = form['size'].replace('/','- ').replace(' ','_')
+    name  = f"{safe}_{session_id[:6]}.mp4"
+    opath = str(OUTPUT_DIR / name)
     try:
-        generate_video(photo_paths, form, out_path)
+        generate_video(photo_path, form, opath)
     except Exception as e:
         import traceback
-        return jsonify({'error': str(e), 'trace': traceback.format_exc()[-800:]}), 500
+        return jsonify({'error': str(e)[:400], 'trace': traceback.format_exc()[-600:]}), 500
     finally:
-        import shutil
-        shutil.rmtree(str(session_dir), ignore_errors=True)
-
-    def cleanup():
-        time.sleep(7200)
-        Path(out_path).unlink(missing_ok=True)
-    threading.Thread(target=cleanup, daemon=True).start()
-
-    return jsonify({'url': f'/download/{out_name}', 'filename': out_name})
-
+        import shutil; shutil.rmtree(str(session_dir), ignore_errors=True)
+    threading.Thread(target=lambda: (time.sleep(7200), Path(opath).unlink(missing_ok=True)), daemon=True).start()
+    return jsonify({'url': f'/download/{name}', 'filename': name})
 
 @app.route('/download/<filename>')
 def download(filename):
     path = OUTPUT_DIR / filename
-    if not path.exists():
-        return 'Файл не найден или истёк срок хранения (2 ч)', 404
+    if not path.exists(): return 'Не найден', 404
     return send_file(str(path), as_attachment=True, download_name=filename)
 
-
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port, debug=False)
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT',5000)), debug=False)
