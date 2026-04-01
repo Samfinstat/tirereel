@@ -665,7 +665,10 @@ async function doGenerate() {
   setStatus('<div class="spinner"></div> Генерация видео (~40–80 сек)...', '');
 
   const fd = new FormData();
-  photoFiles.forEach(f => fd.append('photos', f));
+  photoFiles.forEach((f, i) => {
+    const ext = f.name.split('.').pop().toLowerCase().replace(/[^a-z0-9]/g, '') || 'jpg';
+    fd.append('photos', f, `photo_${i}.${ext}`);
+  });
   fd.append('size',         size);
   fd.append('brand',        document.getElementById('f_brand').value.trim());
   fd.append('description',  document.getElementById('f_desc').value.trim());
