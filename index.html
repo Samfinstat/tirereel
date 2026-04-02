@@ -3,129 +3,149 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>TireReel</title>
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@600;700&family=Barlow:wght@300;400;500&family=Barlow+Condensed:wght@500;700&display=swap" rel="stylesheet">
+<title>TireCard — WB стиль</title>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700;900&family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#0a0b0d;--sur:#111318;--card:#181c22;--brd:rgba(255,255,255,0.07);--brd2:rgba(255,255,255,0.13);--gold:#c9a84c;--gold2:#f0cc7a;--tx:#e8eaf2;--mt:#7a7e92;--r:8px}
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg);color:var(--tx);font-family:'Barlow',sans-serif;font-size:14px;min-height:100vh}
-header{background:var(--sur);border-bottom:1px solid var(--brd);padding:0 28px;height:56px;display:flex;align-items:center;gap:14px}
-.logo{font-family:'Oswald',sans-serif;font-size:22px;font-weight:700;letter-spacing:.06em}
-.logo span{color:var(--gold)}
-.logo-sub{font-size:11px;color:var(--mt);letter-spacing:.1em;text-transform:uppercase}
-.layout{display:grid;grid-template-columns:1fr 360px;min-height:calc(100vh - 56px)}
-.left{padding:22px 26px;display:flex;flex-direction:column;gap:18px;border-right:1px solid var(--brd);overflow-y:auto}
-.right{display:flex;flex-direction:column;background:var(--sur)}
-.sec{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.12em;color:var(--gold);margin-bottom:10px}
-.ubox{border:1.5px dashed rgba(201,168,76,.28);border-radius:10px;padding:20px 14px;text-align:center;cursor:pointer;transition:all .2s;background:rgba(201,168,76,.03);position:relative;display:flex;flex-direction:column;align-items:center;gap:6px}
-.ubox:hover,.ubox.over{border-color:var(--gold);background:rgba(201,168,76,.07)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0d0e14;color:#e8eaf2;font-family:'Roboto',sans-serif;font-size:14px;min-height:100vh}
+header{background:#13141f;border-bottom:1px solid rgba(255,255,255,0.06);padding:0 24px;height:52px;display:flex;align-items:center;gap:12px}
+.logo{font-family:'Oswald',sans-serif;font-size:20px;font-weight:700;color:#fff}
+.logo span{color:#f5c518}
+.logo-sub{font-size:11px;color:#444;letter-spacing:.1em;text-transform:uppercase}
+.layout{display:grid;grid-template-columns:1fr 340px;min-height:calc(100vh - 52px)}
+.left{padding:20px 24px;display:flex;flex-direction:column;gap:16px;border-right:1px solid rgba(255,255,255,0.05);overflow-y:auto}
+.right{display:flex;flex-direction:column;background:#13141f}
+.sec{font-size:10px;font-weight:500;color:#f5c518;text-transform:uppercase;letter-spacing:.12em;margin-bottom:8px}
+.ubox{border:1.5px dashed rgba(245,197,24,.22);border-radius:10px;padding:18px 14px;text-align:center;cursor:pointer;transition:all .2s;background:rgba(245,197,24,.02);position:relative;display:flex;flex-direction:column;align-items:center;gap:5px}
+.ubox:hover,.ubox.over{border-color:#f5c518;background:rgba(245,197,24,.05)}
 .ubox input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
-.ubox .ic{font-size:28px}
-.ubox .tt{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:500;color:var(--tx)}
-.ubox .sb{font-size:11px;color:var(--mt)}
-.ubox.filled{border-color:rgba(201,168,76,.6);background:rgba(201,168,76,.08)}
-label.f{display:block;font-size:11px;font-weight:500;color:var(--mt);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;margin-top:10px}
+.ubox .ic{font-size:26px}
+.ubox .tt{font-size:13px;font-weight:500;color:#bbb}
+.ubox .sb{font-size:11px;color:#444}
+.ubox.filled{border-color:rgba(245,197,24,.45)}
+.uploads-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+label.f{display:block;font-size:10px;font-weight:500;color:#555;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;margin-top:10px}
 label.f:first-child{margin-top:0}
-input[type=text],textarea,select{width:100%;background:var(--card);border:1px solid var(--brd);border-radius:var(--r);padding:8px 11px;color:var(--tx);font-family:'Barlow',sans-serif;font-size:14px;outline:none;transition:border-color .2s}
-input[type=text]:focus,textarea:focus,select:focus{border-color:var(--gold)}
-textarea{resize:vertical;min-height:60px}
+input[type=text],textarea,select{width:100%;background:#1a1b26;border:1px solid rgba(255,255,255,0.06);border-radius:6px;padding:7px 10px;color:#e8eaf2;font-family:'Roboto',sans-serif;font-size:13px;outline:none;transition:border-color .2s}
+input[type=text]:focus,textarea:focus,select:focus{border-color:#f5c518}
+textarea{resize:vertical;min-height:70px}
 select{cursor:pointer}
-select option{background:var(--card)}
-.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+select option{background:#1a1b26}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.feat-list{display:flex;flex-direction:column;gap:5px;margin-top:6px}
+.feat-item{display:flex;gap:6px;align-items:center}
+.feat-item input{flex:1;font-size:12px}
+.feat-del{background:none;border:none;color:#444;cursor:pointer;font-size:15px;padding:0 4px;line-height:1}
+.feat-del:hover{color:#ff6b6b}
+.add-feat{background:rgba(245,197,24,.07);border:1px solid rgba(245,197,24,.18);border-radius:6px;color:#f5c518;cursor:pointer;padding:7px;font-size:12px;width:100%;transition:background .2s;margin-top:6px}
+.add-feat:hover{background:rgba(245,197,24,.14)}
 .prev-wrap{flex:1;display:flex;align-items:center;justify-content:center;padding:20px 14px 10px}
-.phone{position:relative;width:190px;aspect-ratio:9/16;background:#000;border-radius:16px;overflow:hidden;border:1.5px solid var(--brd2);box-shadow:0 12px 36px rgba(0,0,0,.6)}
+.phone{position:relative;width:180px;height:320px;border-radius:10px;overflow:hidden;border:1px solid rgba(255,255,255,0.1);box-shadow:0 12px 36px rgba(0,0,0,.7)}
 #prevCv{position:absolute;inset:0;width:100%;height:100%}
-.gen-panel{border-top:1px solid var(--brd);padding:14px}
-.btn{width:100%;padding:13px;background:var(--gold);color:#0a0b0d;border:none;border-radius:var(--r);font-family:'Oswald',sans-serif;font-size:15px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:background .2s}
-.btn:hover{background:var(--gold2)}
-.btn:disabled{background:#252525;color:#555;cursor:not-allowed}
-.st{margin-top:9px;font-size:12px;text-align:center;min-height:15px;display:flex;align-items:center;justify-content:center;gap:6px}
+.gen-panel{border-top:1px solid rgba(255,255,255,0.05);padding:14px}
+.btn{width:100%;padding:12px;background:#f5c518;color:#0d0e14;border:none;border-radius:7px;font-family:'Oswald',sans-serif;font-size:14px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:background .2s}
+.btn:hover{background:#ffe066}
+.btn:disabled{background:#1e1e28;color:#444;cursor:not-allowed}
+.st{margin-top:8px;font-size:11px;text-align:center;min-height:14px;display:flex;align-items:center;justify-content:center;gap:6px;color:#555}
 .st.err{color:#ff6b6b}.st.ok{color:#4caf88}
-.prog{height:2px;background:rgba(255,255,255,.07);border-radius:1px;margin-top:7px;overflow:hidden;display:none}
-.pb{height:100%;background:var(--gold);width:0%;transition:width .25s}
-.btn-dl{display:flex;align-items:center;justify-content:center;gap:7px;padding:10px;background:#1d3a28;color:#5dde9a;border:1px solid #2a5e3a;border-radius:var(--r);font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:500;text-decoration:none;text-transform:uppercase;margin-top:7px;width:100%;cursor:pointer;transition:background .2s}
+.prog{height:2px;background:rgba(255,255,255,.04);border-radius:1px;margin-top:7px;overflow:hidden;display:none}
+.pb{height:100%;background:#f5c518;width:0%;transition:width .2s}
+.btn-dl{display:flex;align-items:center;justify-content:center;gap:7px;padding:9px;background:#1d3a28;color:#5dde9a;border:1px solid #2a5e3a;border-radius:7px;font-size:12px;font-weight:500;text-decoration:none;margin-top:7px;width:100%;cursor:pointer;transition:background .2s}
 .btn-dl:hover{background:#254a32}
-.spin{width:12px;height:12px;border:2px solid rgba(201,168,76,.25);border-top-color:var(--gold);border-radius:50%;animation:sp .7s linear infinite;flex-shrink:0}
+.spin{width:11px;height:11px;border:2px solid rgba(245,197,24,.2);border-top-color:#f5c518;border-radius:50%;animation:sp .7s linear infinite;flex-shrink:0}
 @keyframes sp{to{transform:rotate(360deg)}}
-.tip{background:rgba(201,168,76,.07);border:1px solid rgba(201,168,76,.18);border-radius:var(--r);padding:9px 12px;font-size:11px;color:rgba(201,168,76,.82);line-height:1.5}
+.tip{background:rgba(245,197,24,.04);border:1px solid rgba(245,197,24,.12);border-radius:7px;padding:8px 11px;font-size:11px;color:rgba(245,197,24,.65);line-height:1.5}
 ::-webkit-scrollbar{width:4px}
-::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:2px}
-@media(max-width:700px){.layout{grid-template-columns:1fr}.right{border-top:1px solid var(--brd)}.left{padding:14px}}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.07);border-radius:2px}
+@media(max-width:680px){.layout{grid-template-columns:1fr}.right{border-top:1px solid rgba(255,255,255,0.05)}.left{padding:14px}.uploads-row{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 <header>
-  <div class="logo">Tire<span>Reel</span></div>
-  <div class="logo-sub">Крутящееся колесо из вашего фото</div>
+  <div class="logo">Tire<span>Card</span></div>
+  <div class="logo-sub">WB / Avito — видео карточка</div>
 </header>
 <div class="layout">
 <div class="left">
 
+  <!-- Загрузка файлов -->
   <div>
-    <div class="sec">01 — Фоновое видео (сцена)</div>
-    <div class="ubox" id="bgBox">
-      <input type="file" accept="video/*" onchange="loadBg(this.files[0])">
-      <span class="ic">🎬</span>
-      <div class="tt">Загрузите фоновое видео</div>
-      <div class="sb">MP4, MOV · пустыня, дорога, зима...</div>
+    <div class="sec">01 — Медиафайлы</div>
+    <div class="uploads-row">
+      <div>
+        <div style="font-size:10px;color:#666;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em">Фоновое видео</div>
+        <div class="ubox" id="bgBox">
+          <input type="file" accept="video/*" onchange="loadBg(this.files[0])">
+          <span class="ic">🎬</span>
+          <div class="tt" style="font-size:11px">Загрузить видео</div>
+          <div class="sb">MP4, MOV</div>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:10px;color:#666;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em">Фото шины</div>
+        <div class="ubox" id="tireBox">
+          <input type="file" accept="image/*" onchange="loadTire(this.files[0])">
+          <span class="ic">📸</span>
+          <div class="tt" style="font-size:11px">Загрузить фото</div>
+          <div class="sb">JPG, PNG</div>
+        </div>
+      </div>
     </div>
-    <div class="tip" style="margin-top:8px">💡 Создайте красивую сцену в Kling AI / Runway / Pika — без колеса. Загрузите сюда. Колесо с вашим протектором мы добавим сами.</div>
+    <div class="tip" style="margin-top:8px">💡 Фото шины на белом фоне — белый фон удалится автоматически. Видео — сцена без колеса (пустыня, дорога, зима)</div>
   </div>
 
+  <!-- Текст -->
   <div>
-    <div class="sec">02 — Фото шины (вид спереди)</div>
-    <div class="ubox" id="tireBox">
-      <input type="file" accept="image/*" onchange="loadTire(this.files[0])">
-      <span class="ic">📸</span>
-      <div class="tt">Загрузите фото шины</div>
-      <div class="sb">Вид спереди — протектор будет виден при вращении</div>
-    </div>
-  </div>
-
-  <div>
-    <div class="sec">03 — Данные шины</div>
-    <label class="f">Размер шины *</label>
-    <input type="text" id="f_size" placeholder="205/55 R16" oninput="schedPrev()">
+    <div class="sec">02 — Текст карточки</div>
+    <label class="f">Тип шины (заголовок)</label>
+    <input type="text" id="f_type" value="ШИНА ЛЕТНЯЯ" oninput="rp()">
+    <label class="f">Размер *</label>
+    <input type="text" id="f_size" value="175/65 R14" oninput="rp()">
     <div class="row2">
       <div><label class="f">Бренд</label>
-        <input type="text" id="f_brand" placeholder="Nokian..." oninput="schedPrev()"></div>
-      <div><label class="f">Логотип / магазин</label>
-        <input type="text" id="f_logo" placeholder="ЕВРОШИНА" oninput="schedPrev()"></div>
+        <input type="text" id="f_brand" value="SAILUN" oninput="rp()"></div>
+      <div><label class="f">Подзаголовок</label>
+        <input type="text" id="f_sub" value="РЕЗИНА ЛЕТНЯЯ" oninput="rp()"></div>
     </div>
-    <label class="f">Описание (плашка)</label>
-    <textarea id="f_desc" placeholder="Летние шины&#10;тихий ход · комфорт" oninput="schedPrev()"></textarea>
+    <label class="f">Скидка (необязательно)</label>
+    <input type="text" id="f_disc" placeholder="-66%" oninput="rp()">
   </div>
 
+  <!-- Характеристики -->
+  <div>
+    <div class="sec">03 — Характеристики</div>
+    <div class="feat-list" id="featList"></div>
+    <button type="button" class="add-feat" onclick="addFeat()">+ Добавить характеристику</button>
+  </div>
+
+  <!-- Оформление -->
   <div>
     <div class="sec">04 — Оформление</div>
     <div class="row2">
-      <div><label class="f">Цвет плашки</label>
-        <select id="f_color" onchange="schedPrev()">
-          <option value="#bb1111">🔴 Красный</option>
-          <option value="#1a4dbb">🔵 Синий</option>
-          <option value="#1a7a2e">🟢 Зелёный</option>
-          <option value="#b87800">🟠 Оранжевый</option>
-          <option value="#222222">⚫ Чёрный</option>
+      <div><label class="f">Цвет темы</label>
+        <select id="f_accent" onchange="rp()">
+          <option value="green">🟢 Зелёный</option>
+          <option value="yellow">🟡 Жёлтый</option>
+          <option value="red">🔴 Красный</option>
+          <option value="blue">🔵 Синий</option>
+          <option value="purple">🟣 Фиолетовый</option>
         </select></div>
-      <div><label class="f">Логотип</label>
-        <select id="f_lpos" onchange="schedPrev()">
-          <option value="left">Верх слева</option>
-          <option value="right">Верх справа</option>
+      <div><label class="f">Длительность</label>
+        <select id="f_dur">
+          <option value="8">8 сек</option>
+          <option value="10" selected>10 сек</option>
+          <option value="12">12 сек</option>
         </select></div>
     </div>
-    <label class="f" style="margin-top:10px">Длительность</label>
-    <select id="f_dur">
-      <option value="8">8 сек</option>
-      <option value="10" selected>10 сек</option>
-      <option value="12">12 сек</option>
-    </select>
   </div>
 
 </div>
+
+<!-- RIGHT: Preview + Generate -->
 <div class="right">
   <div class="prev-wrap">
     <div style="text-align:center">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--mt);margin-bottom:10px">Предпросмотр</div>
+      <div style="font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:#333;margin-bottom:10px">Предпросмотр</div>
       <div class="phone"><canvas id="prevCv" width="270" height="480"></canvas></div>
     </div>
   </div>
@@ -140,243 +160,278 @@ select option{background:var(--card)}
 
 <script>
 const W=540,H=960,FPS=24;
-let bgVid=null,tireImg=null,prevAng=0,prevRaf=null,prevPending=false;
+let bgVid=null,tireImg=null,tireMask=null,prevRaf=null,animT=0;
 
+const THEMES={
+  green: {badge:'#1e5c1e',badgeL:'#2d8a2d',txt:'#6dff6d',line:'#2a7a2a',feat:'rgba(20,60,20,0.85)',dot:'#4dc94d',overlay:'rgba(5,15,5,0.55)'},
+  yellow:{badge:'#7a5e00',badgeL:'#b88a00',txt:'#ffe566',line:'#c49a00',feat:'rgba(40,32,0,0.85)',dot:'#f5c518',overlay:'rgba(15,12,0,0.55)'},
+  red:   {badge:'#7a1111',badgeL:'#aa1818',txt:'#ff8888',line:'#cc2020',feat:'rgba(40,8,8,0.85)',dot:'#ff5555',overlay:'rgba(15,4,4,0.55)'},
+  blue:  {badge:'#112266',badgeL:'#1a3399',txt:'#88aaff',line:'#1e44cc',feat:'rgba(8,14,40,0.85)',dot:'#5588ff',overlay:'rgba(4,6,18,0.55)'},
+  purple:{badge:'#3d1166',badgeL:'#5a1a99',txt:'#cc88ff',line:'#7722cc',feat:'rgba(18,8,36,0.85)',dot:'#aa55ff',overlay:'rgba(8,4,16,0.55)'},
+};
+
+let feats=['Легкая балансировка','Быстрый отвод воды','Устойчивость на поворотах','Ненаправленный рисунок'];
+
+function renderFeatList(){
+  const el=document.getElementById('featList');el.innerHTML='';
+  feats.forEach((f,i)=>{
+    const row=document.createElement('div');row.className='feat-item';
+    row.innerHTML=`<input type="text" value="${he(f)}" oninput="feats[${i}]=this.value;rp()">
+      <button class="feat-del" onclick="feats.splice(${i},1);renderFeatList();rp()">×</button>`;
+    el.appendChild(row);
+  });
+}
+function addFeat(){feats.push('Новое свойство');renderFeatList();rp();}
+renderFeatList();
+function he(t){const d=document.createElement('div');d.textContent=t;return d.innerHTML;}
+
+// Load background video
 function loadBg(f){
   if(!f)return;
   const url=URL.createObjectURL(f);
-  const v=document.createElement('video');
-  v.src=url;v.loop=true;v.muted=true;v.playsInline=true;
-  v.onloadeddata=()=>{
-    bgVid=v;
+  const vid=document.createElement('video');
+  vid.src=url;vid.loop=true;vid.muted=true;vid.playsInline=true;
+  vid.onloadeddata=()=>{
+    bgVid=vid;vid.play().catch(()=>{});
     const b=document.getElementById('bgBox');
     b.classList.add('filled');
     b.querySelector('.tt').textContent='✅ '+f.name;
-    b.querySelector('.ic').textContent='🎬';
-    schedPrev();
-  };
-  v.load();
+    rp();
+  };vid.load();
 }
 
+// Load tire image + remove white bg
 function loadTire(f){
   if(!f)return;
   const url=URL.createObjectURL(f);
   const img=new Image();
   img.onload=()=>{
-    tireImg=img;
+    tireImg=img;tireMask=removeWhiteBg(img);
     const b=document.getElementById('tireBox');
-    b.classList.add('filled');
-    b.querySelector('.tt').textContent='✅ '+f.name;
-    b.querySelector('.ic').textContent='🖼';
-    schedPrev();
-  };
-  img.src=url;
+    b.classList.add('filled');b.querySelector('.tt').textContent='✅ '+f.name;
+    rp();
+  };img.src=url;
 }
 
-// drag-drop
+function removeWhiteBg(img){
+  const c=document.createElement('canvas');c.width=img.width;c.height=img.height;
+  const ctx=c.getContext('2d');ctx.drawImage(img,0,0);
+  const id=ctx.getImageData(0,0,c.width,c.height);const d=id.data;
+  for(let i=0;i<d.length;i+=4){
+    const r=d[i],g=d[i+1],b=d[i+2];
+    const br=(r+g+b)/3;
+    const sat=Math.max(r,g,b)-Math.min(r,g,b);
+    if(br>210&&sat<40) d[i+3]=Math.max(0,Math.round(d[i+3]*(1-(br-210)/45)));
+  }
+  ctx.putImageData(id,0,0);return c;
+}
+
+// Drag & drop
 ['bgBox','tireBox'].forEach(id=>{
   const el=document.getElementById(id);
   el.addEventListener('dragover',e=>{e.preventDefault();el.classList.add('over')});
   el.addEventListener('dragleave',()=>el.classList.remove('over'));
   el.addEventListener('drop',e=>{
     e.preventDefault();el.classList.remove('over');
-    const inp=el.querySelector('input');
     if(id==='bgBox') loadBg(e.dataTransfer.files[0]);
     else loadTire(e.dataTransfer.files[0]);
   });
 });
 
-function schedPrev(){
-  if(prevPending)return;prevPending=true;
-  requestAnimationFrame(()=>{prevPending=false;startPrevLoop();});
-}
-
-function startPrevLoop(){
-  if(prevRaf){cancelAnimationFrame(prevRaf);prevRaf=null;}
-  if(bgVid) bgVid.play().catch(()=>{});
-  loopPrev();
-}
-
-function loopPrev(){
-  prevAng+=0.04;
-  drawF(document.getElementById('prevCv'),270,480,prevAng,
-    v('f_size'),v('f_brand'),v('f_desc'),v('f_logo'),v('f_color'),v('f_lpos'),1,1);
-  prevRaf=requestAnimationFrame(loopPrev);
-}
-
 function v(id){return document.getElementById(id).value.trim();}
 
-function drawF(cv,cw,ch,ang,size,brand,desc,logo,color,lpos,vigA,txtA){
+function rr(ctx,x,y,w,h,r){
+  ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.arcTo(x+w,y,x+w,y+r,r);
+  ctx.lineTo(x+w,y+h-r);ctx.arcTo(x+w,y+h,x+w-r,y+h,r);ctx.lineTo(x+r,y+h);
+  ctx.arcTo(x,y+h,x,y+h-r,r);ctx.lineTo(x,y+r);ctx.arcTo(x,y,x+r,y,r);ctx.closePath();
+}
+
+// ── Main draw function ────────────────────────────────────────────────────────
+function drawFrame(cv,cw,ch,gt,featAnim,vidSrc){
   const ctx=cv.getContext('2d');
   const s=cw/W;
+  const th=THEMES[v('f_accent')||'green'];
+  const typeText=v('f_type')||'ШИНА ЛЕТНЯЯ';
+  const sizeText=v('f_size')||'175/65 R14';
+  const brand=v('f_brand');
+  const sub=v('f_sub');
+  const disc=v('f_disc');
+  const textA=Math.min(1,gt*2.8);
+  const tireS=0.85+0.15*Math.min(1,gt*1.5);
+
   ctx.clearRect(0,0,cw,ch);
 
-  // BG
-  if(bgVid&&bgVid.readyState>=2){
-    const r=Math.max(cw/bgVid.videoWidth,ch/bgVid.videoHeight);
-    ctx.drawImage(bgVid,(cw-bgVid.videoWidth*r)/2,(ch-bgVid.videoHeight*r)/2,bgVid.videoWidth*r,bgVid.videoHeight*r);
+  // ── 1. Background video ───────────────────────────────────────────────────
+  if(vidSrc&&vidSrc.readyState>=2){
+    const r=Math.max(cw/vidSrc.videoWidth,ch/vidSrc.videoHeight);
+    const vw=vidSrc.videoWidth*r,vh=vidSrc.videoHeight*r;
+    ctx.drawImage(vidSrc,(cw-vw)/2,(ch-vh)/2,vw,vh);
   } else {
-    const g=ctx.createLinearGradient(0,0,0,ch);
-    g.addColorStop(0,'#080c14');g.addColorStop(0.7,'#141008');g.addColorStop(1,'#1c1408');
-    ctx.fillStyle=g;ctx.fillRect(0,0,cw,ch);
+    // Fallback dark gradient
+    const bg=ctx.createLinearGradient(0,0,0,ch);
+    bg.addColorStop(0,'#060810');bg.addColorStop(0.5,'#080e08');bg.addColorStop(1,'#050805');
+    ctx.fillStyle=bg;ctx.fillRect(0,0,cw,ch);
   }
 
-  // Dark overlay
-  ctx.fillStyle='rgba(0,0,0,0.25)';ctx.fillRect(0,0,cw,ch);
+  // ── 2. Dark overlay (branded) ────────────────────────────────────────────
+  ctx.fillStyle=th.overlay;ctx.fillRect(0,0,cw,ch);
 
-  // Vignette
-  const vig=ctx.createRadialGradient(cw/2,ch/2,ch*0.18,cw/2,ch/2,ch*0.75);
-  vig.addColorStop(0,'rgba(0,0,0,0)');vig.addColorStop(1,`rgba(0,0,0,${0.65*vigA})`);
+  // Left dark panel for text readability
+  const panGrad=ctx.createLinearGradient(0,0,cw*0.72,0);
+  panGrad.addColorStop(0,'rgba(0,0,0,0.75)');panGrad.addColorStop(0.7,'rgba(0,0,0,0.4)');panGrad.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle=panGrad;ctx.fillRect(0,0,cw,ch);
+
+  // ── 3. Vignette ───────────────────────────────────────────────────────────
+  const vig=ctx.createRadialGradient(cw/2,ch/2,ch*0.15,cw/2,ch/2,ch*0.78);
+  vig.addColorStop(0,'rgba(0,0,0,0)');vig.addColorStop(1,'rgba(0,0,0,0.6)');
   ctx.fillStyle=vig;ctx.fillRect(0,0,cw,ch);
 
-  // Wheel
-  const wr=cw*0.355;
-  const wx=cw/2, wy=ch*0.725-wr;
+  // ── 4. Top accent bar ─────────────────────────────────────────────────────
+  ctx.fillStyle=th.line;ctx.fillRect(0,0,cw,3*s);
 
-  // Shadow
-  ctx.save();ctx.translate(wx,wy+wr*0.95);ctx.scale(1,0.12);
-  const sg=ctx.createRadialGradient(0,0,0,0,0,wr);
-  sg.addColorStop(0,'rgba(0,0,0,0.6)');sg.addColorStop(1,'rgba(0,0,0,0)');
-  ctx.fillStyle=sg;ctx.beginPath();ctx.ellipse(0,0,wr,wr,0,0,Math.PI*2);ctx.fill();ctx.restore();
-
-  // Rotating tire
-  ctx.save();ctx.translate(wx,wy);ctx.rotate(ang);
-  ctx.beginPath();ctx.arc(0,0,wr,0,Math.PI*2);ctx.clip();
-  if(tireImg){
-    const tr=Math.max(wr*2/tireImg.width,wr*2/tireImg.height);
-    ctx.drawImage(tireImg,-tireImg.width*tr/2,-tireImg.height*tr/2,tireImg.width*tr,tireImg.height*tr);
-  } else {
-    ctx.fillStyle='#2a2a2a';ctx.fillRect(-wr,-wr,wr*2,wr*2);
-    // draw simple tread lines
-    ctx.strokeStyle='#383838';ctx.lineWidth=wr*0.06;
-    for(let i=0;i<8;i++){ctx.beginPath();ctx.moveTo(-wr,wr*(-0.75+i*0.22));ctx.lineTo(wr,wr*(-0.75+i*0.22));ctx.stroke();}
-  }
-  ctx.restore();
-
-  // Rim ring
-  ctx.save();ctx.translate(wx,wy);
-  ctx.beginPath();ctx.arc(0,0,wr,0,Math.PI*2);
-  ctx.strokeStyle='rgba(255,255,255,0.1)';ctx.lineWidth=3*s;ctx.stroke();
-  ctx.beginPath();ctx.arc(0,0,wr*0.78,0,Math.PI*2);
-  ctx.strokeStyle='rgba(0,0,0,0.45)';ctx.lineWidth=10*s;ctx.stroke();
-  ctx.restore();
-
-  if(txtA<=0)return;
-
-  // Logo
-  if(logo){
-    ctx.font=`bold ${Math.round(15*s)}px Oswald,sans-serif`;
-    ctx.shadowColor='rgba(0,0,0,0.9)';ctx.shadowBlur=5*s;
-    ctx.fillStyle=`rgba(255,255,255,${0.9*txtA})`;
-    if(lpos==='left'){ctx.textAlign='left';ctx.fillText(logo,10*s,20*s);}
-    else{ctx.textAlign='right';ctx.fillText(logo,cw-10*s,20*s);}
-    ctx.shadowBlur=0;
+  // ── 5. Tire image (RIGHT, large) ─────────────────────────────────────────
+  if(tireMask){
+    const areaX=cw*0.34,areaY=ch*0.03,areaW=cw*0.64,areaH=ch*0.54;
+    const tr=Math.min(areaW/tireMask.width,areaH/tireMask.height)*tireS;
+    const tw=tireMask.width*tr,tha=tireMask.height*tr;
+    ctx.save();
+    ctx.shadowColor='rgba(0,0,0,0.85)';ctx.shadowBlur=22*s;ctx.shadowOffsetX=-4*s;ctx.shadowOffsetY=12*s;
+    ctx.drawImage(tireMask,areaX+(areaW-tw)/2,areaY+(areaH-tha)*0.65,tw,tha);
+    ctx.restore();
   }
 
-  // Banner
-  const lines=desc.split('\n').filter(Boolean).slice(0,2);
-  if(lines.length){
-    const by=ch*0.705,bh=ch*0.155;
-    const rgb=hexRgb(color);
-    ctx.fillStyle=`rgba(${rgb},${0.92*txtA})`;ctx.fillRect(0,by,cw,bh);
-    ctx.textAlign='center';ctx.shadowColor='rgba(0,0,0,0.5)';ctx.shadowBlur=3*s;
-    lines.forEach((l,i)=>{
-      ctx.font=`bold ${Math.round(14*s)}px "Barlow Condensed",sans-serif`;
-      ctx.fillStyle=`rgba(255,255,255,${txtA})`;
-      ctx.fillText(l,cw/2,by+(22+i*18)*s);
-    });ctx.shadowBlur=0;
-  }
+  // ── 6. Text (fades in) ────────────────────────────────────────────────────
+  ctx.globalAlpha=textA;
 
-  // Size
-  if(size){
-    const sy=lines.length?ch*0.878:ch*0.848;
-    ctx.textAlign='center';ctx.font=`bold ${Math.round(30*s)}px Oswald,sans-serif`;
-    ctx.shadowColor='rgba(0,0,0,0.75)';ctx.shadowBlur=7*s;
-    ctx.fillStyle=`rgba(255,255,255,${txtA})`;ctx.fillText(size,cw/2,sy);ctx.shadowBlur=0;
-  }
-
-  // Brand
+  // Brand name
   if(brand){
-    ctx.textAlign='center';ctx.font=`500 ${Math.round(16*s)}px Barlow,sans-serif`;
-    ctx.shadowColor='rgba(0,0,0,0.6)';ctx.shadowBlur=4*s;
-    ctx.fillStyle=`rgba(255,255,255,${0.88*txtA})`;ctx.fillText(brand,cw/2,ch*0.937);ctx.shadowBlur=0;
+    ctx.font=`700 ${Math.round(13*s)}px 'Oswald',sans-serif`;
+    ctx.fillStyle='rgba(255,255,255,0.5)';ctx.textAlign='left';
+    ctx.fillText(brand.toUpperCase(),14*s,26*s);
   }
+
+  // Discount badge
+  if(disc){
+    const dbw=52*s,dbh=24*s,dbx=cw-dbw-12*s,dby=9*s;
+    ctx.fillStyle='#cc1111';rr(ctx,dbx,dby,dbw,dbh,6*s);ctx.fill();
+    ctx.font=`700 ${Math.round(12*s)}px 'Oswald',sans-serif`;
+    ctx.fillStyle='#fff';ctx.textAlign='center';
+    ctx.fillText(disc,dbx+dbw/2,dby+dbh*0.73);
+  }
+
+  // Type headline
+  const tlines=typeText.split(' ');
+  ctx.textAlign='left';
+  if(tlines.length>=2){
+    ctx.font=`900 ${Math.round(38*s)}px 'Oswald',sans-serif`;
+    ctx.fillStyle='#ffffff';
+    ctx.fillText(tlines[0],14*s,68*s);
+    ctx.fillText(tlines.slice(1).join(' '),14*s,106*s);
+  } else {
+    ctx.font=`900 ${Math.round(38*s)}px 'Oswald',sans-serif`;
+    ctx.fillStyle='#ffffff';
+    ctx.fillText(typeText,14*s,88*s);
+  }
+
+  // Size badge
+  const sbw=cw*0.54,sbh=54*s,sbx=14*s,sby=116*s;
+  const sbg=ctx.createLinearGradient(sbx,sby,sbx+sbw,sby);
+  sbg.addColorStop(0,th.badge);sbg.addColorStop(1,th.badgeL);
+  ctx.fillStyle=sbg;rr(ctx,sbx,sby,sbw,sbh,10*s);ctx.fill();
+  ctx.fillStyle='rgba(255,255,255,0.07)';rr(ctx,sbx,sby,sbw,sbh*0.5,10*s);ctx.fill();
+  ctx.font=`700 ${Math.round(27*s)}px 'Oswald',sans-serif`;
+  ctx.fillStyle=th.txt;ctx.textAlign='center';
+  ctx.fillText(sizeText,sbx+sbw/2,sby+sbh*0.7);
+
+  // Sub badge
+  if(sub){
+    const sw=sbw*0.78,sh=20*s,sx=14*s,sy=sby+sbh+5*s;
+    ctx.fillStyle='rgba(255,255,255,0.07)';rr(ctx,sx,sy,sw,sh,5*s);ctx.fill();
+    ctx.font=`500 ${Math.round(10*s)}px 'Oswald',sans-serif`;
+    ctx.fillStyle='rgba(255,255,255,0.5)';ctx.textAlign='center';
+    ctx.fillText(sub.toUpperCase(),sx+sw/2,sy+sh*0.74);
+  }
+
+  ctx.globalAlpha=1;
+
+  // ── 7. Feature list ───────────────────────────────────────────────────────
+  const fStartY=ch*0.595;
+  const fStep=ch*0.072;
+  feats.slice(0,5).forEach((feat,i)=>{
+    if(!feat)return;
+    const fa=Math.max(0,Math.min(1,(featAnim-i*0.15)*2.5));
+    if(fa<=0)return;
+    ctx.globalAlpha=fa;
+    const fy=fStartY+i*fStep;
+    const fw=cw*0.56,fh=25*s;
+    ctx.fillStyle=th.feat;rr(ctx,12*s,fy-fh*0.55,fw,fh,6*s);ctx.fill();
+    ctx.fillStyle=th.dot;ctx.beginPath();ctx.arc(24*s,fy+1*s,4.5*s,0,Math.PI*2);ctx.fill();
+    ctx.font=`500 ${Math.round(11*s)}px Roboto,sans-serif`;
+    ctx.fillStyle='rgba(255,255,255,0.9)';ctx.textAlign='left';
+    ctx.fillText(feat,36*s,fy+4.5*s);
+    ctx.globalAlpha=1;
+  });
+
+  // ── 8. Bottom bar ─────────────────────────────────────────────────────────
+  ctx.fillStyle=th.line;ctx.fillRect(0,ch-3*s,cw,3*s);
 }
 
-function hexRgb(h){
-  return `${parseInt(h.slice(1,3),16)},${parseInt(h.slice(3,5),16)},${parseInt(h.slice(5,7),16)}`;
+// ── Preview loop ──────────────────────────────────────────────────────────────
+function rp(){cancelAnimationFrame(prevRaf);animT=0;loop();}
+function loop(){
+  animT+=0.018;
+  drawFrame(document.getElementById('prevCv'),270,480,animT,Math.max(0,animT-0.4),bgVid);
+  prevRaf=requestAnimationFrame(loop);
 }
+loop();
 
-// Start preview
-schedPrev();
-
+// ── Generate ──────────────────────────────────────────────────────────────────
 async function startGen(){
   const size=v('f_size');
   if(!size){setSt('Введите размер шины','err');return;}
-  if(!bgVid){setSt('Загрузите фоновое видео','err');return;}
-
-  const btn=document.getElementById('genBtn');
-  btn.disabled=true;
+  const btn=document.getElementById('genBtn');btn.disabled=true;
   cancelAnimationFrame(prevRaf);prevRaf=null;
   document.getElementById('dlArea').innerHTML='';
   document.getElementById('prog').style.display='block';
   document.getElementById('pb').style.width='0%';
-  setSt('<div class="spin"></div> Генерация видео...','');
-
+  setSt('<div class="spin"></div> Генерация...','');
   try{
-    const blob=await genVideo(size);
+    const blob=await genVideo();
     const url=URL.createObjectURL(blob);
     const safe=size.replace(/[^a-zA-Z0-9]/g,'_');
     document.getElementById('pb').style.width='100%';
     setSt('✅ Готово!','ok');
-    document.getElementById('dlArea').innerHTML=
-      `<a class="btn-dl" href="${url}" download="${safe}.webm">⬇ Скачать видео</a>`;
+    document.getElementById('dlArea').innerHTML=`<a class="btn-dl" href="${url}" download="${safe}.webm">⬇ Скачать видео</a>`;
   }catch(e){setSt('❌ '+e.message,'err');}
-  btn.disabled=false;
-  schedPrev();
+  btn.disabled=false;loop();
 }
 
-async function genVideo(size){
-  const dur=parseInt(document.getElementById('f_dur').value)||10;
+async function genVideo(){
+  const dur=parseInt(v('f_dur'))||10;
   const totF=FPS*dur;
-  const T_TXT=Math.floor(totF*0.58);
-  const FADE=Math.floor(FPS*0.55);
-  const brand=v('f_brand'),desc=v('f_desc'),logo=v('f_logo'),
-        color=v('f_color'),lpos=v('f_lpos');
-
   const cv=document.createElement('canvas');cv.width=W;cv.height=H;
-
-  bgVid.currentTime=0;
-  await new Promise(r=>{bgVid.onseeked=r;setTimeout(r,500);});
-  bgVid.play().catch(()=>{});
-
-  const mime=MediaRecorder.isTypeSupported('video/webm;codecs=vp9')
-    ?'video/webm;codecs=vp9':'video/webm';
+  if(bgVid){bgVid.currentTime=0;await new Promise(r=>{bgVid.onseeked=r;setTimeout(r,500);});bgVid.play().catch(()=>{});}
+  const mime=MediaRecorder.isTypeSupported('video/webm;codecs=vp9')?'video/webm;codecs=vp9':'video/webm';
   const stream=cv.captureStream(FPS);
-  const rec=new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:8000000});
+  const rec=new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:10000000});
   const chunks=[];
   rec.ondataavailable=e=>{if(e.data.size>0)chunks.push(e.data);};
-
   return new Promise((resolve,reject)=>{
     rec.start(100);
-    let f=0,ang=0;
+    let f=0,gt=0;
     const bar=document.getElementById('pb');
-
     function frame(){
-      const tA=f>=T_TXT?Math.min(1,(f-T_TXT)/FADE):0;
-      drawF(cv,W,H,ang,size,brand,desc,logo,color,lpos,1,tA);
-      ang+=0.065;f++;
-      bar.style.width=Math.round(f/totF*95)+'%';
+      gt+=1/FPS;
+      drawFrame(cv,W,H,gt,Math.max(0,gt-0.4),bgVid);
+      f++;bar.style.width=Math.round(f/totF*95)+'%';
       if(f<totF) setTimeout(frame,0);
-      else{bgVid.pause();rec.stop();}
+      else{if(bgVid)bgVid.pause();rec.stop();}
     }
-
     rec.onstop=()=>resolve(new Blob(chunks,{type:mime}));
     rec.onerror=e=>reject(e.error||new Error('Ошибка записи'));
     frame();
   });
 }
-
 function setSt(h,c){const el=document.getElementById('st');el.className='st '+c;el.innerHTML=h;}
 </script>
 </body>
