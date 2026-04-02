@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>TireCard — WB стиль</title>
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700;900&family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700;900&family=Roboto:wght@300;400;500;700;900&family=Montserrat:wght@400;500;700;900&family=Bebas+Neue&family=Anton&family=Russo+One&family=PT+Sans:wght@400;700&family=Raleway:wght@400;700;900&family=Nunito:wght@400;700;900&family=Ubuntu:wght@400;700&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:#0d0e14;color:#e8eaf2;font-family:'Roboto',sans-serif;font-size:14px;min-height:100vh}
@@ -54,6 +54,12 @@ select option{background:#1a1b26}
 .btn-dl:hover{background:#254a32}
 .spin{width:11px;height:11px;border:2px solid rgba(245,197,24,.2);border-top-color:#f5c518;border-radius:50%;animation:sp .7s linear infinite;flex-shrink:0}
 @keyframes sp{to{transform:rotate(360deg)}}
+.font-row{display:grid;grid-template-columns:auto 1fr 80px 32px;gap:6px;align-items:center;margin-bottom:6px}
+.font-row .flabel{font-size:10px;color:#666;white-space:nowrap;letter-spacing:.04em}
+.font-row select{font-size:11px;padding:5px 7px}
+.font-row input[type=range]{-webkit-appearance:none;height:3px;background:rgba(255,255,255,0.1);border-radius:2px;outline:none;padding:0;border:none}
+.font-row input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:#f5c518;cursor:pointer}
+.font-row .fval{font-size:11px;color:#f5c518;text-align:right;font-weight:500;min-width:28px}
 .tip{background:rgba(245,197,24,.04);border:1px solid rgba(245,197,24,.12);border-radius:7px;padding:8px 11px;font-size:11px;color:rgba(245,197,24,.65);line-height:1.5}
 ::-webkit-scrollbar{width:4px}
 ::-webkit-scrollbar-thumb{background:rgba(255,255,255,.07);border-radius:2px}
@@ -137,6 +143,49 @@ select option{background:#1a1b26}
           <option value="12">12 сек</option>
         </select></div>
     </div>
+  </div>
+
+  <!-- Шрифты и размеры -->
+  <div>
+    <div class="sec">05 — Шрифты и размеры</div>
+
+    <div style="font-size:10px;color:#555;margin-bottom:8px;letter-spacing:.04em">ПОЛЕ · ШРИФТ · РАЗМЕР</div>
+
+    <div class="font-row">
+      <span class="flabel">Заголовок</span>
+      <select id="fn_type" onchange="rp()"><option value="Oswald">Oswald (по умолч.)</option><option value="Roboto">Roboto</option><option value="Montserrat">Montserrat</option><option value="Bebas Neue">Bebas Neue</option><option value="Anton">Anton</option><option value="Russo One">Russo One</option><option value="Raleway">Raleway</option><option value="Nunito">Nunito</option><option value="Ubuntu">Ubuntu</option><option value="PT Sans">PT Sans</option><option value="Arial">Arial</option><option value="Georgia">Georgia</option><option value="Impact">Impact</option><option value="Verdana">Verdana</option><option value="Trebuchet MS">Trebuchet MS</option></select>
+      <input type="range" id="fs_type" min="20" max="60" value="38" oninput="document.getElementById('fv_type').textContent=this.value+'px';rp()">
+      <span class="fval" id="fv_type">38px</span>
+    </div>
+
+    <div class="font-row">
+      <span class="flabel">Размер</span>
+      <select id="fn_size" onchange="rp()"><option value="Oswald">Oswald (по умолч.)</option><option value="Roboto">Roboto</option><option value="Montserrat">Montserrat</option><option value="Bebas Neue">Bebas Neue</option><option value="Anton">Anton</option><option value="Russo One">Russo One</option><option value="Raleway">Raleway</option><option value="Nunito">Nunito</option><option value="Ubuntu">Ubuntu</option><option value="PT Sans">PT Sans</option><option value="Arial">Arial</option><option value="Georgia">Georgia</option><option value="Impact">Impact</option><option value="Verdana">Verdana</option><option value="Trebuchet MS">Trebuchet MS</option></select>
+      <input type="range" id="fs_size" min="14" max="50" value="27" oninput="document.getElementById('fv_size').textContent=this.value+'px';rp()">
+      <span class="fval" id="fv_size">27px</span>
+    </div>
+
+    <div class="font-row">
+      <span class="flabel">Бренд</span>
+      <select id="fn_brand" onchange="rp()"><option value="Oswald">Oswald (по умолч.)</option><option value="Roboto">Roboto</option><option value="Montserrat">Montserrat</option><option value="Bebas Neue">Bebas Neue</option><option value="Anton">Anton</option><option value="Russo One">Russo One</option><option value="Raleway">Raleway</option><option value="Nunito">Nunito</option><option value="Ubuntu">Ubuntu</option><option value="PT Sans">PT Sans</option><option value="Arial">Arial</option><option value="Georgia">Georgia</option><option value="Impact">Impact</option><option value="Verdana">Verdana</option><option value="Trebuchet MS">Trebuchet MS</option></select>
+      <input type="range" id="fs_brand" min="8" max="28" value="13" oninput="document.getElementById('fv_brand').textContent=this.value+'px';rp()">
+      <span class="fval" id="fv_brand">13px</span>
+    </div>
+
+    <div class="font-row">
+      <span class="flabel">Подзагол.</span>
+      <select id="fn_sub" onchange="rp()"><option value="Oswald">Oswald (по умолч.)</option><option value="Roboto">Roboto</option><option value="Montserrat">Montserrat</option><option value="Bebas Neue">Bebas Neue</option><option value="Anton">Anton</option><option value="Russo One">Russo One</option><option value="Raleway">Raleway</option><option value="Nunito">Nunito</option><option value="Ubuntu">Ubuntu</option><option value="PT Sans">PT Sans</option><option value="Arial">Arial</option><option value="Georgia">Georgia</option><option value="Impact">Impact</option><option value="Verdana">Verdana</option><option value="Trebuchet MS">Trebuchet MS</option></select>
+      <input type="range" id="fs_sub" min="7" max="22" value="10" oninput="document.getElementById('fv_sub').textContent=this.value+'px';rp()">
+      <span class="fval" id="fv_sub">10px</span>
+    </div>
+
+    <div class="font-row">
+      <span class="flabel">Характер.</span>
+      <select id="fn_feat" onchange="rp()"><option value="Oswald">Oswald (по умолч.)</option><option value="Roboto">Roboto</option><option value="Montserrat">Montserrat</option><option value="Bebas Neue">Bebas Neue</option><option value="Anton">Anton</option><option value="Russo One">Russo One</option><option value="Raleway">Raleway</option><option value="Nunito">Nunito</option><option value="Ubuntu">Ubuntu</option><option value="PT Sans">PT Sans</option><option value="Arial">Arial</option><option value="Georgia">Georgia</option><option value="Impact">Impact</option><option value="Verdana">Verdana</option><option value="Trebuchet MS">Trebuchet MS</option></select>
+      <input type="range" id="fs_feat" min="7" max="20" value="11" oninput="document.getElementById('fv_feat').textContent=this.value+'px';rp()">
+      <span class="fval" id="fv_feat">11px</span>
+    </div>
+
   </div>
 
 </div>
@@ -246,8 +295,195 @@ function rr(ctx,x,y,w,h,r){
   ctx.arcTo(x,y+h,x,y+h-r,r);ctx.lineTo(x,y+r);ctx.arcTo(x,y,x+r,y,r);ctx.closePath();
 }
 
-// ── Main draw function ────────────────────────────────────────────────────────
+// ── Main draw function — adaptive layout ──────────────────────────────────────
+function gf(id){return document.getElementById(id);}
+
+// Returns scaled font string AND raw/scaled sizes
+function fnt(nameId, sizeId, weight, s){
+  const name = gf(nameId) ? gf(nameId).value : 'Oswald';
+  const rawSz = gf(sizeId) ? parseInt(gf(sizeId).value) : 16;
+  const px = Math.round(rawSz * s);
+  return { font:`${weight} ${px}px '${name}',sans-serif`, px, raw:rawSz };
+}
+
 function drawFrame(cv,cw,ch,gt,featAnim,vidSrc){
+  const ctx = cv.getContext('2d');
+  const s   = cw / W;
+  const th  = THEMES[v('f_accent')||'green'];
+
+  const typeText = v('f_type') || 'ШИНА ЛЕТНЯЯ';
+  const sizeText = v('f_size') || '175/65 R14';
+  const brand    = v('f_brand');
+  const sub      = v('f_sub');
+  const disc     = v('f_disc');
+  const textA    = Math.min(1, gt * 2.8);
+  const tireS    = 0.85 + 0.15 * Math.min(1, gt * 1.5);
+
+  // ── Font objects (all sizes scaled to canvas) ─────────────────────────────
+  const F = {
+    type:  fnt('fn_type',  'fs_type',  '900', s),
+    size:  fnt('fn_size',  'fs_size',  '700', s),
+    brand: fnt('fn_brand', 'fs_brand', '700', s),
+    sub:   fnt('fn_sub',   'fs_sub',   '500', s),
+    feat:  fnt('fn_feat',  'fs_feat',  '500', s),
+  };
+
+  // ── Layout constants ───────────────────────────────────────────────────────
+  const PAD      = 18 * s;   // left margin
+  const TOP_PAD  = 22 * s;   // min top padding from accent bar
+  const VGAP     = 7  * s;   // vertical gap between blocks
+  const LINE_H   = 1.35;     // headline line-height multiplier
+  const LEFTWID  = cw * 0.58;// left text column width
+
+  ctx.clearRect(0, 0, cw, ch);
+
+  // 1. Background video / fallback
+  if(vidSrc && vidSrc.readyState >= 2){
+    const r  = Math.max(cw/vidSrc.videoWidth, ch/vidSrc.videoHeight);
+    const vw = vidSrc.videoWidth * r, vh = vidSrc.videoHeight * r;
+    ctx.drawImage(vidSrc, (cw-vw)/2, (ch-vh)/2, vw, vh);
+  } else {
+    const bg = ctx.createLinearGradient(0,0,0,ch);
+    bg.addColorStop(0,'#060810'); bg.addColorStop(0.5,'#080e08'); bg.addColorStop(1,'#050805');
+    ctx.fillStyle = bg; ctx.fillRect(0,0,cw,ch);
+  }
+
+  // 2. Overlays
+  ctx.fillStyle = th.overlay; ctx.fillRect(0,0,cw,ch);
+  const panG = ctx.createLinearGradient(0,0,cw*0.72,0);
+  panG.addColorStop(0,'rgba(0,0,0,0.80)');
+  panG.addColorStop(0.65,'rgba(0,0,0,0.44)');
+  panG.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle = panG; ctx.fillRect(0,0,cw,ch);
+  const vig = ctx.createRadialGradient(cw/2,ch/2,ch*0.15, cw/2,ch/2,ch*0.78);
+  vig.addColorStop(0,'rgba(0,0,0,0)'); vig.addColorStop(1,'rgba(0,0,0,0.6)');
+  ctx.fillStyle = vig; ctx.fillRect(0,0,cw,ch);
+
+  // 3. Top accent bar (3px)
+  ctx.fillStyle = th.line; ctx.fillRect(0,0,cw,3*s);
+
+  // ── ADAPTIVE LAYOUT CALCULATOR ────────────────────────────────────────────
+  // Compute pixel heights of each block from font sizes
+  const brandH     = brand ? F.brand.px * 1.8          : 0;
+  const typeLineH  = F.type.px * LINE_H;
+  const typeLines  = typeText.split(' ');
+  const typeH      = typeLines.length >= 2
+                     ? typeLineH * 2           // two lines
+                     : typeLineH;              // one line
+  const badgeH     = F.size.px * 2.4;         // size badge height
+  const subH       = sub ? F.sub.px * 2.4     : 0;
+  const featRowH   = F.feat.px * 2.4;
+  const featGap    = 4 * s;
+  const activeFeat = feats.filter(f => f.trim()).slice(0,5);
+  const featsTotal = activeFeat.length * (featRowH + featGap) - featGap;
+
+  // Y positions — stack top-down with TOP_PAD and VGAP
+  let cy     = 3*s + TOP_PAD;               // start below accent bar + top padding
+  const yBrand  = cy; cy += brandH  > 0 ? brandH  + VGAP : 0;
+  const yType   = cy; cy += typeH   + VGAP;
+  const yBadge  = cy; cy += badgeH  + VGAP * 0.5;
+  const ySub    = cy; cy += subH    > 0 ? subH    + VGAP * 0.5 : 0;
+
+  // Features are pinned to bottom
+  const yFeats = ch - featsTotal - 12 * s;
+
+  // Tire area: right column, from top to just above features
+  const tireX = cw * 0.33, tireY = 4*s;
+  const tireW = cw * 0.66, tireH = Math.max(ch * 0.28, yFeats - tireY - 8*s);
+
+  // 4. Tire image
+  if(tireMask){
+    const tr  = Math.min(tireW/tireMask.width, tireH/tireMask.height) * tireS;
+    const tw  = tireMask.width  * tr;
+    const tha = tireMask.height * tr;
+    ctx.save();
+    ctx.shadowColor = 'rgba(0,0,0,0.85)';
+    ctx.shadowBlur  = 22*s;
+    ctx.shadowOffsetX = -4*s; ctx.shadowOffsetY = 12*s;
+    ctx.drawImage(tireMask,
+      tireX + (tireW - tw) / 2,
+      tireY + (tireH - tha) * 0.55,
+      tw, tha);
+    ctx.restore();
+  }
+
+  // ── 5. TEXT (fades in) ────────────────────────────────────────────────────
+  ctx.globalAlpha = textA;
+
+  // Brand (top-left) + discount badge (top-right)
+  if(brand){
+    ctx.font = F.brand.font;
+    ctx.fillStyle = 'rgba(255,255,255,0.5)';
+    ctx.textAlign = 'left';
+    ctx.fillText(brand.toUpperCase(), PAD, yBrand + F.brand.px);
+  }
+  if(disc){
+    ctx.font = F.brand.font;
+    const mw  = ctx.measureText(disc).width;
+    const dbw = mw + 18*s, dbh = F.brand.px * 1.8;
+    const dbx = cw - dbw - PAD;
+    const dby = 3*s + TOP_PAD - (brand ? 0 : (brandH > 0 ? 0 : 0));
+    ctx.fillStyle = '#cc1111'; rr(ctx, dbx, dby, dbw, dbh, 5*s); ctx.fill();
+    ctx.fillStyle = '#fff'; ctx.textAlign = 'center';
+    ctx.fillText(disc, dbx + dbw/2, dby + dbh * 0.75);
+  }
+
+  // Headline — two lines with proper line spacing
+  ctx.font = F.type.font;
+  ctx.fillStyle = '#ffffff';
+  ctx.textAlign = 'left';
+  if(typeLines.length >= 2){
+    ctx.fillText(typeLines[0], PAD, yType + typeLineH * 0.82);
+    ctx.fillText(typeLines.slice(1).join(' '), PAD, yType + typeLineH * 0.82 + typeLineH * LINE_H);
+  } else {
+    ctx.fillText(typeText, PAD, yType + typeLineH * 0.88);
+  }
+
+  // Size badge — height adapts to font size
+  const sbw = LEFTWID - PAD;
+  ctx.font = F.size.font;
+  const sbg = ctx.createLinearGradient(PAD, yBadge, PAD+sbw, yBadge);
+  sbg.addColorStop(0, th.badge); sbg.addColorStop(1, th.badgeL);
+  ctx.fillStyle = sbg; rr(ctx, PAD, yBadge, sbw, badgeH, 8*s); ctx.fill();
+  // Shine
+  ctx.fillStyle = 'rgba(255,255,255,0.07)';
+  rr(ctx, PAD, yBadge, sbw, badgeH*0.48, 8*s); ctx.fill();
+  // Badge text
+  ctx.font = F.size.font;
+  ctx.fillStyle = th.txt; ctx.textAlign = 'center';
+  ctx.fillText(sizeText, PAD + sbw/2, yBadge + badgeH * 0.70);
+
+  // Sub badge — height adapts to font size
+  if(sub && subH > 0){
+    const sw = sbw * 0.75, sy = ySub;
+    ctx.fillStyle = 'rgba(255,255,255,0.07)'; rr(ctx, PAD, sy, sw, subH, 5*s); ctx.fill();
+    ctx.font = F.sub.font;
+    ctx.fillStyle = 'rgba(255,255,255,0.55)'; ctx.textAlign = 'center';
+    ctx.fillText(sub.toUpperCase(), PAD + sw/2, sy + subH * 0.74);
+  }
+
+  ctx.globalAlpha = 1;
+
+  // 6. Features — pinned to bottom, appear one by one
+  activeFeat.forEach((feat, i) => {
+    const fa = Math.max(0, Math.min(1, (featAnim - i * 0.15) * 2.5));
+    if(fa <= 0) return;
+    ctx.globalAlpha = fa;
+    const fy  = yFeats + i * (featRowH + featGap);
+    const fw  = LEFTWID - PAD;
+    const dotR = Math.max(3*s, F.feat.px * 0.35);
+    ctx.fillStyle = th.feat; rr(ctx, PAD, fy, fw, featRowH, 5*s); ctx.fill();
+    ctx.fillStyle = th.dot; ctx.beginPath();
+    ctx.arc(PAD + dotR + 4*s, fy + featRowH/2, dotR, 0, Math.PI*2); ctx.fill();
+    ctx.font = F.feat.font;
+    ctx.fillStyle = 'rgba(255,255,255,0.9)'; ctx.textAlign = 'left';
+    ctx.fillText(feat, PAD + dotR*2 + 10*s, fy + featRowH * 0.68);
+    ctx.globalAlpha = 1;
+  });
+
+  // 7. Bottom bar
+  ctx.fillStyle = th.line; ctx.fillRect(0, ch-3*s, cw, 3*s);
+}
   const ctx=cv.getContext('2d');
   const s=cw/W;
   const th=THEMES[v('f_accent')||'green'];
@@ -259,120 +495,158 @@ function drawFrame(cv,cw,ch,gt,featAnim,vidSrc){
   const textA=Math.min(1,gt*2.8);
   const tireS=0.85+0.15*Math.min(1,gt*1.5);
 
+  // ── Font settings ─────────────────────────────────────────────────────────
+  const F={
+    type:  fnt('fn_type','fs_type','900'),
+    size:  fnt('fn_size','fs_size','700'),
+    brand: fnt('fn_brand','fs_brand','700'),
+    sub:   fnt('fn_sub','fs_sub','500'),
+    feat:  fnt('fn_feat','fs_feat','500'),
+  };
+
+  // ── Padding / gap constants (scale with canvas) ───────────────────────────
+  const PAD=12*s;          // left margin
+  const VGAP=6*s;          // gap between blocks
+
   ctx.clearRect(0,0,cw,ch);
 
-  // ── 1. Background video ───────────────────────────────────────────────────
+  // 1. Background video
   if(vidSrc&&vidSrc.readyState>=2){
     const r=Math.max(cw/vidSrc.videoWidth,ch/vidSrc.videoHeight);
     const vw=vidSrc.videoWidth*r,vh=vidSrc.videoHeight*r;
     ctx.drawImage(vidSrc,(cw-vw)/2,(ch-vh)/2,vw,vh);
   } else {
-    // Fallback dark gradient
     const bg=ctx.createLinearGradient(0,0,0,ch);
     bg.addColorStop(0,'#060810');bg.addColorStop(0.5,'#080e08');bg.addColorStop(1,'#050805');
     ctx.fillStyle=bg;ctx.fillRect(0,0,cw,ch);
   }
 
-  // ── 2. Dark overlay (branded) ────────────────────────────────────────────
+  // 2. Overlays
   ctx.fillStyle=th.overlay;ctx.fillRect(0,0,cw,ch);
-
-  // Left dark panel for text readability
   const panGrad=ctx.createLinearGradient(0,0,cw*0.72,0);
-  panGrad.addColorStop(0,'rgba(0,0,0,0.75)');panGrad.addColorStop(0.7,'rgba(0,0,0,0.4)');panGrad.addColorStop(1,'rgba(0,0,0,0)');
+  panGrad.addColorStop(0,'rgba(0,0,0,0.78)');
+  panGrad.addColorStop(0.65,'rgba(0,0,0,0.42)');
+  panGrad.addColorStop(1,'rgba(0,0,0,0)');
   ctx.fillStyle=panGrad;ctx.fillRect(0,0,cw,ch);
-
-  // ── 3. Vignette ───────────────────────────────────────────────────────────
   const vig=ctx.createRadialGradient(cw/2,ch/2,ch*0.15,cw/2,ch/2,ch*0.78);
   vig.addColorStop(0,'rgba(0,0,0,0)');vig.addColorStop(1,'rgba(0,0,0,0.6)');
   ctx.fillStyle=vig;ctx.fillRect(0,0,cw,ch);
 
-  // ── 4. Top accent bar ─────────────────────────────────────────────────────
+  // 3. Top accent bar
   ctx.fillStyle=th.line;ctx.fillRect(0,0,cw,3*s);
 
-  // ── 5. Tire image (RIGHT, large) ─────────────────────────────────────────
+  // ── LAYOUT ENGINE ─────────────────────────────────────────────────────────
+  // Measure all blocks, assign Y positions dynamically
+  const LEFTWID=cw*0.58; // text area width (left side)
+  let curY=8*s;           // current Y cursor
+
+  // Block heights
+  const brandH  = brand ? F.brand.size*s*1.8 : 0;
+  const discH   = disc  ? F.brand.size*s*1.8 : 0; // same row as brand
+  const tlineH  = F.type.size*s*1.25;
+  const typeLines= typeText.split(' ');
+  const typeH   = typeLines.length>=2 ? tlineH*2 + VGAP*0.5 : tlineH;
+  const sizeBadgeH = F.size.size*s*2.2;
+  const subBadgeH  = sub ? F.sub.size*s*2.4 : 0;
+  const featH      = F.feat.size*s*2.2;
+  const featCount  = feats.filter(f=>f).slice(0,5).length;
+  const featsH     = featCount * (featH + VGAP*0.5);
+
+  // Y positions
+  const yBrand   = curY; curY += brandH>0 ? brandH+VGAP : 0;
+  const yType    = curY; curY += typeH + VGAP;
+  const ySizeBadge = curY; curY += sizeBadgeH + VGAP*0.5;
+  const ySubBadge  = curY; curY += subBadgeH>0 ? subBadgeH+VGAP*0.5 : 0;
+  const textBottom = curY;
+  const yFeats     = ch - featsH - 10*s; // features pinned to bottom
+
+  // Tire image fills right side (from top to features area)
+  const tireAreaX=cw*0.33;
+  const tireAreaY=4*s;
+  const tireAreaW=cw*0.65;
+  const tireAreaH=Math.max(ch*0.3, yFeats - tireAreaY - 10*s);
+
+  // 4. Tire image (drawn before text so text is on top)
   if(tireMask){
-    const areaX=cw*0.34,areaY=ch*0.03,areaW=cw*0.64,areaH=ch*0.54;
-    const tr=Math.min(areaW/tireMask.width,areaH/tireMask.height)*tireS;
+    const tr=Math.min(tireAreaW/tireMask.width,tireAreaH/tireMask.height)*tireS;
     const tw=tireMask.width*tr,tha=tireMask.height*tr;
     ctx.save();
     ctx.shadowColor='rgba(0,0,0,0.85)';ctx.shadowBlur=22*s;ctx.shadowOffsetX=-4*s;ctx.shadowOffsetY=12*s;
-    ctx.drawImage(tireMask,areaX+(areaW-tw)/2,areaY+(areaH-tha)*0.65,tw,tha);
+    ctx.drawImage(tireMask,
+      tireAreaX+(tireAreaW-tw)/2,
+      tireAreaY+(tireAreaH-tha)*0.55,
+      tw, tha);
     ctx.restore();
   }
 
-  // ── 6. Text (fades in) ────────────────────────────────────────────────────
+  // ── 5. TEXT BLOCKS ────────────────────────────────────────────────────────
   ctx.globalAlpha=textA;
 
-  // Brand name
+  // Brand (top left) + Discount badge (top right)
   if(brand){
-    ctx.font=`700 ${Math.round(13*s)}px 'Oswald',sans-serif`;
+    ctx.font=F.brand.font;
     ctx.fillStyle='rgba(255,255,255,0.5)';ctx.textAlign='left';
-    ctx.fillText(brand.toUpperCase(),14*s,26*s);
+    ctx.fillText(brand.toUpperCase(), PAD, yBrand+F.brand.size*s);
   }
-
-  // Discount badge
   if(disc){
-    const dbw=52*s,dbh=24*s,dbx=cw-dbw-12*s,dby=9*s;
-    ctx.fillStyle='#cc1111';rr(ctx,dbx,dby,dbw,dbh,6*s);ctx.fill();
-    ctx.font=`700 ${Math.round(12*s)}px 'Oswald',sans-serif`;
+    const dbh=Math.max(F.brand.size*s*1.6, 20*s);
+    const dbw=Math.max(ctx.measureText(disc).width+16*s, 44*s);
+    const dbx=cw-dbw-10*s, dby=yBrand+(brandH-dbh)/2;
+    ctx.font=F.brand.font;
+    const mw=ctx.measureText(disc).width;
+    const dbw2=mw+20*s;
+    ctx.fillStyle='#cc1111';
+    rr(ctx,cw-dbw2-10*s,dby>0?dby:6*s,dbw2,dbh,5*s);ctx.fill();
     ctx.fillStyle='#fff';ctx.textAlign='center';
-    ctx.fillText(disc,dbx+dbw/2,dby+dbh*0.73);
+    ctx.fillText(disc,cw-dbw2/2-10*s,(dby>0?dby:6*s)+dbh*0.73);
   }
 
   // Type headline
-  const tlines=typeText.split(' ');
-  ctx.textAlign='left';
-  if(tlines.length>=2){
-    ctx.font=`900 ${Math.round(38*s)}px 'Oswald',sans-serif`;
-    ctx.fillStyle='#ffffff';
-    ctx.fillText(tlines[0],14*s,68*s);
-    ctx.fillText(tlines.slice(1).join(' '),14*s,106*s);
+  ctx.font=F.type.font;ctx.fillStyle='#fff';ctx.textAlign='left';
+  if(typeLines.length>=2){
+    ctx.fillText(typeLines[0], PAD, yType+tlineH*0.85);
+    ctx.fillText(typeLines.slice(1).join(' '), PAD, yType+tlineH*0.85+tlineH*1.1);
   } else {
-    ctx.font=`900 ${Math.round(38*s)}px 'Oswald',sans-serif`;
-    ctx.fillStyle='#ffffff';
-    ctx.fillText(typeText,14*s,88*s);
+    ctx.fillText(typeText, PAD, yType+tlineH*0.9);
   }
 
   // Size badge
-  const sbw=cw*0.54,sbh=54*s,sbx=14*s,sby=116*s;
+  const sbw=LEFTWID-PAD, sbh=sizeBadgeH, sbx=PAD, sby=ySizeBadge;
   const sbg=ctx.createLinearGradient(sbx,sby,sbx+sbw,sby);
   sbg.addColorStop(0,th.badge);sbg.addColorStop(1,th.badgeL);
-  ctx.fillStyle=sbg;rr(ctx,sbx,sby,sbw,sbh,10*s);ctx.fill();
-  ctx.fillStyle='rgba(255,255,255,0.07)';rr(ctx,sbx,sby,sbw,sbh*0.5,10*s);ctx.fill();
-  ctx.font=`700 ${Math.round(27*s)}px 'Oswald',sans-serif`;
-  ctx.fillStyle=th.txt;ctx.textAlign='center';
-  ctx.fillText(sizeText,sbx+sbw/2,sby+sbh*0.7);
+  ctx.fillStyle=sbg;rr(ctx,sbx,sby,sbw,sbh,8*s);ctx.fill();
+  ctx.fillStyle='rgba(255,255,255,0.07)';rr(ctx,sbx,sby,sbw,sbh*0.48,8*s);ctx.fill();
+  ctx.font=F.size.font;ctx.fillStyle=th.txt;ctx.textAlign='center';
+  ctx.fillText(sizeText, sbx+sbw/2, sby+sbh*0.72);
 
   // Sub badge
-  if(sub){
-    const sw=sbw*0.78,sh=20*s,sx=14*s,sy=sby+sbh+5*s;
+  if(sub&&subBadgeH>0){
+    const sw=sbw*0.75, sh=subBadgeH, sx=PAD, sy=ySubBadge;
     ctx.fillStyle='rgba(255,255,255,0.07)';rr(ctx,sx,sy,sw,sh,5*s);ctx.fill();
-    ctx.font=`500 ${Math.round(10*s)}px 'Oswald',sans-serif`;
-    ctx.fillStyle='rgba(255,255,255,0.5)';ctx.textAlign='center';
-    ctx.fillText(sub.toUpperCase(),sx+sw/2,sy+sh*0.74);
+    ctx.font=F.sub.font;ctx.fillStyle='rgba(255,255,255,0.55)';ctx.textAlign='center';
+    ctx.fillText(sub.toUpperCase(), sx+sw/2, sy+sh*0.74);
   }
 
   ctx.globalAlpha=1;
 
-  // ── 7. Feature list ───────────────────────────────────────────────────────
-  const fStartY=ch*0.595;
-  const fStep=ch*0.072;
-  feats.slice(0,5).forEach((feat,i)=>{
-    if(!feat)return;
+  // 6. Features — pinned to bottom, appear one by one
+  feats.filter(f=>f).slice(0,5).forEach((feat,i)=>{
     const fa=Math.max(0,Math.min(1,(featAnim-i*0.15)*2.5));
     if(fa<=0)return;
     ctx.globalAlpha=fa;
-    const fy=fStartY+i*fStep;
-    const fw=cw*0.56,fh=25*s;
-    ctx.fillStyle=th.feat;rr(ctx,12*s,fy-fh*0.55,fw,fh,6*s);ctx.fill();
-    ctx.fillStyle=th.dot;ctx.beginPath();ctx.arc(24*s,fy+1*s,4.5*s,0,Math.PI*2);ctx.fill();
-    ctx.font=`500 ${Math.round(11*s)}px Roboto,sans-serif`;
-    ctx.fillStyle='rgba(255,255,255,0.9)';ctx.textAlign='left';
-    ctx.fillText(feat,36*s,fy+4.5*s);
+    const fy=yFeats + i*(featH+VGAP*0.5);
+    const fw=LEFTWID-PAD, fh=featH;
+    ctx.fillStyle=th.feat;rr(ctx,PAD,fy,fw,fh,5*s);ctx.fill();
+    // dot
+    ctx.fillStyle=th.dot;ctx.beginPath();
+    ctx.arc(PAD+12*s, fy+fh*0.5, 4*s,0,Math.PI*2);ctx.fill();
+    // text
+    ctx.font=F.feat.font;ctx.fillStyle='rgba(255,255,255,0.9)';ctx.textAlign='left';
+    ctx.fillText(feat, PAD+22*s, fy+fh*0.68);
     ctx.globalAlpha=1;
   });
 
-  // ── 8. Bottom bar ─────────────────────────────────────────────────────────
+  // 7. Bottom bar
   ctx.fillStyle=th.line;ctx.fillRect(0,ch-3*s,cw,3*s);
 }
 
