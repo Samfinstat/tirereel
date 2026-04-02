@@ -24,15 +24,21 @@ def find_font(c):
 def esc(t):
     return (str(t).strip()
             .replace('\\', '\\\\')
-            .replace("'", "\\'")
-            .replace(':', '\\:')
-            .replace('%', '\\%'))
+            .replace("'",  "\\'")
+            .replace(':',  '\\:')
+            .replace('%',  '\\%'))
+
+def run(cmd):
+    r = subprocess.run(cmd, capture_output=True, text=True, timeout=240)
+    if r.returncode != 0:
+        raise RuntimeError(r.stderr[-800:])
+    return r
 
 def generate_video(photo_path, data, out_path):
-    W, H  = 540, 960
-    FPS   = 24
-    DUR   = 10
-    T0    = 5.8   # text appears at second 5.8
+    W, H = 540, 960
+    FPS  = 24
+    DUR  = 10
+    T0   = 5.5
 
     fb = f"fontfile='{find_font(FONT_BOLD)}':" if find_font(FONT_BOLD) else ""
     fr = f"fontfile='{find_font(FONT_REG)}':"  if find_font(FONT_REG)  else ""
@@ -44,85 +50,51 @@ def generate_video(photo_path, data, out_path):
     banner_hex  = data.get('banner_color', '#bb1111').lstrip('#')
     logo_pos    = data.get('logo_pos',    'left')
 
-    # ── Filter chain ──────────────────────────────────────────────────────────
-    vf = []
+    tmp_dir  = Path(out_path).parent / (Path(out_path).stem + '_tmp')
+    tmp_dir.mkdir(exist_ok=True)
 
-    # Scale to 2x target, then zoompan down to target (gives room for zoom)
-    vf.append(f"scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920")
+    try:
+        # ── Step 1: prepare base frame (scaled + darkened) ───────────────────
+        base_jpg = str(tmp_dir / 'base.jpg')
+        run(['ffmpeg', '-i', photo_path,
+             '-vf', f"scale={W}:{H}:force_original_aspect_ratio=increase,crop={W}:{H}",
+             '-frames:v', '1', '-y', base_jpg])
 
-    # Slow zoom-in: z goes from 1.0 to 1.22 over 240 frames
-    # Using n (frame index) instead of on for compatibility
-    vf.append(
-        f"zoompan=z='1.0+n*0.00092':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)'"
-        f":d={FPS*DUR}:s={W}x{H}:fps={FPS}"
-    )
+        # ── Step 2: build drawtext filter ────────────────────────────────────
+        dt = []
+        if logo:
+            lx = '18' if logo_pos == 'left' else f'{W}-tw-18'
+            dt.append(f"drawtext=text='{esc(logo)}':{fb}fontcolor=white:fontsize=28:x={lx}:y=18:shadowcolor=black:shadowx=1:shadowy=1")
 
-    # Vignette
-    vf.append("vignette=angle=PI/4")
+        if description:
+            dt.append(f"drawbox=x=0:y=ih*0.705:w=iw:h=ih*0.155:color=0x{banner_hex}@0.90:t=fill:enable='gte(t,{T0})'")
+            for i, line in enumerate(description.split('\n')[:2]):
+                yp = 0.745 + i * 0.052
+                dt.append(f"drawtext=text='{esc(line)}':{fb}fontcolor=white:fontsize=27:x=(w-tw)/2:y=ih*{yp:.3f}:shadowcolor=black:shadowx=1:shadowy=1:enable='gte(t,{T0})'")
 
-    # Logo — always visible, top corner
-    if logo:
-        lx = '18' if logo_pos == 'left' else 'w-tw-18'
-        vf.append(
-            f"drawtext=text='{esc(logo)}':{fb}"
-            f"fontcolor=white:fontsize=28:x={lx}:y=18:"
-            f"shadowcolor=black:shadowx=1:shadowy=1"
-        )
+        if size_text:
+            sy  = 0.875 if description else 0.845
+            dt.append(f"drawtext=text='{esc(size_text)}':{fb}fontcolor=white:fontsize=54:x=(w-tw)/2:y=ih*{sy:.3f}:shadowcolor=black:shadowx=2:shadowy=2:enable='gte(t,{T0+0.2})'")
 
-    # Coloured banner
-    if description:
-        vf.append(
-            f"drawbox=x=0:y=ih*0.705:w=iw:h=ih*0.155:"
-            f"color=0x{banner_hex}@0.90:t=fill:"
-            f"enable='gte(t,{T0})'"
-        )
-        for i, line in enumerate(description.split('\n')[:2]):
-            yp = 0.745 + i * 0.052
-            vf.append(
-                f"drawtext=text='{esc(line)}':{fb}"
-                f"fontcolor=white:fontsize=27:x=(w-tw)/2:y=ih*{yp:.3f}:"
-                f"shadowcolor=black:shadowx=1:shadowy=1:"
-                f"enable='gte(t,{T0})'"
-            )
+        if brand:
+            dt.append(f"drawtext=text='{esc(brand)}':{fr}fontcolor=white:fontsize=32:x=(w-tw)/2:y=ih*0.932:shadowcolor=black:shadowx=1:shadowy=1:enable='gte(t,{T0+0.3})'")
 
-    # Tyre size
-    if size_text:
-        sy = 0.875 if description else 0.845
-        vf.append(
-            f"drawtext=text='{esc(size_text)}':{fb}"
-            f"fontcolor=white:fontsize=54:x=(w-tw)/2:y=ih*{sy:.3f}:"
-            f"shadowcolor=black:shadowx=2:shadowy=2:"
-            f"enable='gte(t,{T0+0.2})'"
-        )
+        vf_str = ','.join(dt) if dt else 'null'
 
-    # Brand
-    if brand:
-        vf.append(
-            f"drawtext=text='{esc(brand)}':{fr}"
-            f"fontcolor=white:fontsize=32:x=(w-tw)/2:y=ih*0.932:"
-            f"shadowcolor=black:shadowx=1:shadowy=1:"
-            f"enable='gte(t,{T0+0.25})'"
-        )
+        # ── Step 3: encode video from still image ─────────────────────────────
+        run(['ffmpeg',
+             '-loop', '1', '-framerate', str(FPS), '-t', str(DUR + 0.5),
+             '-i', base_jpg,
+             '-vf', vf_str,
+             '-t', str(DUR),
+             '-c:v', 'libx264', '-crf', '22', '-preset', 'fast',
+             '-pix_fmt', 'yuv420p', '-movflags', '+faststart',
+             '-y', out_path])
 
-    cmd = [
-        'ffmpeg',
-        '-loop', '1', '-framerate', str(FPS),
-        '-t', str(DUR + 1),
-        '-i', photo_path,
-        '-vf', ','.join(vf),
-        '-t', str(DUR),
-        '-c:v', 'libx264', '-crf', '22', '-preset', 'fast',
-        '-pix_fmt', 'yuv420p',
-        '-movflags', '+faststart',
-        '-y', out_path,
-    ]
+    finally:
+        import shutil
+        shutil.rmtree(str(tmp_dir), ignore_errors=True)
 
-    result = subprocess.run(cmd, capture_output=True, text=True, timeout=240)
-    if result.returncode != 0:
-        raise RuntimeError(result.stderr[-800:])
-
-
-# ── Flask routes ──────────────────────────────────────────────────────────────
 
 @app.route('/')
 def index():
@@ -159,8 +131,8 @@ def generate():
         return jsonify({'error': 'Не удалось обработать фото'}), 400
 
     form = {k: str(data.get(k, '')).strip()
-            for k in ('size', 'brand', 'description', 'logo', 'logo_pos', 'banner_color')}
-    if not re.match(r'^#[0-9a-fA-F]{6}$', form.get('banner_color', '')):
+            for k in ('size','brand','description','logo','logo_pos','banner_color')}
+    if not re.match(r'^#[0-9a-fA-F]{6}$', form.get('banner_color','')):
         form['banner_color'] = '#bb1111'
     if not form.get('size'):
         return jsonify({'error': 'Введите размер шины'}), 400
