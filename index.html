@@ -59,6 +59,12 @@ select option{background:#1a1b26}
 .font-row input[type=range]{-webkit-appearance:none;height:3px;background:rgba(255,255,255,0.1);border-radius:2px;outline:none;padding:0;border:none}
 .font-row input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:#f5c518;cursor:pointer}
 .font-row .fval{font-size:11px;color:#f5c518;text-align:right;font-weight:500;min-width:28px}
+.anim-row{display:grid;grid-template-columns:60px 1fr 70px 30px;gap:6px;align-items:center;margin-bottom:6px}
+.anim-row .alabel{font-size:10px;color:#666;white-space:nowrap;letter-spacing:.04em}
+.anim-row select{font-size:11px;padding:5px 7px}
+.anim-row input[type=range]{-webkit-appearance:none;height:3px;background:rgba(255,255,255,0.1);border-radius:2px;outline:none;padding:0;border:none}
+.anim-row input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:#f5c518;cursor:pointer}
+.anim-row .aval{font-size:11px;color:#f5c518;text-align:right;font-weight:500;min-width:26px}
 .tip{background:rgba(245,197,24,.04);border:1px solid rgba(245,197,24,.12);border-radius:7px;padding:8px 11px;font-size:11px;color:rgba(245,197,24,.65);line-height:1.5}
 ::-webkit-scrollbar{width:4px}
 ::-webkit-scrollbar-thumb{background:rgba(255,255,255,.07);border-radius:2px}
@@ -187,6 +193,58 @@ select option{background:#1a1b26}
 
   </div>
 
+  <!-- Анимация появления -->
+  <div>
+    <div class="sec">06 — Анимация появления</div>
+
+    <div style="font-size:10px;color:#555;margin-bottom:10px;letter-spacing:.04em">БЛОК · ЭФФЕКТ · ЗАДЕРЖКА (сек)</div>
+
+    <div class="anim-row">
+      <span class="alabel">Бренд</span>
+      <select id="ae_brand" onchange="rp()"><option value="fade">Плавное появление</option><option value="slideLeft">Сдвиг слева</option><option value="slideUp">Сдвиг снизу</option><option value="slideDown">Сдвиг сверху</option><option value="zoom">Масштаб</option><option value="typewriter">Печать</option></select>
+      <input type="range" id="at_brand" min="0" max="8" step="0.5" value="0.5" oninput="document.getElementById('av_brand').textContent=this.value+'с';rp()">
+      <span class="aval" id="av_brand">0.5с</span>
+    </div>
+
+    <div class="anim-row">
+      <span class="alabel">Заголовок</span>
+      <select id="ae_type" onchange="rp()"><option value="fade">Плавное появление</option><option value="slideLeft">Сдвиг слева</option><option value="slideUp">Сдвиг снизу</option><option value="slideDown">Сдвиг сверху</option><option value="zoom">Масштаб</option><option value="typewriter">Печать</option></select>
+      <input type="range" id="at_type" min="0" max="8" step="0.5" value="1.5" oninput="document.getElementById('av_type').textContent=this.value+'с';rp()">
+      <span class="aval" id="av_type">1.5с</span>
+    </div>
+
+    <div class="anim-row">
+      <span class="alabel">Размер</span>
+      <select id="ae_size" onchange="rp()"><option value="fade">Плавное появление</option><option value="slideLeft">Сдвиг слева</option><option value="slideUp">Сдвиг снизу</option><option value="slideDown">Сдвиг сверху</option><option value="zoom">Масштаб</option><option value="typewriter">Печать</option></select>
+      <input type="range" id="at_size" min="0" max="8" step="0.5" value="2.5" oninput="document.getElementById('av_size').textContent=this.value+'с';rp()">
+      <span class="aval" id="av_size">2.5с</span>
+    </div>
+
+    <div class="anim-row">
+      <span class="alabel">Подзагол.</span>
+      <select id="ae_sub" onchange="rp()"><option value="fade">Плавное появление</option><option value="slideLeft">Сдвиг слева</option><option value="slideUp">Сдвиг снизу</option><option value="slideDown">Сдвиг сверху</option><option value="zoom">Масштаб</option><option value="typewriter">Печать</option></select>
+      <input type="range" id="at_sub" min="0" max="8" step="0.5" value="3.0" oninput="document.getElementById('av_sub').textContent=this.value+'с';rp()">
+      <span class="aval" id="av_sub">3.0с</span>
+    </div>
+
+    <div class="anim-row">
+      <span class="alabel">Характер.</span>
+      <select id="ae_feat" onchange="rp()"><option value="fade">Плавное появление</option><option value="slideLeft">Сдвиг слева</option><option value="slideUp">Сдвиг снизу</option><option value="slideDown">Сдвиг сверху</option><option value="zoom">Масштаб</option><option value="typewriter">Печать</option></select>
+      <input type="range" id="at_feat" min="0" max="8" step="0.5" value="4.0" oninput="document.getElementById('av_feat').textContent=this.value+'с';rp()">
+      <span class="aval" id="av_feat">4.0с</span>
+    </div>
+
+    <div style="margin-top:10px">
+      <label class="f">Длительность эффекта (сек)</label>
+      <select id="anim_dur" onchange="rp()">
+        <option value="0.3">Быстро (0.3 с)</option>
+        <option value="0.5" selected>Нормально (0.5 с)</option>
+        <option value="0.8">Медленно (0.8 с)</option>
+        <option value="1.2">Очень медленно (1.2 с)</option>
+      </select>
+    </div>
+  </div>
+
 </div>
 
 <!-- RIGHT: Preview + Generate -->
@@ -307,7 +365,7 @@ function fnt(nameId, sizeId, weight, s){
   return { font:`${weight} ${px}px '${name}',sans-serif`, px, raw:rawSz };
 }
 
-function drawFrame(cv,cw,ch,gt,featAnim,vidSrc){
+function drawFrame(cv,cw,ch,gt,vidSrc){
   const ctx = cv.getContext('2d');
   const s   = cw / W;
   const th  = THEMES[v('f_accent')||'green'];
@@ -317,8 +375,50 @@ function drawFrame(cv,cw,ch,gt,featAnim,vidSrc){
   const brand    = v('f_brand');
   const sub      = v('f_sub');
   const disc     = v('f_disc');
-  const textA    = Math.min(1, gt * 2.8);
   const tireS    = 0.85 + 0.15 * Math.min(1, gt * 1.5);
+
+  // ── Per-element animation engine ─────────────────────────────────────────
+  const animFadeDur = parseFloat(document.getElementById('anim_dur')?.value||'0.5');
+
+  // Returns {alpha, offsetX, offsetY, scale} for a given element at time gt
+  function elemAnim(typeId, delayId, cx, cy2){
+    const effect = document.getElementById(typeId)?.value || 'fade';
+    const delay  = parseFloat(document.getElementById(delayId)?.value || '0');
+    const t      = Math.max(0, gt - delay);          // local time after delay
+    const p      = Math.min(1, t / animFadeDur);     // 0→1 progress
+    const ease   = p < 0.5 ? 2*p*p : -1+(4-2*p)*p; // ease-in-out
+
+    let alpha=ease, ox=0, oy=0, sc=1;
+    if(p <= 0) return {alpha:0, ox:0, oy:0, sc:1};
+
+    switch(effect){
+      case 'fade':     alpha=ease; break;
+      case 'slideLeft':ox=(1-ease)*-60*s; alpha=ease; break;
+      case 'slideUp':  oy=(1-ease)*40*s;  alpha=ease; break;
+      case 'slideDown':oy=(1-ease)*-40*s; alpha=ease; break;
+      case 'zoom':     sc=0.6+ease*0.4;   alpha=ease; break;
+      case 'typewriter': alpha=1; break; // handled separately
+    }
+    return {alpha, ox, oy, sc, p, effect};
+  }
+
+  // Helper: apply transform + alpha, draw text or shape, restore
+  function withAnim(anim, drawFn){
+    if(anim.alpha <= 0) return;
+    ctx.save();
+    ctx.globalAlpha = anim.alpha;
+    if(anim.ox !== 0 || anim.oy !== 0 || anim.sc !== 1){
+      // find approximate center from drawFn — use translate
+      ctx.translate(anim.ox, anim.oy);
+      if(anim.sc !== 1){
+        ctx.translate(cw*0.29, 0);
+        ctx.scale(anim.sc, anim.sc);
+        ctx.translate(-cw*0.29, 0);
+      }
+    }
+    drawFn(anim);
+    ctx.restore();
+  }
 
   // ── Font objects (all sizes scaled to canvas) ─────────────────────────────
   const F = {
@@ -408,72 +508,127 @@ function drawFrame(cv,cw,ch,gt,featAnim,vidSrc){
     ctx.restore();
   }
 
-  // ── 5. TEXT (fades in) ────────────────────────────────────────────────────
-  ctx.globalAlpha = textA;
+  // ── 5. TEXT — каждый блок со своей анимацией ─────────────────────────────
 
-  // Бренд (верх-лево) + бейдж скидки (верх-право)
+  // Бренд
   if(brand){
-    ctx.font = F.brand.font;
-    ctx.fillStyle = 'rgba(255,255,255,0.5)';
-    ctx.textAlign = 'left';
-    ctx.fillText(brand.toUpperCase(), PAD, yBrand + F.brand.px);
+    const a = elemAnim('ae_brand','at_brand');
+    withAnim(a, ()=>{
+      ctx.font = F.brand.font;
+      ctx.fillStyle = 'rgba(255,255,255,0.5)';
+      ctx.textAlign = 'left';
+      ctx.fillText(brand.toUpperCase(), PAD, yBrand + F.brand.px);
+    });
   }
+
+  // Бейдж скидки (вместе с брендом)
   if(disc){
-    ctx.font = F.brand.font;
-    const mw  = ctx.measureText(disc).width;
-    const dbw = mw + 16*s;
-    const dbh = brandH > 0 ? brandH : F.brand.px * 1.6;
-    const dbx = cw - dbw - PAD;
-    const dby = 3*s + TOP_PAD;
-    ctx.fillStyle = '#cc1111'; rr(ctx, dbx, dby, dbw, dbh, 5*s); ctx.fill();
-    ctx.fillStyle = '#fff'; ctx.textAlign = 'center';
-    ctx.fillText(disc, dbx + dbw/2, dby + dbh * 0.73);
+    const a = elemAnim('ae_brand','at_brand');
+    withAnim(a, ()=>{
+      ctx.font = F.brand.font;
+      const mw  = ctx.measureText(disc).width;
+      const dbw = mw + 16*s;
+      const dbh = brandH > 0 ? brandH : F.brand.px * 1.6;
+      const dbx = cw - dbw - PAD;
+      const dby = 3*s + TOP_PAD;
+      ctx.fillStyle = '#cc1111'; rr(ctx, dbx, dby, dbw, dbh, 5*s); ctx.fill();
+      ctx.fillStyle = '#fff'; ctx.textAlign = 'center';
+      ctx.fillText(disc, dbx + dbw/2, dby + dbh * 0.73);
+    });
   }
 
-  // Заголовок — ОДНА строка, не переносится
-  ctx.font = F.type.font;
-  ctx.fillStyle = '#ffffff';
-  ctx.textAlign = 'left';
-  ctx.fillText(typeText, PAD, yType + F.type.px);
+  // Заголовок
+  {
+    const a = elemAnim('ae_type','at_type');
+    withAnim(a, (an)=>{
+      ctx.font = F.type.font;
+      ctx.fillStyle = '#ffffff';
+      ctx.textAlign = 'left';
+      if(an.effect === 'typewriter'){
+        // Печатная машинка — показываем по символу
+        const total = typeText.length;
+        const shown = Math.ceil(an.p * total);
+        ctx.fillText(typeText.slice(0, shown), PAD, yType + F.type.px);
+      } else {
+        ctx.fillText(typeText, PAD, yType + F.type.px);
+      }
+    });
+  }
 
-  // Плашка размера — высота адаптируется к шрифту
-  const sbw = LEFTWID - PAD;
-  const sbg = ctx.createLinearGradient(PAD, yBadge, PAD+sbw, yBadge);
-  sbg.addColorStop(0, th.badge); sbg.addColorStop(1, th.badgeL);
-  ctx.fillStyle = sbg; rr(ctx, PAD, yBadge, sbw, badgeH, 8*s); ctx.fill();
-  ctx.fillStyle = 'rgba(255,255,255,0.07)';
-  rr(ctx, PAD, yBadge, sbw, badgeH*0.48, 8*s); ctx.fill();
-  ctx.font = F.size.font;
-  ctx.fillStyle = th.txt; ctx.textAlign = 'center';
-  ctx.fillText(sizeText, PAD + sbw/2, yBadge + badgeH * 0.70);
+  // Плашка размера
+  {
+    const a = elemAnim('ae_size','at_size');
+    withAnim(a, ()=>{
+      const sbw = LEFTWID - PAD;
+      const sbg = ctx.createLinearGradient(PAD, yBadge, PAD+sbw, yBadge);
+      sbg.addColorStop(0, th.badge); sbg.addColorStop(1, th.badgeL);
+      ctx.fillStyle = sbg; rr(ctx, PAD, yBadge, sbw, badgeH, 8*s); ctx.fill();
+      ctx.fillStyle = 'rgba(255,255,255,0.07)';
+      rr(ctx, PAD, yBadge, sbw, badgeH*0.48, 8*s); ctx.fill();
+      ctx.font = F.size.font;
+      ctx.fillStyle = th.txt; ctx.textAlign = 'center';
+      ctx.fillText(sizeText, PAD + sbw/2, yBadge + badgeH * 0.70);
+    });
+  }
 
-  // Подзаголовок — высота адаптируется
+  // Подзаголовок
   if(sub && subH > 0){
-    const sw = sbw * 0.75;
-    ctx.fillStyle = 'rgba(255,255,255,0.07)'; rr(ctx, PAD, ySub, sw, subH, 5*s); ctx.fill();
-    ctx.font = F.sub.font;
-    ctx.fillStyle = 'rgba(255,255,255,0.55)'; ctx.textAlign = 'center';
-    ctx.fillText(sub.toUpperCase(), PAD + sw/2, ySub + subH * 0.74);
+    const a = elemAnim('ae_sub','at_sub');
+    withAnim(a, ()=>{
+      const sw = (LEFTWID - PAD) * 0.75;
+      ctx.fillStyle = 'rgba(255,255,255,0.07)'; rr(ctx, PAD, ySub, sw, subH, 5*s); ctx.fill();
+      ctx.font = F.sub.font;
+      ctx.fillStyle = 'rgba(255,255,255,0.55)'; ctx.textAlign = 'center';
+      ctx.fillText(sub.toUpperCase(), PAD + sw/2, ySub + subH * 0.74);
+    });
   }
 
-  ctx.globalAlpha = 1;
+  // Характеристики — появляются по одной с задержкой между ними
+  {
+    const baseDelay = parseFloat(document.getElementById('at_feat')?.value || '4');
+    const effect    = document.getElementById('ae_feat')?.value || 'slideLeft';
+    activeFeat.forEach((feat, i) => {
+      const delay = baseDelay + i * 0.35;
+      const t     = Math.max(0, gt - delay);
+      const p     = Math.min(1, t / animFadeDur);
+      const ease  = p < 0.5 ? 2*p*p : -1+(4-2*p)*p;
+      if(p <= 0) return;
 
-  // 6. Характеристики — прибиты к низу, появляются по одной
-  activeFeat.forEach((feat, i) => {
-    const fa = Math.max(0, Math.min(1, (featAnim - i * 0.15) * 2.5));
-    if(fa <= 0) return;
-    ctx.globalAlpha = fa;
-    const fy   = yFeats + i * (featRowH + featGap);
-    const fw   = LEFTWID - PAD;
-    const dotR = Math.max(3*s, F.feat.px * 0.32);
-    ctx.fillStyle = th.feat; rr(ctx, PAD, fy, fw, featRowH, 5*s); ctx.fill();
-    ctx.fillStyle = th.dot; ctx.beginPath();
-    ctx.arc(PAD + dotR + 5*s, fy + featRowH/2, dotR, 0, Math.PI*2); ctx.fill();
-    ctx.font = F.feat.font;
-    ctx.fillStyle = 'rgba(255,255,255,0.9)'; ctx.textAlign = 'left';
-    ctx.fillText(feat, PAD + dotR*2 + 12*s, fy + featRowH * 0.68);
-    ctx.globalAlpha = 1;
-  });
+      let alpha=ease, ox=0, oy=0, sc=1;
+      switch(effect){
+        case 'fade':     alpha=ease; break;
+        case 'slideLeft':ox=(1-ease)*-60*s; alpha=ease; break;
+        case 'slideUp':  oy=(1-ease)*30*s;  alpha=ease; break;
+        case 'slideDown':oy=(1-ease)*-30*s; alpha=ease; break;
+        case 'zoom':     sc=0.6+ease*0.4;   alpha=ease; break;
+        case 'typewriter':alpha=1; break;
+      }
+
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      ctx.translate(ox, oy);
+      if(sc !== 1){ ctx.translate(PAD, yFeats+i*(featRowH+featGap)+featRowH/2); ctx.scale(sc,sc); ctx.translate(-PAD,-(yFeats+i*(featRowH+featGap)+featRowH/2)); }
+
+      const fy   = yFeats + i * (featRowH + featGap);
+      const fw   = LEFTWID - PAD;
+      const dotR = Math.max(3*s, F.feat.px * 0.32);
+      ctx.fillStyle = th.feat; rr(ctx, PAD, fy, fw, featRowH, 5*s); ctx.fill();
+      ctx.fillStyle = th.dot; ctx.beginPath();
+      ctx.arc(PAD + dotR + 5*s, fy + featRowH/2, dotR, 0, Math.PI*2); ctx.fill();
+      ctx.font = F.feat.font;
+
+      if(effect === 'typewriter'){
+        const shown = Math.ceil(p * feat.length);
+        const txt = feat.slice(0, shown);
+        ctx.fillStyle = 'rgba(255,255,255,0.9)'; ctx.textAlign = 'left';
+        ctx.fillText(txt, PAD + dotR*2 + 12*s, fy + featRowH * 0.68);
+      } else {
+        ctx.fillStyle = 'rgba(255,255,255,0.9)'; ctx.textAlign = 'left';
+        ctx.fillText(feat, PAD + dotR*2 + 12*s, fy + featRowH * 0.68);
+      }
+      ctx.restore();
+    });
+  }
 
   // 7. Bottom bar
   ctx.fillStyle = th.line; ctx.fillRect(0, ch-3*s, cw, 3*s);
@@ -483,7 +638,7 @@ function drawFrame(cv,cw,ch,gt,featAnim,vidSrc){
 function rp(){cancelAnimationFrame(prevRaf);animT=0;loop();}
 function loop(){
   animT+=0.018;
-  drawFrame(document.getElementById('prevCv'),270,480,animT,Math.max(0,animT-0.4),bgVid);
+  drawFrame(document.getElementById('prevCv'),270,480,animT,bgVid);
   prevRaf=requestAnimationFrame(loop);
 }
 loop();
@@ -525,7 +680,7 @@ async function genVideo(){
     const bar=document.getElementById('pb');
     function frame(){
       gt+=1/FPS;
-      drawFrame(cv,W,H,gt,Math.max(0,gt-0.4),bgVid);
+      drawFrame(cv,W,H,gt,bgVid);
       f++;bar.style.width=Math.round(f/totF*95)+'%';
       if(f<totF) setTimeout(frame,0);
       else{if(bgVid)bgVid.pause();rec.stop();}
