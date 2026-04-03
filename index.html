@@ -115,20 +115,33 @@ select option{background:#1a1b26}
 .btog input:checked+span{color:#f5c518}
 .add-ctext-btn{background:rgba(245,197,24,0.12);border:1px solid rgba(245,197,24,0.3);border-radius:6px;color:#f5c518;font-size:11px;font-weight:600;padding:3px 10px;cursor:pointer;transition:background .15s}
 .add-ctext-btn:hover{background:rgba(245,197,24,0.2)}
-.ctext-card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:10px;position:relative}
-.ctext-toolbar{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;align-items:center}
-.ctext-toolbar select,.ctext-toolbar input[type=text],.ctext-toolbar input[type=number]{background:#1a1b26;border:1px solid rgba(255,255,255,0.08);border-radius:5px;color:#e8eaf2;font-size:11px;padding:3px 6px;outline:none}
-.ctext-toolbar select{cursor:pointer}
-.ctext-toolbar .tbtn{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:5px;color:#888;font-size:12px;padding:3px 7px;cursor:pointer;transition:all .15s;line-height:1.4}
-.ctext-toolbar .tbtn:hover{background:rgba(255,255,255,0.1);color:#fff}
-.ctext-toolbar .tbtn.on{background:rgba(245,197,24,0.15);border-color:rgba(245,197,24,0.35);color:#f5c518}
-.ctext-toolbar input[type=color]{width:28px;height:24px;padding:1px 2px;border-radius:5px;background:#1a1b26;border:1px solid rgba(255,255,255,0.08);cursor:pointer}
-.ctext-input{width:100%;background:#1a1b26;border:1px solid rgba(255,255,255,0.08);border-radius:6px;padding:7px 10px;color:#e8eaf2;font-size:13px;outline:none;resize:none;min-height:44px;font-family:inherit}
-.ctext-input:focus{border-color:#f5c518}
-.ctext-del{position:absolute;top:8px;right:8px;background:none;border:none;color:#444;cursor:pointer;font-size:16px;line-height:1;padding:0}
+/* Word-style card */
+.ctext-card{background:#1c1e2a;border:1px solid rgba(255,255,255,0.08);border-radius:10px;overflow:hidden;position:relative;margin-bottom:2px}
+.ctext-card-head{display:flex;align-items:center;justify-content:space-between;padding:6px 10px 4px;border-bottom:1px solid rgba(255,255,255,0.05)}
+.ctext-card-head span{font-size:10px;color:#555;letter-spacing:.04em}
+.ctext-del{background:none;border:none;color:#444;cursor:pointer;font-size:15px;line-height:1;padding:2px 4px}
 .ctext-del:hover{color:#ff6b6b}
-.ctext-label{font-size:10px;color:#555;margin-bottom:5px;display:flex;align-items:center;gap:6px}
-.ctext-label span{flex:1}
+/* Word toolbar */
+.word-toolbar{background:#14161f;border-bottom:1px solid rgba(255,255,255,0.06);padding:5px 8px;display:flex;flex-direction:column;gap:4px}
+.word-row{display:flex;align-items:center;gap:3px;flex-wrap:wrap}
+.word-sep{width:1px;height:18px;background:rgba(255,255,255,0.1);margin:0 2px;flex-shrink:0}
+.wsel{background:#1a1b26;border:1px solid rgba(255,255,255,0.1);border-radius:4px;color:#ccc;font-size:11px;padding:3px 5px;outline:none;cursor:pointer;height:24px}
+.wsel:focus{border-color:#f5c518}
+.wsel.font-sel{min-width:100px;max-width:130px}
+.wsel.size-sel{width:52px}
+.wnuminput{background:#1a1b26;border:1px solid rgba(255,255,255,0.1);border-radius:4px;color:#ccc;font-size:11px;padding:3px 5px;outline:none;width:44px;height:24px;text-align:center}
+.wnuminput:focus{border-color:#f5c518}
+.wbtn{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;background:none;border:1px solid transparent;border-radius:4px;color:#888;cursor:pointer;font-size:12px;transition:all .12s;flex-shrink:0;padding:0}
+.wbtn:hover{background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.12);color:#ccc}
+.wbtn.on{background:rgba(245,197,24,0.15);border-color:rgba(245,197,24,0.35);color:#f5c518}
+.wbtn svg{width:13px;height:13px;fill:currentColor}
+.wcolor{width:24px;height:24px;padding:2px;border-radius:4px;border:1px solid rgba(255,255,255,0.1);background:#1a1b26;cursor:pointer}
+.wopacity{-webkit-appearance:none;height:3px;background:rgba(255,255,255,0.1);border-radius:2px;outline:none;padding:0;border:none;width:60px;cursor:pointer}
+.wopacity::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;border-radius:50%;background:#f5c518;cursor:pointer}
+.wlabel{font-size:9px;color:#555;white-space:nowrap}
+.ctext-body{padding:8px}
+.ctext-input{width:100%;background:#1a1b26;border:1px solid rgba(255,255,255,0.08);border-radius:6px;padding:7px 10px;color:#e8eaf2;font-size:13px;outline:none;resize:vertical;min-height:44px;font-family:inherit}
+.ctext-input:focus{border-color:#f5c518}
 .src-tabs{display:flex;gap:6px;margin-bottom:2px}
 .src-tab{flex:1;padding:9px 6px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:#666;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s;text-align:center}
 .src-tab:hover{background:rgba(255,255,255,0.07);color:#aaa}
@@ -1006,8 +1019,13 @@ function drawFrame(cv,cw,ch,gt,vidSrc){
       ctx.save();ctx.globalAlpha=alpha;ctx.translate(ox,oy);
       if(sc!==1){ctx.translate(fx2,fy2+i*(featRowH+featGap)+featRowH/2);ctx.scale(sc,sc);ctx.translate(-fx2,-(fy2+i*(featRowH+featGap)+featRowH/2));}
       const fy=fy2+i*(featRowH+featGap);
-      const fw=LEFTWID-PAD;
       const dotR=Math.max(3*s,F.feat.px*0.32);
+      // Ширина плашки = ширина текста + отступы (адаптивно)
+      ctx.font=F.feat.font;
+      const textPad = dotR*2 + 20*s;
+      const displayFeat = effect==='typewriter' ? feat.slice(0,Math.ceil(p*feat.length)) : feat;
+      const textW = ctx.measureText(displayFeat).width;
+      const fw = textW + textPad + dotR + 8*s;
       ctx.fillStyle=th.feat;rr(ctx,fx2,fy,fw,featRowH,5*s);ctx.fill();
       ctx.fillStyle=th.dot;ctx.beginPath();ctx.arc(fx2+dotR+5*s,fy+featRowH/2,dotR,0,Math.PI*2);ctx.fill();
       ctx.font=F.feat.font;
@@ -1026,31 +1044,67 @@ function drawFrame(cv,cw,ch,gt,vidSrc){
   // ── 8. Custom text blocks ─────────────────────────────────────────────────
   customTexts.forEach(t=>{
     const key = 'ct_'+t.id;
-    if(!EP[key]) EP[key]={x:t.x,y:t.y};
+    if(!EP[key]) EP[key]={x:t.x, y:t.y};
     const cx2=EP[key].x*cw, cy2=EP[key].y*ch;
     const weight=(t.bold?'bold ':'')+(t.italic?'italic ':'');
-    const fontStr=`${weight}${Math.round(t.size*s)}px '${t.font}',sans-serif`;
+    const px2=Math.max(8, Math.round(t.size*s));
+    const fontStr=`${weight}${px2}px '${t.font}',sans-serif`;
+    const lh=px2*1.35;
+    const opacity=(t.opacity||100)/100;
+
     ctx.save();
+    ctx.globalAlpha=opacity;
     ctx.font=fontStr;
     ctx.fillStyle=t.color;
-    ctx.globalAlpha=(t.opacity||100)/100;
     ctx.textAlign=t.align||'left';
-    ctx.shadowColor='rgba(0,0,0,0.6)';ctx.shadowBlur=4*s;
-    // Multi-line support
+
+    if(t.shadow){
+      ctx.shadowColor='rgba(0,0,0,0.75)';
+      ctx.shadowBlur=px2*0.4;
+      ctx.shadowOffsetX=px2*0.06;
+      ctx.shadowOffsetY=px2*0.06;
+    }
+
     const lines=t.text.split('\n');
-    const lh=t.size*s*1.3;
     const maxW=lines.reduce((m,l)=>Math.max(m,ctx.measureText(l).width),0);
-    // Register box for dragging
     let bx=cx2;
     if(t.align==='center') bx=cx2-maxW/2;
     if(t.align==='right')  bx=cx2-maxW;
-    regBox(key,bx,cy2-lh*0.8,maxW,lh*lines.length);
+
+    // Register bounding box
+    regBox(key, bx, cy2-lh*0.85, maxW||50*s, lh*lines.length);
+
     // Draw hover outline
     if(hovered===key||drag?.key===key){
-      ctx.save();ctx.strokeStyle='rgba(245,197,24,0.6)';ctx.lineWidth=1.5*s;
-      ctx.setLineDash([3*s,3*s]);ctx.strokeRect(bx-4*s,cy2-lh*0.9,maxW+8*s,lh*lines.length+4*s);ctx.restore();
+      ctx.save();
+      ctx.strokeStyle='rgba(245,197,24,0.7)';ctx.lineWidth=1.5*s;
+      ctx.setLineDash([3*s,3*s]);
+      ctx.strokeRect(bx-5*s, cy2-lh*0.95, (maxW||50*s)+10*s, lh*lines.length+6*s);
+      ctx.restore();
     }
-    lines.forEach((line,i)=>ctx.fillText(line,cx2,cy2+i*lh));
+
+    lines.forEach((line,i)=>{
+      const ly=cy2+i*lh;
+      ctx.fillText(line, cx2, ly);
+
+      // Underline
+      if(t.underline){
+        const lw=ctx.measureText(line).width;
+        const ux=t.align==='center'?cx2-lw/2:t.align==='right'?cx2-lw:cx2;
+        ctx.save();ctx.shadowBlur=0;ctx.shadowOffsetX=0;ctx.shadowOffsetY=0;
+        ctx.fillRect(ux, ly+px2*0.15, lw, Math.max(1, px2*0.07));
+        ctx.restore();
+      }
+      // Strikethrough
+      if(t.strike){
+        const lw=ctx.measureText(line).width;
+        const sx2=t.align==='center'?cx2-lw/2:t.align==='right'?cx2-lw:cx2;
+        ctx.save();ctx.shadowBlur=0;ctx.shadowOffsetX=0;ctx.shadowOffsetY=0;
+        ctx.fillRect(sx2, ly-px2*0.3, lw, Math.max(1, px2*0.07));
+        ctx.restore();
+      }
+    });
+
     ctx.restore();
   });
 
@@ -1121,10 +1175,10 @@ function addCustomText(){
   const id = ++ctxtIdSeq;
   customTexts.push({
     id, text:'Мой текст', font:'Oswald', size:28, color:'#ffffff',
-    bold:true, italic:false, align:'left', opacity:100,
+    bold:false, italic:false, underline:false, strike:false,
+    align:'left', opacity:100, lineHeight:1.3,
     x: 0.05 + Math.random()*0.3, y: 0.45 + Math.random()*0.2,
   });
-  // Add to EP for dragging
   EP['ct_'+id] = {x: customTexts[customTexts.length-1].x, y: customTexts[customTexts.length-1].y};
   renderCustomTextList();
   rp();
@@ -1145,39 +1199,85 @@ function ctChange(id, field, val){
   rp();
 }
 
+// SVG icons for Word toolbar
+const ICONS = {
+  bold:      `<svg viewBox="0 0 24 24"><path d="M15.6 10.8A4 4 0 0012 4H6v16h7a4 4 0 001.6-7.2zM9 7h3a1.5 1.5 0 010 3H9V7zm3.5 10H9v-4h3.5a2 2 0 010 4z"/></svg>`,
+  italic:    `<svg viewBox="0 0 24 24"><path d="M10 4v3h2.21l-3.42 10H6v3h8v-3h-2.21l3.42-10H18V4h-8z"/></svg>`,
+  underline: `<svg viewBox="0 0 24 24"><path d="M12 17c3.31 0 6-2.69 6-6V3h-2.5v8c0 1.93-1.57 3.5-3.5 3.5S8.5 12.93 8.5 11V3H6v8c0 3.31 2.69 6 6 6zm-7 2v2h14v-2H5z"/></svg>`,
+  strike:    `<svg viewBox="0 0 24 24"><path d="M10 19h4v-3h-4v3zM5 4v3h5v3h4V7h5V4H5zM3 14h18v-2H3v2z"/></svg>`,
+  alignL:    `<svg viewBox="0 0 24 24"><path d="M15 15H3v2h12v-2zm0-8H3v2h12V7zM3 13h18v-2H3v2zm0 8h18v-2H3v2zM3 3v2h18V3H3z"/></svg>`,
+  alignC:    `<svg viewBox="0 0 24 24"><path d="M7 15v2h10v-2H7zm-4 6h18v-2H3v2zm0-8h18v-2H3v2zm4-6v2h10V7H7zM3 3v2h18V3H3z"/></svg>`,
+  alignR:    `<svg viewBox="0 0 24 24"><path d="M3 21h18v-2H3v2zm6-4h12v-2H9v2zm-6-4h18v-2H3v2zm6-4h12V7H9v2zM3 3v2h18V3H3z"/></svg>`,
+  shadow:    `<svg viewBox="0 0 24 24"><path d="M5 5h2V3H5v2zm4-2v2h2V3H9zm4 0v2h2V3h-2zm4 2h2V3h-2v2zM3 7v2h2V7H3zm0 4h2v-2H3v2zm0 4h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2v-2H3v2zm18-4h-2v2h2V7zm0 4h-2v2h2v-2zm0 4h-2v2h2v-2zm0 4h-2v2h2v-2zm-2 2v2h2v-2h-2zM5 21h2v-2H5v2zm4 0h2v-2H9v2zm4 0h2v-2h-2v2z"/></svg>`,
+};
+
+function wb(id, field, icon, title, isOn, toggle){
+  return `<button type="button" class="wbtn${isOn?' on':''}" title="${title}"
+    onclick="ctChange(${id},'${field}',!${toggle});renderCustomTextList()">${icon}</button>`;
+}
+
 function renderCustomTextList(){
   const el = document.getElementById('customTextList');
   el.innerHTML='';
   if(customTexts.length===0){
-    el.innerHTML='<div style="font-size:11px;color:#444;text-align:center;padding:10px">Нажмите «+ Добавить» чтобы создать свой текст</div>';
+    el.innerHTML='<div style="font-size:11px;color:#444;text-align:center;padding:12px">Нажмите «+ Добавить» чтобы создать свой текст</div>';
     return;
   }
   customTexts.forEach(t=>{
     const d=document.createElement('div');
     d.className='ctext-card';
     d.innerHTML=`
-      <button class="ctext-del" onclick="removeCustomText(${t.id})">×</button>
-      <div class="ctext-label"><span>Текст #${t.id} · перетащите на превью</span></div>
-      <div class="ctext-toolbar">
-        <select onchange="ctChange(${t.id},'font',this.value)" style="flex:1;min-width:90px">
-          ${FONT_LIST.map(f=>`<option value="${f}"${f===t.font?' selected':''}>${f}</option>`).join('')}
-        </select>
-        <input type="number" min="8" max="120" value="${t.size}" style="width:46px"
-               onchange="ctChange(${t.id},'size',+this.value)">
-        <input type="color" value="${t.color}" oninput="ctChange(${t.id},'color',this.value)">
-        <button type="button" class="tbtn${t.bold?' on':''}"
-                onclick="ctChange(${t.id},'bold',!${t.bold});renderCustomTextList()"><b>B</b></button>
-        <button type="button" class="tbtn${t.italic?' on':''}"
-                onclick="ctChange(${t.id},'italic',!${t.italic});renderCustomTextList()"><i>I</i></button>
-        <button type="button" class="tbtn${t.align==='left'?' on':''}"
-                onclick="ctChange(${t.id},'align','left');renderCustomTextList()" title="Лево">⬅</button>
-        <button type="button" class="tbtn${t.align==='center'?' on':''}"
-                onclick="ctChange(${t.id},'align','center');renderCustomTextList()" title="Центр">☰</button>
-        <button type="button" class="tbtn${t.align==='right'?' on':''}"
-                onclick="ctChange(${t.id},'align','right');renderCustomTextList()" title="Право">➡</button>
+      <div class="ctext-card-head">
+        <span>Текст #${t.id} · тащите на превью</span>
+        <button class="ctext-del" onclick="removeCustomText(${t.id})">×</button>
       </div>
-      <textarea class="ctext-input" rows="2"
-        oninput="ctChange(${t.id},'text',this.value)">${he(t.text)}</textarea>
+
+      <div class="word-toolbar">
+
+        <!-- Строка 1: шрифт + размер + цвет -->
+        <div class="word-row">
+          <select class="wsel font-sel" onchange="ctChange(${t.id},'font',this.value)">
+            ${FONT_LIST.map(f=>`<option value="${f}"${f===t.font?' selected':''}>${f}</option>`).join('')}
+          </select>
+          <div class="word-sep"></div>
+          <input class="wnuminput" type="number" min="6" max="200" value="${t.size}"
+                 onchange="ctChange(${t.id},'size',+this.value)" title="Размер шрифта">
+          <div class="word-sep"></div>
+          <label class="wlabel" title="Цвет текста">A</label>
+          <input class="wcolor" type="color" value="${t.color}"
+                 oninput="ctChange(${t.id},'color',this.value)" title="Цвет текста">
+        </div>
+
+        <!-- Строка 2: форматирование + выравнивание + прозрачность -->
+        <div class="word-row">
+          ${wb(t.id,'bold',   ICONS.bold,      'Жирный (Ctrl+B)',   t.bold,   t.bold)}
+          ${wb(t.id,'italic', ICONS.italic,    'Курсив (Ctrl+I)',   t.italic, t.italic)}
+          ${wb(t.id,'underline',ICONS.underline,'Подчёркнутый',     t.underline,t.underline)}
+          ${wb(t.id,'strike', ICONS.strike,    'Зачёркнутый',      t.strike, t.strike)}
+          <div class="word-sep"></div>
+          <button type="button" class="wbtn${t.align==='left'?' on':''}" title="По левому краю"
+            onclick="ctChange(${t.id},'align','left');renderCustomTextList()">${ICONS.alignL}</button>
+          <button type="button" class="wbtn${t.align==='center'?' on':''}" title="По центру"
+            onclick="ctChange(${t.id},'align','center');renderCustomTextList()">${ICONS.alignC}</button>
+          <button type="button" class="wbtn${t.align==='right'?' on':''}" title="По правому краю"
+            onclick="ctChange(${t.id},'align','right');renderCustomTextList()">${ICONS.alignR}</button>
+          <div class="word-sep"></div>
+          <span class="wlabel">Тень</span>
+          ${wb(t.id,'shadow', ICONS.shadow,    'Тень текста',       t.shadow, t.shadow)}
+          <div class="word-sep"></div>
+          <span class="wlabel">Прозр.</span>
+          <input class="wopacity" type="range" min="10" max="100" value="${t.opacity||100}"
+                 oninput="ctChange(${t.id},'opacity',+this.value)"
+                 title="Прозрачность: ${t.opacity||100}%">
+        </div>
+
+      </div>
+
+      <div class="ctext-body">
+        <textarea class="ctext-input" rows="2"
+          placeholder="Введите текст..."
+          oninput="ctChange(${t.id},'text',this.value)">${he(t.text)}</textarea>
+      </div>
     `;
     el.appendChild(d);
   });
