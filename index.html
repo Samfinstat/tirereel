@@ -12,9 +12,16 @@ header{background:#13141f;border-bottom:1px solid rgba(255,255,255,0.06);padding
 .logo{font-family:'Oswald',sans-serif;font-size:20px;font-weight:700;color:#fff}
 .logo span{color:#f5c518}
 .logo-sub{font-size:11px;color:#444;letter-spacing:.1em;text-transform:uppercase}
-.layout{display:grid;grid-template-columns:1fr 340px;min-height:calc(100vh - 52px)}
-.left{padding:20px 24px;display:flex;flex-direction:column;gap:16px;border-right:1px solid rgba(255,255,255,0.05);overflow-y:auto}
-.right{display:flex;flex-direction:column;background:#13141f}
+.layout{display:grid;grid-template-columns:1fr 1fr;min-height:calc(100vh - 52px)}
+.left{padding:20px 24px;display:flex;flex-direction:column;gap:16px;border-right:1px solid rgba(255,255,255,0.05);overflow-y:auto;max-height:calc(100vh - 52px)}
+.right{display:flex;flex-direction:column;background:#080a10;position:sticky;top:0;height:calc(100vh - 52px)}
+.fmt-bar{display:flex;gap:0;border-bottom:1px solid rgba(255,255,255,0.06);flex-shrink:0}
+.fmt-btn{flex:1;padding:8px 2px;background:none;border:none;border-right:1px solid rgba(255,255,255,0.06);color:#444;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:1px;transition:all .15s}
+.fmt-btn:last-child{border-right:none}
+.fmt-btn:hover{background:rgba(255,255,255,0.04);color:#888}
+.fmt-btn.active{background:rgba(245,197,24,0.08);color:#f5c518;border-bottom:2px solid #f5c518}
+.fmt-btn .fl{font-family:"Oswald",sans-serif;font-size:12px;font-weight:700;line-height:1}
+.fmt-btn .fs{font-size:9px;opacity:.7}
 .sec{font-size:10px;font-weight:500;color:#f5c518;text-transform:uppercase;letter-spacing:.12em;margin-bottom:8px}
 .ubox{border:1.5px dashed rgba(245,197,24,.22);border-radius:10px;padding:18px 14px;text-align:center;cursor:pointer;transition:all .2s;background:rgba(245,197,24,.02);display:flex;flex-direction:column;align-items:center;gap:5px}
 .ubox:hover,.ubox.over{border-color:#f5c518;background:rgba(245,197,24,.05)}
@@ -38,10 +45,13 @@ select option{background:#1a1b26}
 .feat-del:hover{color:#ff6b6b}
 .add-feat{background:rgba(245,197,24,.07);border:1px solid rgba(245,197,24,.18);border-radius:6px;color:#f5c518;cursor:pointer;padding:7px;font-size:12px;width:100%;transition:background .2s;margin-top:6px}
 .add-feat:hover{background:rgba(245,197,24,.14)}
-.prev-wrap{flex:1;display:flex;align-items:center;justify-content:center;padding:20px 14px 10px}
-.phone{position:relative;width:180px;height:320px;border-radius:10px;overflow:hidden;border:1px solid rgba(255,255,255,0.1);box-shadow:0 12px 36px rgba(0,0,0,.7)}
-#prevCv{position:absolute;inset:0;width:100%;height:100%}
-.gen-panel{border-top:1px solid rgba(255,255,255,0.05);padding:14px}
+.prev-wrap{flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#080a10;padding:8px;position:relative}
+.prev-top-bar{display:flex;align-items:center;justify-content:space-between;width:100%;max-width:360px;margin-bottom:10px}
+.prev-top-bar .prev-label{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:#333}
+.prev-top-bar .prev-hint{font-size:10px;color:#444}
+
+#prevCv{border-radius:10px;border:1.5px solid rgba(255,255,255,0.1);box-shadow:0 12px 40px rgba(0,0,0,.8);display:block;max-width:100%;max-height:100%;cursor:default}
+.gen-panel{border-top:1px solid rgba(255,255,255,0.05);padding:12px 16px;flex-shrink:0}
 .btn{width:100%;padding:12px;background:#f5c518;color:#0d0e14;border:none;border-radius:7px;font-family:'Oswald',sans-serif;font-size:14px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:background .2s}
 .btn:hover{background:#ffe066}
 .btn:disabled{background:#1e1e28;color:#444;cursor:not-allowed}
@@ -98,6 +108,27 @@ select option{background:#1a1b26}
 .anim-row input[type=range]{-webkit-appearance:none;height:3px;background:rgba(255,255,255,0.1);border-radius:2px;outline:none;padding:0;border:none}
 .anim-row input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:#f5c518;cursor:pointer}
 .anim-row .aval{font-size:11px;color:#f5c518;text-align:right;font-weight:500;min-width:26px}
+.block-toggles{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:4px}
+.btog{display:flex;align-items:center;gap:5px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:6px;padding:4px 8px;cursor:pointer;font-size:11px;color:#666;transition:all .15s;user-select:none}
+.btog:hover{background:rgba(255,255,255,0.07);color:#aaa}
+.btog input{width:auto;accent-color:#f5c518;cursor:pointer;margin:0}
+.btog input:checked+span{color:#f5c518}
+.add-ctext-btn{background:rgba(245,197,24,0.12);border:1px solid rgba(245,197,24,0.3);border-radius:6px;color:#f5c518;font-size:11px;font-weight:600;padding:3px 10px;cursor:pointer;transition:background .15s}
+.add-ctext-btn:hover{background:rgba(245,197,24,0.2)}
+.ctext-card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:10px;position:relative}
+.ctext-toolbar{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;align-items:center}
+.ctext-toolbar select,.ctext-toolbar input[type=text],.ctext-toolbar input[type=number]{background:#1a1b26;border:1px solid rgba(255,255,255,0.08);border-radius:5px;color:#e8eaf2;font-size:11px;padding:3px 6px;outline:none}
+.ctext-toolbar select{cursor:pointer}
+.ctext-toolbar .tbtn{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:5px;color:#888;font-size:12px;padding:3px 7px;cursor:pointer;transition:all .15s;line-height:1.4}
+.ctext-toolbar .tbtn:hover{background:rgba(255,255,255,0.1);color:#fff}
+.ctext-toolbar .tbtn.on{background:rgba(245,197,24,0.15);border-color:rgba(245,197,24,0.35);color:#f5c518}
+.ctext-toolbar input[type=color]{width:28px;height:24px;padding:1px 2px;border-radius:5px;background:#1a1b26;border:1px solid rgba(255,255,255,0.08);cursor:pointer}
+.ctext-input{width:100%;background:#1a1b26;border:1px solid rgba(255,255,255,0.08);border-radius:6px;padding:7px 10px;color:#e8eaf2;font-size:13px;outline:none;resize:none;min-height:44px;font-family:inherit}
+.ctext-input:focus{border-color:#f5c518}
+.ctext-del{position:absolute;top:8px;right:8px;background:none;border:none;color:#444;cursor:pointer;font-size:16px;line-height:1;padding:0}
+.ctext-del:hover{color:#ff6b6b}
+.ctext-label{font-size:10px;color:#555;margin-bottom:5px;display:flex;align-items:center;gap:6px}
+.ctext-label span{flex:1}
 .src-tabs{display:flex;gap:6px;margin-bottom:2px}
 .src-tab{flex:1;padding:9px 6px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:#666;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s;text-align:center}
 .src-tab:hover{background:rgba(255,255,255,0.07);color:#aaa}
@@ -105,7 +136,7 @@ select option{background:#1a1b26}
 .tip{background:rgba(245,197,24,.04);border:1px solid rgba(245,197,24,.12);border-radius:7px;padding:8px 11px;font-size:11px;color:rgba(245,197,24,.65);line-height:1.5}
 ::-webkit-scrollbar{width:4px}
 ::-webkit-scrollbar-thumb{background:rgba(255,255,255,.07);border-radius:2px}
-@media(max-width:680px){.layout{grid-template-columns:1fr}.right{border-top:1px solid rgba(255,255,255,0.05)}.left{padding:14px}.uploads-row{grid-template-columns:1fr}}
+@media(max-width:900px){.layout{grid-template-columns:1fr}.right{position:static;height:auto;border-top:1px solid rgba(255,255,255,0.05)}.left{max-height:none;padding:14px}.uploads-row{grid-template-columns:1fr}.phone{max-height:70vw}}
 </style>
 </head>
 <body>
@@ -269,8 +300,20 @@ select option{background:#1a1b26}
 
   <!-- Текст -->
   <div>
-    <div class="sec">02 — Текст карточки</div>
-    <label class="f">Тип шины (заголовок)</label>
+    <div class="sec">02 — Стандартные блоки</div>
+
+    <!-- Тогглы видимости -->
+    <div class="block-toggles">
+      <label class="btog"><input type="checkbox" id="vis_type"  checked onchange="rp()"><span>Заголовок</span></label>
+      <label class="btog"><input type="checkbox" id="vis_badge" checked onchange="rp()"><span>Размер</span></label>
+      <label class="btog"><input type="checkbox" id="vis_brand" checked onchange="rp()"><span>Бренд</span></label>
+      <label class="btog"><input type="checkbox" id="vis_sub"   checked onchange="rp()"><span>Подзагол.</span></label>
+      <label class="btog"><input type="checkbox" id="vis_disc"  checked onchange="rp()"><span>Скидка</span></label>
+      <label class="btog"><input type="checkbox" id="vis_feats" checked onchange="rp()"><span>Характер.</span></label>
+      <label class="btog"><input type="checkbox" id="vis_tire"  checked onchange="rp()"><span>Фото шины</span></label>
+    </div>
+
+    <label class="f" style="margin-top:10px">Тип шины (заголовок)</label>
     <input type="text" id="f_type" value="ШИНА ЛЕТНЯЯ" oninput="rp()">
     <label class="f">Размер *</label>
     <input type="text" id="f_size" value="175/65 R14" oninput="rp()">
@@ -289,6 +332,18 @@ select option{background:#1a1b26}
     <div class="sec">03 — Характеристики</div>
     <div class="feat-list" id="featList"></div>
     <button type="button" class="add-feat" onclick="addFeat()">+ Добавить характеристику</button>
+  </div>
+
+  <!-- Свои тексты -->
+  <div>
+    <div class="sec" style="display:flex;align-items:center;justify-content:space-between">
+      <span>03б — Свои текстовые блоки</span>
+      <button type="button" class="add-ctext-btn" onclick="addCustomText()">+ Добавить</button>
+    </div>
+    <div id="customTextList" style="display:flex;flex-direction:column;gap:10px;margin-top:8px"></div>
+    <div style="font-size:10px;color:#444;margin-top:6px">
+      💡 Перетаскивайте свои тексты прямо на предпросмотре
+    </div>
   </div>
 
   <!-- Оформление -->
@@ -410,28 +465,110 @@ select option{background:#1a1b26}
 
 <!-- RIGHT: Preview + Generate -->
 <div class="right">
-  <div class="prev-wrap">
-    <div style="text-align:center">
-      <div style="font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:#333;margin-bottom:6px">Предпросмотр</div>
-      <div style="font-size:10px;color:#444;margin-bottom:8px" id="dragHint">☝️ Перетаскивайте элементы прямо на превью</div>
-      <div class="phone" style="cursor:default">
-        <canvas id="prevCv" width="270" height="480" style="cursor:default"></canvas>
-      </div>
-      <button type="button" onclick="resetPositions()" style="margin-top:8px;background:none;border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:#555;font-size:11px;padding:5px 12px;cursor:pointer">↺ Сброс позиций</button>
-    </div>
+
+  <!-- Подписи -->
+  <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 14px 0;flex-shrink:0">
+    <span style="font-size:10px;color:#333;text-transform:uppercase;letter-spacing:.08em">Предпросмотр</span>
+    <span style="font-size:10px;color:#555" id="dragHint">☝️ Перетаскивайте элементы</span>
   </div>
+
+  <!-- Формат видео -->
+  <div class="fmt-bar" id="fmtBar">
+    <button type="button" class="fmt-btn active" onclick="setFormat('9:16')">
+      <span class="fl">9:16</span><span class="fs">Reels/TikTok</span>
+    </button>
+    <button type="button" class="fmt-btn" onclick="setFormat('3:4')">
+      <span class="fl">3:4</span><span class="fs">Portrait</span>
+    </button>
+    <button type="button" class="fmt-btn" onclick="setFormat('1:1')">
+      <span class="fl">1:1</span><span class="fs">Квадрат</span>
+    </button>
+    <button type="button" class="fmt-btn" onclick="setFormat('4:3')">
+      <span class="fl">4:3</span><span class="fs">Классик</span>
+    </button>
+    <button type="button" class="fmt-btn" onclick="setFormat('16:9')">
+      <span class="fl">16:9</span><span class="fs">YouTube</span>
+    </button>
+  </div>
+
+  <!-- Предпросмотр -->
+  <div class="prev-wrap">
+    <canvas id="prevCv" width="540" height="960"></canvas>
+  </div>
+
+  <!-- Панель генерации -->
   <div class="gen-panel">
-    <button type="button" class="btn" id="genBtn" onclick="startGen()">▶ Сгенерировать видео</button>
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+      <button type="button" onclick="resetPositions()"
+        style="background:none;border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:#555;font-size:11px;padding:7px 12px;cursor:pointer;white-space:nowrap">
+        ↺ Сброс
+      </button>
+      <button type="button" class="btn" id="genBtn" onclick="startGen()">▶ Сгенерировать видео</button>
+    </div>
     <div class="prog" id="prog"><div class="pb" id="pb"></div></div>
     <div class="st" id="st"></div>
     <div id="dlArea"></div>
   </div>
+
 </div>
 </div>
 
 <script>
 const W=540,H=960,FPS=24;
 let bgVid=null,tireImg=null,tireMask=null,prevRaf=null,animT=0;
+
+// ── Video format system ───────────────────────────────────────────────────────
+const FORMATS = {
+  '9:16': {w:540,  h:960,  label:'9:16'},
+  '3:4':  {w:540,  h:720,  label:'3:4'},
+  '1:1':  {w:540,  h:540,  label:'1:1'},
+  '4:3':  {w:720,  h:540,  label:'4:3'},
+  '16:9': {w:960,  h:540,  label:'16:9'},
+};
+let currentFmt = '9:16';
+let FW = 540, FH = 960; // current frame dimensions
+
+function setFormat(key){
+  currentFmt = key;
+  const fmt = FORMATS[key];
+  FW = fmt.w; FH = fmt.h;
+  // Update canvas dimensions
+  const cv = document.getElementById('prevCv');
+  cv.width  = FW;
+  cv.height = FH;
+  // Update active button
+  document.querySelectorAll('.fmt-btn').forEach(b=>b.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+  EP = JSON.parse(JSON.stringify(DEFAULT_POS));
+  sizeCanvas();
+  rp();
+}
+
+function sizeCanvas(){
+  const cv = document.getElementById('prevCv');
+  const wrap = cv.parentElement;
+  const aw = wrap.clientWidth  - 16;
+  const ah = wrap.clientHeight - 16;
+  const ratio = FW / FH;
+  let cw = aw, ch = aw / ratio;
+  if(ch > ah){ ch = ah; cw = ah * ratio; }
+  cv.style.width  = Math.round(cw) + 'px';
+  cv.style.height = Math.round(ch) + 'px';
+}
+window.addEventListener('resize', sizeCanvas);
+// Call after DOM ready
+setTimeout(sizeCanvas, 50);
+
+// ── Custom text blocks — объявляем ДО всех функций ───────────────────────────
+let customTexts = [];
+let ctxtIdSeq   = 0;
+const FONT_LIST = ['Oswald','Roboto','Montserrat','Bebas Neue','Anton','Russo One','Raleway','Nunito','Ubuntu','PT Sans','Arial','Georgia','Impact','Verdana'];
+
+// ── Standard block visibility ─────────────────────────────────────────────────
+function vis(key){ const el=document.getElementById('vis_'+key); return !el||el.checked; }
+
+// ── Features list ─────────────────────────────────────────────────────────────
+let feats=['Легкая балансировка','Быстрый отвод воды','Устойчивость на поворотах','Ненаправленный рисунок'];
 
 // ── Element positions (fractions 0-1 of canvas size) ─────────────────────────
 // x,y = top-left anchor of each element
@@ -540,8 +677,6 @@ const THEMES={
   blue:  {badge:'#112266',badgeL:'#1a3399',txt:'#88aaff',line:'#1e44cc',feat:'rgba(8,14,40,0.85)',dot:'#5588ff',overlay:'rgba(4,6,18,0.55)'},
   purple:{badge:'#3d1166',badgeL:'#5a1a99',txt:'#cc88ff',line:'#7722cc',feat:'rgba(18,8,36,0.85)',dot:'#aa55ff',overlay:'rgba(8,4,16,0.55)'},
 };
-
-let feats=['Легкая балансировка','Быстрый отвод воды','Устойчивость на поворотах','Ненаправленный рисунок'];
 
 function renderFeatList(){
   const el=document.getElementById('featList');el.innerHTML='';
@@ -742,7 +877,7 @@ function drawFrame(cv,cw,ch,gt,vidSrc){
   const tireW = cw * 0.66, tireH2 = ch * 0.55;
 
   // 4. Tire image
-  if(tireMask){
+  if(tireMask && vis('tire')){
     const tr  = Math.min(tireW/tireMask.width, tireH2/tireMask.height) * tireS;
     const tw  = tireMask.width  * tr;
     const tha = tireMask.height * tr;
@@ -770,7 +905,7 @@ function drawFrame(cv,cw,ch,gt,vidSrc){
   }
 
   // Бренд
-  if(brand){
+  if(brand && vis('brand')){
     const a = elemAnim('ae_brand','at_brand');
     const bx=px('brand'), by=py('brand');
     regBox('brand', bx, by, LEFTWID*0.7, brandH||F.brand.px*1.6);
@@ -782,7 +917,7 @@ function drawFrame(cv,cw,ch,gt,vidSrc){
   }
 
   // Скидка
-  if(disc){
+  if(disc && vis('disc')){
     const a = elemAnim('ae_brand','at_brand');
     withAnim(a,()=>{
       ctx.font=F.brand.font;
@@ -798,7 +933,7 @@ function drawFrame(cv,cw,ch,gt,vidSrc){
   }
 
   // Заголовок
-  {
+  if(vis('type')){
     const a=elemAnim('ae_type','at_type');
     const tx=px('type'), ty2=py('type');
     ctx.font=F.type.font;
@@ -817,7 +952,7 @@ function drawFrame(cv,cw,ch,gt,vidSrc){
   }
 
   // Плашка размера
-  {
+  if(vis('badge')){
     const a=elemAnim('ae_size','at_size');
     const bx=px('badge'), by=py('badge');
     const sbw=LEFTWID-PAD;
@@ -834,7 +969,7 @@ function drawFrame(cv,cw,ch,gt,vidSrc){
   }
 
   // Подзаголовок
-  if(sub&&subH>0){
+  if(sub && subH>0 && vis('sub')){
     const a=elemAnim('ae_sub','at_sub');
     const bx=px('sub'), by=py('sub');
     const sw=(LEFTWID-PAD)*0.75;
@@ -848,7 +983,7 @@ function drawFrame(cv,cw,ch,gt,vidSrc){
   }
 
   // Характеристики
-  {
+  if(vis('feats')){
     const baseDelay=parseFloat(document.getElementById('at_feat')?.value||'4');
     const effect=document.getElementById('ae_feat')?.value||'slideLeft';
     const fx2=px('feats'), fy2=py('feats');
@@ -888,7 +1023,38 @@ function drawFrame(cv,cw,ch,gt,vidSrc){
     });
   }
 
-  // 7. Bottom bar
+  // ── 8. Custom text blocks ─────────────────────────────────────────────────
+  customTexts.forEach(t=>{
+    const key = 'ct_'+t.id;
+    if(!EP[key]) EP[key]={x:t.x,y:t.y};
+    const cx2=EP[key].x*cw, cy2=EP[key].y*ch;
+    const weight=(t.bold?'bold ':'')+(t.italic?'italic ':'');
+    const fontStr=`${weight}${Math.round(t.size*s)}px '${t.font}',sans-serif`;
+    ctx.save();
+    ctx.font=fontStr;
+    ctx.fillStyle=t.color;
+    ctx.globalAlpha=(t.opacity||100)/100;
+    ctx.textAlign=t.align||'left';
+    ctx.shadowColor='rgba(0,0,0,0.6)';ctx.shadowBlur=4*s;
+    // Multi-line support
+    const lines=t.text.split('\n');
+    const lh=t.size*s*1.3;
+    const maxW=lines.reduce((m,l)=>Math.max(m,ctx.measureText(l).width),0);
+    // Register box for dragging
+    let bx=cx2;
+    if(t.align==='center') bx=cx2-maxW/2;
+    if(t.align==='right')  bx=cx2-maxW;
+    regBox(key,bx,cy2-lh*0.8,maxW,lh*lines.length);
+    // Draw hover outline
+    if(hovered===key||drag?.key===key){
+      ctx.save();ctx.strokeStyle='rgba(245,197,24,0.6)';ctx.lineWidth=1.5*s;
+      ctx.setLineDash([3*s,3*s]);ctx.strokeRect(bx-4*s,cy2-lh*0.9,maxW+8*s,lh*lines.length+4*s);ctx.restore();
+    }
+    lines.forEach((line,i)=>ctx.fillText(line,cx2,cy2+i*lh));
+    ctx.restore();
+  });
+
+  // 9. Bottom bar
   ctx.fillStyle = th.line; ctx.fillRect(0, ch-3*s, cw, 3*s);
 }
 
@@ -896,11 +1062,12 @@ function drawFrame(cv,cw,ch,gt,vidSrc){
 function rp(){cancelAnimationFrame(prevRaf);animT=0;loop();}
 function loop(){
   animT+=0.018;
-  drawFrame(document.getElementById('prevCv'),270,480,animT,bgVid);
+  drawFrame(document.getElementById('prevCv'),FW,FH,animT,bgVid);
   prevRaf=requestAnimationFrame(loop);
 }
 loop();
 initDrag();
+sizeCanvas();
 
 // ── Generate ──────────────────────────────────────────────────────────────────
 async function startGen(){
@@ -926,7 +1093,7 @@ async function startGen(){
 async function genVideo(){
   const dur=parseInt(v('f_dur'))||10;
   const totF=FPS*dur;
-  const cv=document.createElement('canvas');cv.width=W;cv.height=H;
+  const cv=document.createElement('canvas');cv.width=FW;cv.height=FH;
   if(bgVid){bgVid.currentTime=0;await new Promise(r=>{bgVid.onseeked=r;setTimeout(r,500);});bgVid.play().catch(()=>{});}
   const mime=MediaRecorder.isTypeSupported('video/webm;codecs=vp9')?'video/webm;codecs=vp9':'video/webm';
   const stream=cv.captureStream(FPS);
@@ -939,7 +1106,7 @@ async function genVideo(){
     const bar=document.getElementById('pb');
     function frame(){
       gt+=1/FPS;
-      drawFrame(cv,W,H,gt,bgVid);
+      drawFrame(cv,FW,FH,gt,bgVid);
       f++;bar.style.width=Math.round(f/totF*95)+'%';
       if(f<totF) setTimeout(frame,0);
       else{if(bgVid)bgVid.pause();rec.stop();}
@@ -949,7 +1116,75 @@ async function genVideo(){
     frame();
   });
 }
-// ── Tab switcher ──────────────────────────────────────────────────────────────
+// ── Custom text blocks ────────────────────────────────────────────────────────
+function addCustomText(){
+  const id = ++ctxtIdSeq;
+  customTexts.push({
+    id, text:'Мой текст', font:'Oswald', size:28, color:'#ffffff',
+    bold:true, italic:false, align:'left', opacity:100,
+    x: 0.05 + Math.random()*0.3, y: 0.45 + Math.random()*0.2,
+  });
+  // Add to EP for dragging
+  EP['ct_'+id] = {x: customTexts[customTexts.length-1].x, y: customTexts[customTexts.length-1].y};
+  renderCustomTextList();
+  rp();
+}
+
+function removeCustomText(id){
+  customTexts = customTexts.filter(t=>t.id!==id);
+  delete EP['ct_'+id];
+  delete BOXES['ct_'+id];
+  renderCustomTextList();
+  rp();
+}
+
+function ctChange(id, field, val){
+  const t = customTexts.find(t=>t.id===id);
+  if(!t) return;
+  t[field] = val;
+  rp();
+}
+
+function renderCustomTextList(){
+  const el = document.getElementById('customTextList');
+  el.innerHTML='';
+  if(customTexts.length===0){
+    el.innerHTML='<div style="font-size:11px;color:#444;text-align:center;padding:10px">Нажмите «+ Добавить» чтобы создать свой текст</div>';
+    return;
+  }
+  customTexts.forEach(t=>{
+    const d=document.createElement('div');
+    d.className='ctext-card';
+    d.innerHTML=`
+      <button class="ctext-del" onclick="removeCustomText(${t.id})">×</button>
+      <div class="ctext-label"><span>Текст #${t.id} · перетащите на превью</span></div>
+      <div class="ctext-toolbar">
+        <select onchange="ctChange(${t.id},'font',this.value)" style="flex:1;min-width:90px">
+          ${FONT_LIST.map(f=>`<option value="${f}"${f===t.font?' selected':''}>${f}</option>`).join('')}
+        </select>
+        <input type="number" min="8" max="120" value="${t.size}" style="width:46px"
+               onchange="ctChange(${t.id},'size',+this.value)">
+        <input type="color" value="${t.color}" oninput="ctChange(${t.id},'color',this.value)">
+        <button type="button" class="tbtn${t.bold?' on':''}"
+                onclick="ctChange(${t.id},'bold',!${t.bold});renderCustomTextList()"><b>B</b></button>
+        <button type="button" class="tbtn${t.italic?' on':''}"
+                onclick="ctChange(${t.id},'italic',!${t.italic});renderCustomTextList()"><i>I</i></button>
+        <button type="button" class="tbtn${t.align==='left'?' on':''}"
+                onclick="ctChange(${t.id},'align','left');renderCustomTextList()" title="Лево">⬅</button>
+        <button type="button" class="tbtn${t.align==='center'?' on':''}"
+                onclick="ctChange(${t.id},'align','center');renderCustomTextList()" title="Центр">☰</button>
+        <button type="button" class="tbtn${t.align==='right'?' on':''}"
+                onclick="ctChange(${t.id},'align','right');renderCustomTextList()" title="Право">➡</button>
+      </div>
+      <textarea class="ctext-input" rows="2"
+        oninput="ctChange(${t.id},'text',this.value)">${he(t.text)}</textarea>
+    `;
+    el.appendChild(d);
+  });
+}
+renderCustomTextList();
+
+
 function switchTab(tab){
   document.getElementById('panel_manual').style.display = tab==='manual' ? '' : 'none';
   document.getElementById('panel_ai').style.display     = tab==='ai'     ? '' : 'none';
