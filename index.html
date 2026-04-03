@@ -59,6 +59,22 @@ select option{background:#1a1b26}
 .font-row input[type=range]{-webkit-appearance:none;height:3px;background:rgba(255,255,255,0.1);border-radius:2px;outline:none;padding:0;border:none}
 .font-row input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:#f5c518;cursor:pointer}
 .font-row .fval{font-size:11px;color:#f5c518;text-align:right;font-weight:500;min-width:28px}
+.ai-card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:16px;position:relative;overflow:hidden}
+.ai-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(245,197,24,0.04) 0%,rgba(100,80,255,0.04) 100%);pointer-events:none}
+.ai-badge{display:inline-block;background:rgba(245,197,24,0.15);color:#f5c518;border:1px solid rgba(245,197,24,0.3);border-radius:4px;font-size:10px;font-weight:600;letter-spacing:.08em;padding:2px 8px;text-transform:uppercase;margin-bottom:8px}
+.ai-title{font-family:'Oswald',sans-serif;font-size:15px;font-weight:600;color:#fff;margin-bottom:6px}
+.ai-desc{font-size:11px;color:#666;line-height:1.55}
+.ai-btn{width:100%;margin-top:14px;padding:11px;background:linear-gradient(90deg,#7c3aed,#4f46e5);color:#fff;border:none;border-radius:8px;font-family:'Oswald',sans-serif;font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:opacity .2s;opacity:0.45}
+.ai-btn:not(:disabled){opacity:1}
+.ai-btn:not(:disabled):hover{opacity:.85}
+.ai-btn:disabled{cursor:not-allowed}
+.ai-status{margin-top:8px;font-size:11px;text-align:center;min-height:14px;color:#666;display:flex;align-items:center;justify-content:center;gap:6px}
+.ai-status.ok{color:#4caf88}.ai-status.err{color:#ff6b6b}
+.ai-prompts{margin-top:12px}
+.ai-prompts-title{font-size:10px;color:#555;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
+.ai-prompt-chip{display:inline-block;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:20px;padding:4px 11px;font-size:11px;color:#888;cursor:pointer;margin:0 4px 4px 0;transition:all .15s}
+.ai-prompt-chip:hover{background:rgba(245,197,24,0.1);border-color:rgba(245,197,24,0.3);color:#f5c518}
+.ai-card input:disabled,.ai-card select:disabled,.ai-card textarea:disabled{opacity:0.4;cursor:not-allowed}
 .anim-row{display:grid;grid-template-columns:60px 1fr 70px 30px;gap:6px;align-items:center;margin-bottom:6px}
 .anim-row .alabel{font-size:10px;color:#666;white-space:nowrap;letter-spacing:.04em}
 .anim-row select{font-size:11px;padding:5px 7px}
@@ -193,7 +209,72 @@ select option{background:#1a1b26}
 
   </div>
 
-  <!-- Анимация появления -->
+  <!-- ИИ Генерация видео -->
+  <div>
+    <div class="sec">07 — ИИ генерация фона</div>
+
+    <div class="ai-card">
+      <div class="ai-badge">Скоро</div>
+      <div class="ai-title">Генерация видео через ИИ</div>
+      <div class="ai-desc">Опишите сцену — ИИ создаст фоновое видео. Потом мы наложим поверх шину, размер и характеристики.</div>
+
+      <label class="f" style="margin-top:14px">Выберите ИИ-сервис</label>
+      <select id="ai_service" onchange="onAiServiceChange()" disabled>
+        <option value="">— Выбрать сервис —</option>
+        <option value="runway">Runway ML (Gen-3)</option>
+        <option value="kling">Kling AI</option>
+        <option value="pika">Pika Labs</option>
+        <option value="luma">Luma Dream Machine</option>
+        <option value="replicate">Replicate API</option>
+      </select>
+
+      <label class="f">API ключ</label>
+      <div style="position:relative">
+        <input type="text" id="ai_key" placeholder="Вставьте API ключ..." disabled
+               style="padding-right:36px" oninput="onApiKeyInput()">
+        <button type="button" id="ai_eye" onclick="toggleKey()"
+                style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;color:#555;cursor:pointer;font-size:16px;padding:0">👁</button>
+      </div>
+
+      <label class="f">Промт (описание сцены)</label>
+      <textarea id="ai_prompt" rows="3" disabled
+        placeholder="Cinematic desert scene, sandy ground with rocks, warm golden light, dust particles floating, slow camera movement forward, no people, no text, 4K..."></textarea>
+
+      <div class="row2" style="margin-top:10px">
+        <div>
+          <label class="f">Длительность</label>
+          <select id="ai_dur" disabled>
+            <option value="5">5 сек</option>
+            <option value="8" selected>8 сек</option>
+            <option value="10">10 сек</option>
+          </select>
+        </div>
+        <div>
+          <label class="f">Формат</label>
+          <select id="ai_ratio" disabled>
+            <option value="9:16">9:16 (вертикальный)</option>
+            <option value="16:9">16:9 (горизонтальный)</option>
+            <option value="1:1">1:1 (квадрат)</option>
+          </select>
+        </div>
+      </div>
+
+      <button type="button" class="ai-btn" id="ai_gen_btn" onclick="generateAiVideo()" disabled>
+        ✨ Сгенерировать фон через ИИ
+      </button>
+
+      <div class="ai-status" id="ai_status"></div>
+
+      <div class="ai-prompts">
+        <div class="ai-prompts-title">Готовые промты:</div>
+        <div class="ai-prompt-chip" onclick="setPrompt('desert')">🏜 Пустыня</div>
+        <div class="ai-prompt-chip" onclick="setPrompt('road')">🛣 Ночная трасса</div>
+        <div class="ai-prompt-chip" onclick="setPrompt('winter')">❄️ Зима</div>
+        <div class="ai-prompt-chip" onclick="setPrompt('city')">🌆 Город</div>
+        <div class="ai-prompt-chip" onclick="setPrompt('offroad')">🏔 Бездорожье</div>
+      </div>
+    </div>
+  </div>
   <div>
     <div class="sec">06 — Анимация появления</div>
 
@@ -690,6 +771,71 @@ async function genVideo(){
     frame();
   });
 }
+// ── AI Section ────────────────────────────────────────────────────────────────
+const AI_PROMPTS = {
+  desert:  'Cinematic desert landscape, warm golden hour sunlight, sandy ground with scattered rocks, dust particles floating in air, slow dolly forward camera movement, empty center frame, no people, no text, no tire, photorealistic 4K, vertical 9:16',
+  road:    'Cinematic wet asphalt night highway, neon city lights bokeh background, rain drops on ground, slow forward camera drift, empty foreground, no people, no cars, no text, dark moody atmosphere, blue and orange color grade, photorealistic 4K, vertical 9:16',
+  winter:  'Cinematic winter forest road, heavy snow falling slowly, pine trees covered in snow, soft blue cold light, slow camera movement forward, empty center frame, no people, no vehicles, no text, misty foggy atmosphere, photorealistic 4K, vertical 9:16',
+  city:    'Cinematic city street at blue hour, wet pavement with light reflections, skyscrapers bokeh background, slow parallax camera movement, empty foreground, no people, no cars, no text, dramatic shadows, photorealistic 4K, vertical 9:16',
+  offroad: 'Cinematic mountain off-road trail, rocky terrain, dramatic clouds, golden hour warm light, dust floating in air, slow low-angle camera movement, empty frame, no people, no text, photorealistic 4K, vertical 9:16',
+};
+
+function setPrompt(key){
+  const el = document.getElementById('ai_prompt');
+  if(el && !el.disabled) el.value = AI_PROMPTS[key] || '';
+}
+
+function onAiServiceChange(){
+  const svc = document.getElementById('ai_service').value;
+  const hasService = svc !== '';
+  document.getElementById('ai_key').disabled    = !hasService;
+  document.getElementById('ai_prompt').disabled  = !hasService;
+  document.getElementById('ai_dur').disabled     = !hasService;
+  document.getElementById('ai_ratio').disabled   = !hasService;
+  // Button only enabled when key is also filled
+  onApiKeyInput();
+}
+
+function onApiKeyInput(){
+  const svc = document.getElementById('ai_service').value;
+  const key = document.getElementById('ai_key').value.trim();
+  document.getElementById('ai_gen_btn').disabled = !(svc && key);
+}
+
+function toggleKey(){
+  const inp = document.getElementById('ai_key');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+}
+
+async function generateAiVideo(){
+  const svc    = document.getElementById('ai_service').value;
+  const key    = document.getElementById('ai_key').value.trim();
+  const prompt = document.getElementById('ai_prompt').value.trim();
+  const dur    = document.getElementById('ai_dur').value;
+  const ratio  = document.getElementById('ai_ratio').value;
+  const btn    = document.getElementById('ai_gen_btn');
+  const status = document.getElementById('ai_status');
+
+  if(!svc || !key || !prompt){
+    status.className='ai-status err';
+    status.textContent='Заполните сервис, ключ и промт';
+    return;
+  }
+
+  btn.disabled = true;
+  status.className = 'ai-status';
+  status.innerHTML = '<div class="spin"></div> Отправка запроса...';
+
+  // Пока сервисы не подключены — показываем заглушку
+  await new Promise(r => setTimeout(r, 1500));
+
+  status.className = 'ai-status err';
+  status.innerHTML = `⚠️ Сервис <b>${svc}</b> ещё не подключён.<br>
+    <span style="font-size:10px;color:#555;display:block;margin-top:4px">
+    Выберите подходящий API — подключим на следующем шаге</span>`;
+  btn.disabled = false;
+}
+
 function setSt(h,c){const el=document.getElementById('st');el.className='st '+c;el.innerHTML=h;}
 </script>
 </body>
