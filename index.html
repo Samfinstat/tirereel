@@ -605,8 +605,79 @@ function resetPositions(){
 const BOXES = {};
 
 // ── Drag state ────────────────────────────────────────────────────────────────
-let drag = null; // {key, startMouseFX, startMouseFY, startEX, startEY}
+let drag = null;
 let hovered = null;
+let snapLines = []; // lines to draw: [{x1,y1,x2,y2,type}]
+
+// Snap threshold in fraction units
+const SNAP_THR = 0.025;
+
+// Snap guide positions (fraction of canvas)
+const SNAP_H = [0, 0.25, 0.5, 0.75, 1.0]; // horizontal snap X
+const SNAP_V = [0, 1/3, 0.5, 2/3, 1.0];   // vertical snap Y
+
+function calcSnap(key, rawX, rawY){
+  const b = BOXES[key];
+  if(!b) return {x:rawX, y:rawY};
+  const cw = FW, ch = FH;
+
+  // Element center & edges in fraction space
+  const ew = b.w/cw, eh = b.h/ch;
+  const cx = rawX + ew/2;   // element center X
+  const cy = rawY + eh/2;   // element center Y
+  const rx = rawX + ew;     // element right edge X
+
+  let snapX = rawX, snapY = rawY;
+  const lines = [];
+
+  // Check horizontal snaps (for X)
+  for(const sx of SNAP_H){
+    // Left edge snaps
+    if(Math.abs(rawX - sx) < SNAP_THR){ snapX = sx; lines.push({x1:sx,y1:0,x2:sx,y2:1,t:'x'}); break; }
+    // Center snaps
+    if(Math.abs(cx - sx) < SNAP_THR){ snapX = sx - ew/2; lines.push({x1:sx,y1:0,x2:sx,y2:1,t:'x'}); break; }
+    // Right edge snaps
+    if(Math.abs(rx - sx) < SNAP_THR){ snapX = sx - ew; lines.push({x1:sx,y1:0,x2:sx,y2:1,t:'x'}); break; }
+  }
+
+  // Check vertical snaps (for Y)
+  for(const sy of SNAP_V){
+    if(Math.abs(rawY - sy) < SNAP_THR){ snapY = sy; lines.push({x1:0,y1:sy,x2:1,y2:sy,t:'y'}); break; }
+    if(Math.abs(cy - sy) < SNAP_THR){ snapY = sy - eh/2; lines.push({x1:0,y1:sy,x2:1,y2:sy,t:'y'}); break; }
+  }
+
+  snapLines = lines;
+  return {x: Math.max(0, Math.min(1, snapX)), y: Math.max(0, Math.min(1, snapY))};
+}
+
+function drawSnapLines(ctx, cw, ch){
+  if(!drag || snapLines.length===0) return;
+  ctx.save();
+  snapLines.forEach(l=>{
+    ctx.strokeStyle = l.t==='x' ? 'rgba(245,197,24,0.85)' : 'rgba(100,180,255,0.85)';
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([6,4]);
+    ctx.lineDashOffset = 0;
+    ctx.beginPath();
+    ctx.moveTo(l.x1*cw, l.y1*ch);
+    ctx.lineTo(l.x2*cw, l.y2*ch);
+    ctx.stroke();
+    // Label
+    const labelMap = {
+      0:'◀ Край',0.25:'¼',0.5:'⊕ Центр',0.75:'¾',1.0:'Край ▶',
+      0.333:'⅓',0.667:'⅔',
+    };
+    const val = l.t==='x' ? l.x1 : l.y1;
+    const label = labelMap[Math.round(val*1000)/1000] || (Math.round(val*100)+'%');
+    ctx.setLineDash([]);
+    ctx.font = `bold ${Math.round(10*(cw/FW))}px sans-serif`;
+    ctx.fillStyle = l.t==='x' ? 'rgba(245,197,24,0.9)' : 'rgba(100,180,255,0.9)';
+    ctx.textAlign = l.t==='x' ? 'center' : 'left';
+    if(l.t==='x') ctx.fillText(label, l.x1*cw, 14*(ch/FH));
+    else ctx.fillText(label, 4*(cw/FW), l.y1*ch - 4*(ch/FH));
+  });
+  ctx.restore();
+}
 
 function initDrag(){
   const cv = document.getElementById('prevCv');
@@ -621,9 +692,8 @@ function initDrag(){
   }
 
   function hitTest(fx,fy){
-    // Convert fraction → canvas px
     const cx = fx * cv.width, cy = fy * cv.height;
-    const keys = Object.keys(BOXES).reverse(); // top elements first
+    const keys = Object.keys(BOXES).reverse();
     for(const k of keys){
       const b = BOXES[k];
       if(!b) continue;
@@ -639,7 +709,7 @@ function initDrag(){
     if(!key) return;
     drag = {key, startFX:fx, startFY:fy, startEX:EP[key].x, startEY:EP[key].y};
     cv.style.cursor='grabbing';
-    document.getElementById('dragHint').textContent='🔵 Перемещаю: '+keyLabel(key);
+    document.getElementById('dragHint').textContent='🔵 '+keyLabel(key)+' — жёлтая = центр X, синяя = центр Y';
   }
 
   function onMove(e){
@@ -648,8 +718,11 @@ function initDrag(){
     if(drag){
       const dx = fx - drag.startFX;
       const dy = fy - drag.startFY;
-      EP[drag.key].x = Math.max(0, Math.min(1, drag.startEX + dx));
-      EP[drag.key].y = Math.max(0, Math.min(1, drag.startEY + dy));
+      const rawX = drag.startEX + dx;
+      const rawY = drag.startEY + dy;
+      const snapped = calcSnap(drag.key, rawX, rawY);
+      EP[drag.key].x = snapped.x;
+      EP[drag.key].y = snapped.y;
     } else {
       const h = hitTest(fx,fy);
       if(h !== hovered){
@@ -661,6 +734,7 @@ function initDrag(){
 
   function onUp(e){
     if(drag){
+      snapLines = [];
       cv.style.cursor = 'grab';
       document.getElementById('dragHint').textContent='☝️ Перетаскивайте элементы прямо на превью';
       drag = null;
@@ -921,8 +995,11 @@ function drawFrame(cv,cw,ch,gt,vidSrc){
   if(brand && vis('brand')){
     const a = elemAnim('ae_brand','at_brand');
     const bx=px('brand'), by=py('brand');
-    regBox('brand', bx, by, LEFTWID*0.7, brandH||F.brand.px*1.6);
-    drawHover('brand',bx,by,LEFTWID*0.7,brandH||F.brand.px*1.6);
+    ctx.font=F.brand.font; // установить шрифт ДО измерения
+    const brandW = ctx.measureText(brand.toUpperCase()).width + 6*s;
+    const brandH2 = brandH||F.brand.px*1.6;
+    regBox('brand', bx, by, brandW, brandH2);
+    drawHover('brand', bx, by, brandW, brandH2);
     withAnim(a,()=>{
       ctx.font=F.brand.font;ctx.fillStyle='rgba(255,255,255,0.5)';
       ctx.textAlign='left';ctx.fillText(brand.toUpperCase(),bx,by+F.brand.px);
@@ -968,7 +1045,8 @@ function drawFrame(cv,cw,ch,gt,vidSrc){
   if(vis('badge')){
     const a=elemAnim('ae_size','at_size');
     const bx=px('badge'), by=py('badge');
-    const sbw=LEFTWID-PAD;
+    ctx.font=F.size.font;
+    const sbw=Math.max(ctx.measureText(sizeText).width+30*s, 120*s);
     regBox('badge',bx,by,sbw,badgeH);
     drawHover('badge',bx,by,sbw,badgeH);
     withAnim(a,()=>{
@@ -985,7 +1063,8 @@ function drawFrame(cv,cw,ch,gt,vidSrc){
   if(sub && subH>0 && vis('sub')){
     const a=elemAnim('ae_sub','at_sub');
     const bx=px('sub'), by=py('sub');
-    const sw=(LEFTWID-PAD)*0.75;
+    ctx.font=F.sub.font;
+    const sw=Math.max(ctx.measureText(sub.toUpperCase()).width+24*s, 60*s);
     regBox('sub',bx,by,sw,subH);
     drawHover('sub',bx,by,sw,subH);
     withAnim(a,()=>{
@@ -1107,6 +1186,9 @@ function drawFrame(cv,cw,ch,gt,vidSrc){
 
     ctx.restore();
   });
+
+  // ── Snap guides ───────────────────────────────────────────────────────────
+  drawSnapLines(ctx, cw, ch);
 
   // 9. Bottom bar
   ctx.fillStyle = th.line; ctx.fillRect(0, ch-3*s, cw, 3*s);
