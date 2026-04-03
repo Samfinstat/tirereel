@@ -59,6 +59,23 @@ select option{background:#1a1b26}
 .font-row input[type=range]{-webkit-appearance:none;height:3px;background:rgba(255,255,255,0.1);border-radius:2px;outline:none;padding:0;border:none}
 .font-row input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:#f5c518;cursor:pointer}
 .font-row .fval{font-size:11px;color:#f5c518;text-align:right;font-weight:500;min-width:28px}
+.ai-flow{display:flex;align-items:center;gap:6px;margin-top:12px;flex-wrap:wrap}
+.ai-flow-step{display:flex;flex-direction:column;align-items:center;gap:2px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:6px 8px;min-width:44px}
+.ai-flow-result{background:rgba(245,197,24,0.08);border-color:rgba(245,197,24,0.2)}
+.ai-flow-icon{font-size:16px}
+.ai-flow-text{font-size:9px;color:#666;text-align:center;white-space:nowrap}
+.ai-flow-arrow{color:#444;font-size:14px;font-weight:700}
+.ai-upload-box{display:flex;flex-direction:column;align-items:center;gap:3px;border:1.5px dashed rgba(255,255,255,0.1);border-radius:8px;padding:12px;text-align:center;cursor:pointer;transition:all .2s}
+.ai-upload-box:hover{border-color:rgba(245,197,24,0.35);background:rgba(245,197,24,0.03)}
+.ai-upload-box.loaded{border-color:rgba(245,197,24,0.4);background:rgba(245,197,24,0.05)}
+.ai-upl-icon{font-size:20px}
+.ai-upl-text{font-size:12px;color:#888;font-weight:500}
+.ai-upl-sub{font-size:10px;color:#444}
+.ai-thumb-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.ai-thumb{width:48px;height:48px;border-radius:6px;overflow:hidden;border:1px solid rgba(255,255,255,0.08);position:relative}
+.ai-thumb img{width:100%;height:100%;object-fit:cover}
+.ai-thumb .ai-tdel{position:absolute;top:1px;right:1px;width:14px;height:14px;background:rgba(0,0,0,0.7);border:none;border-radius:50%;cursor:pointer;color:#fff;font-size:9px;display:flex;align-items:center;justify-content:center;padding:0}
+.ai-thumb .ai-tdel:hover{background:#c0392b}
 .ai-card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:16px;position:relative;overflow:hidden}
 .ai-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(245,197,24,0.04) 0%,rgba(100,80,255,0.04) 100%);pointer-events:none}
 .ai-badge{display:inline-block;background:rgba(245,197,24,0.15);color:#f5c518;border:1px solid rgba(245,197,24,0.3);border-radius:4px;font-size:10px;font-weight:600;letter-spacing:.08em;padding:2px 8px;text-transform:uppercase;margin-bottom:8px}
@@ -81,6 +98,10 @@ select option{background:#1a1b26}
 .anim-row input[type=range]{-webkit-appearance:none;height:3px;background:rgba(255,255,255,0.1);border-radius:2px;outline:none;padding:0;border:none}
 .anim-row input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:#f5c518;cursor:pointer}
 .anim-row .aval{font-size:11px;color:#f5c518;text-align:right;font-weight:500;min-width:26px}
+.src-tabs{display:flex;gap:6px;margin-bottom:2px}
+.src-tab{flex:1;padding:9px 6px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:#666;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s;text-align:center}
+.src-tab:hover{background:rgba(255,255,255,0.07);color:#aaa}
+.src-tab.active{background:rgba(245,197,24,0.1);border-color:rgba(245,197,24,0.35);color:#f5c518}
 .tip{background:rgba(245,197,24,.04);border:1px solid rgba(245,197,24,.12);border-radius:7px;padding:8px 11px;font-size:11px;color:rgba(245,197,24,.65);line-height:1.5}
 ::-webkit-scrollbar{width:4px}
 ::-webkit-scrollbar-thumb{background:rgba(255,255,255,.07);border-radius:2px}
@@ -95,30 +116,155 @@ select option{background:#1a1b26}
 <div class="layout">
 <div class="left">
 
-  <!-- Загрузка файлов -->
+  <!-- 01: Источник видео — два пути -->
   <div>
-    <div class="sec">01 — Медиафайлы</div>
-    <div class="uploads-row">
-      <div>
-        <div style="font-size:10px;color:#666;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em">Фоновое видео</div>
-        <input type="file" id="bgInput" accept="video/*" style="display:none" onchange="loadBg(this.files[0])">
-        <label for="bgInput" class="ubox" id="bgBox">
-          <span class="ic">🎬</span>
-          <div class="tt" style="font-size:11px">Загрузить видео</div>
-          <div class="sb">MP4, MOV</div>
-        </label>
+    <div class="sec">01 — Источник фонового видео</div>
+
+    <!-- Таб-переключатель -->
+    <div class="src-tabs">
+      <button type="button" class="src-tab active" id="tab_manual" onclick="switchTab('manual')">
+        📁 Загрузить своё
+      </button>
+      <button type="button" class="src-tab" id="tab_ai" onclick="switchTab('ai')">
+        ✨ Создать через ИИ
+      </button>
+    </div>
+
+    <!-- Путь 1: Своё видео -->
+    <div id="panel_manual">
+      <div class="uploads-row" style="margin-top:10px">
+        <div>
+          <div style="font-size:10px;color:#666;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em">Фоновое видео</div>
+          <input type="file" id="bgInput" accept="video/*" style="display:none" onchange="loadBg(this.files[0])">
+          <label for="bgInput" class="ubox" id="bgBox">
+            <span class="ic">🎬</span>
+            <div class="tt" style="font-size:11px">Загрузить видео</div>
+            <div class="sb">MP4, MOV</div>
+          </label>
+        </div>
+        <div>
+          <div style="font-size:10px;color:#666;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em">Фото шины</div>
+          <input type="file" id="tireInput" accept="image/*" style="display:none" onchange="loadTire(this.files[0])">
+          <label for="tireInput" class="ubox" id="tireBox">
+            <span class="ic">📸</span>
+            <div class="tt" style="font-size:11px">Загрузить фото</div>
+            <div class="sb">JPG, PNG</div>
+          </label>
+        </div>
       </div>
-      <div>
-        <div style="font-size:10px;color:#666;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em">Фото шины</div>
-        <input type="file" id="tireInput" accept="image/*" style="display:none" onchange="loadTire(this.files[0])">
-        <label for="tireInput" class="ubox" id="tireBox">
-          <span class="ic">📸</span>
-          <div class="tt" style="font-size:11px">Загрузить фото</div>
-          <div class="sb">JPG, PNG</div>
-        </label>
+      <div class="tip" style="margin-top:8px">💡 Фото на белом фоне — фон удалится автоматически. Видео — красивая сцена без текста.</div>
+    </div>
+
+    <!-- Путь 2: ИИ сборка -->
+    <div id="panel_ai" style="display:none">
+      <div class="ai-card" style="margin-top:10px">
+
+        <!-- Схема -->
+        <div class="ai-flow">
+          <div class="ai-flow-step"><div class="ai-flow-icon">🎬</div><div class="ai-flow-text">Ваше видео</div></div>
+          <div class="ai-flow-arrow">+</div>
+          <div class="ai-flow-step"><div class="ai-flow-icon">📸</div><div class="ai-flow-text">Фото шин</div></div>
+          <div class="ai-flow-arrow">+</div>
+          <div class="ai-flow-step"><div class="ai-flow-icon">✍️</div><div class="ai-flow-text">Промт</div></div>
+          <div class="ai-flow-arrow">→</div>
+          <div class="ai-flow-step ai-flow-result"><div class="ai-flow-icon">✨</div><div class="ai-flow-text">Фон готов</div></div>
+        </div>
+
+        <!-- Загрузка материалов -->
+        <div class="uploads-row" style="margin-top:12px">
+          <div>
+            <div style="font-size:10px;color:#666;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em">Видео-база</div>
+            <input type="file" id="ai_video_input" accept="video/*" style="display:none" onchange="onAiVideoLoad(this.files[0])">
+            <label for="ai_video_input" class="ubox" id="ai_video_box">
+              <span class="ic">🎬</span>
+              <div class="tt" style="font-size:11px">Видео-заготовка</div>
+              <div class="sb">MP4, MOV</div>
+            </label>
+          </div>
+          <div>
+            <div style="font-size:10px;color:#666;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em">Фото шин (до 5)</div>
+            <input type="file" id="ai_photos_input" accept="image/*" multiple style="display:none" onchange="onAiPhotosLoad(this.files)">
+            <label for="ai_photos_input" class="ubox" id="ai_photos_box">
+              <span class="ic">📸</span>
+              <div class="tt" style="font-size:11px">Фото для ИИ</div>
+              <div class="sb">JPG, PNG</div>
+            </label>
+          </div>
+        </div>
+        <div class="ai-thumb-row" id="ai_thumb_row"></div>
+
+        <!-- Сервис + ключ -->
+        <label class="f" style="margin-top:12px">ИИ-сервис</label>
+        <select id="ai_service" onchange="onAiServiceChange()">
+          <option value="">— Выбрать сервис —</option>
+          <option value="runway">Runway ML Gen-3</option>
+          <option value="kling">Kling AI</option>
+          <option value="pika">Pika Labs</option>
+          <option value="luma">Luma Dream Machine</option>
+          <option value="replicate">Replicate API</option>
+        </select>
+        <div style="font-size:10px;color:#444;margin-top:3px" id="ai_key_hint">Выберите сервис — покажем где взять ключ</div>
+
+        <label class="f">API ключ</label>
+        <div style="position:relative">
+          <input type="text" id="ai_key" placeholder="Вставьте API ключ..."
+                 style="padding-right:36px;font-family:monospace;font-size:12px" oninput="onApiKeyInput()">
+          <button type="button" onclick="toggleKey()"
+                  style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;color:#555;cursor:pointer;font-size:16px;padding:0">👁</button>
+        </div>
+
+        <!-- Промт -->
+        <label class="f">Промт — как собрать видео</label>
+        <textarea id="ai_prompt" rows="3"
+          placeholder="Смонтируй динамичную сцену: крупный план шины, тёплый золотой свет, пыль, кинематографичный стиль..."></textarea>
+        <div class="ai-prompts" style="margin-top:6px">
+          <div class="ai-prompts-title">Быстрые промты:</div>
+          <div class="ai-prompt-chip" onclick="setPrompt('dynamic')">🔥 Динамика</div>
+          <div class="ai-prompt-chip" onclick="setPrompt('cinematic')">🎬 Кино</div>
+          <div class="ai-prompt-chip" onclick="setPrompt('offroad')">🏔 Внедорожье</div>
+          <div class="ai-prompt-chip" onclick="setPrompt('summer')">☀️ Лето</div>
+          <div class="ai-prompt-chip" onclick="setPrompt('winter')">❄️ Зима</div>
+        </div>
+
+        <!-- Настройки -->
+        <div class="row2" style="margin-top:10px">
+          <div>
+            <label class="f">Длительность</label>
+            <select id="ai_dur">
+              <option value="5">5 сек</option>
+              <option value="8" selected>8 сек</option>
+              <option value="10">10 сек</option>
+            </select>
+          </div>
+          <div>
+            <label class="f">Стиль</label>
+            <select id="ai_style">
+              <option value="smooth">Плавный</option>
+              <option value="dynamic">Динамичный</option>
+              <option value="slow">Замедленный</option>
+            </select>
+          </div>
+        </div>
+
+        <button type="button" class="ai-btn" id="ai_gen_btn" onclick="generateAiVideo()" disabled>
+          ✨ Собрать фон через ИИ
+        </button>
+        <div class="ai-status" id="ai_status"></div>
+
+        <!-- Результат — автоматически становится фоновым видео -->
+        <div id="ai_result" style="display:none;margin-top:10px">
+          <div style="font-size:10px;color:#4caf88;margin-bottom:6px;letter-spacing:.06em">
+            ✅ Фон готов — автоматически загружен в предпросмотр
+          </div>
+          <video id="ai_result_video" controls muted
+                 style="width:100%;border-radius:8px;border:1px solid rgba(255,255,255,0.08)"></video>
+          <div class="tip" style="margin-top:8px">
+            💡 Теперь заполните данные шины ниже и нажмите «Сгенерировать видео»
+          </div>
+        </div>
+
       </div>
     </div>
-    <div class="tip" style="margin-top:8px">💡 Фото шины на белом фоне — белый фон удалится автоматически. Видео — сцена без колеса (пустыня, дорога, зима)</div>
   </div>
 
   <!-- Текст -->
@@ -209,72 +355,6 @@ select option{background:#1a1b26}
 
   </div>
 
-  <!-- ИИ Генерация видео -->
-  <div>
-    <div class="sec">07 — ИИ генерация фона</div>
-
-    <div class="ai-card">
-      <div class="ai-badge">Скоро</div>
-      <div class="ai-title">Генерация видео через ИИ</div>
-      <div class="ai-desc">Опишите сцену — ИИ создаст фоновое видео. Потом мы наложим поверх шину, размер и характеристики.</div>
-
-      <label class="f" style="margin-top:14px">Выберите ИИ-сервис</label>
-      <select id="ai_service" onchange="onAiServiceChange()" disabled>
-        <option value="">— Выбрать сервис —</option>
-        <option value="runway">Runway ML (Gen-3)</option>
-        <option value="kling">Kling AI</option>
-        <option value="pika">Pika Labs</option>
-        <option value="luma">Luma Dream Machine</option>
-        <option value="replicate">Replicate API</option>
-      </select>
-
-      <label class="f">API ключ</label>
-      <div style="position:relative">
-        <input type="text" id="ai_key" placeholder="Вставьте API ключ..." disabled
-               style="padding-right:36px" oninput="onApiKeyInput()">
-        <button type="button" id="ai_eye" onclick="toggleKey()"
-                style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;color:#555;cursor:pointer;font-size:16px;padding:0">👁</button>
-      </div>
-
-      <label class="f">Промт (описание сцены)</label>
-      <textarea id="ai_prompt" rows="3" disabled
-        placeholder="Cinematic desert scene, sandy ground with rocks, warm golden light, dust particles floating, slow camera movement forward, no people, no text, 4K..."></textarea>
-
-      <div class="row2" style="margin-top:10px">
-        <div>
-          <label class="f">Длительность</label>
-          <select id="ai_dur" disabled>
-            <option value="5">5 сек</option>
-            <option value="8" selected>8 сек</option>
-            <option value="10">10 сек</option>
-          </select>
-        </div>
-        <div>
-          <label class="f">Формат</label>
-          <select id="ai_ratio" disabled>
-            <option value="9:16">9:16 (вертикальный)</option>
-            <option value="16:9">16:9 (горизонтальный)</option>
-            <option value="1:1">1:1 (квадрат)</option>
-          </select>
-        </div>
-      </div>
-
-      <button type="button" class="ai-btn" id="ai_gen_btn" onclick="generateAiVideo()" disabled>
-        ✨ Сгенерировать фон через ИИ
-      </button>
-
-      <div class="ai-status" id="ai_status"></div>
-
-      <div class="ai-prompts">
-        <div class="ai-prompts-title">Готовые промты:</div>
-        <div class="ai-prompt-chip" onclick="setPrompt('desert')">🏜 Пустыня</div>
-        <div class="ai-prompt-chip" onclick="setPrompt('road')">🛣 Ночная трасса</div>
-        <div class="ai-prompt-chip" onclick="setPrompt('winter')">❄️ Зима</div>
-        <div class="ai-prompt-chip" onclick="setPrompt('city')">🌆 Город</div>
-        <div class="ai-prompt-chip" onclick="setPrompt('offroad')">🏔 Бездорожье</div>
-      </div>
-    </div>
-  </div>
   <div>
     <div class="sec">06 — Анимация появления</div>
 
@@ -771,35 +851,102 @@ async function genVideo(){
     frame();
   });
 }
+// ── Tab switcher ──────────────────────────────────────────────────────────────
+function switchTab(tab){
+  document.getElementById('panel_manual').style.display = tab==='manual' ? '' : 'none';
+  document.getElementById('panel_ai').style.display     = tab==='ai'     ? '' : 'none';
+  document.getElementById('tab_manual').classList.toggle('active', tab==='manual');
+  document.getElementById('tab_ai').classList.toggle('active',     tab==='ai');
+}
+
 // ── AI Section ────────────────────────────────────────────────────────────────
 const AI_PROMPTS = {
-  desert:  'Cinematic desert landscape, warm golden hour sunlight, sandy ground with scattered rocks, dust particles floating in air, slow dolly forward camera movement, empty center frame, no people, no text, no tire, photorealistic 4K, vertical 9:16',
-  road:    'Cinematic wet asphalt night highway, neon city lights bokeh background, rain drops on ground, slow forward camera drift, empty foreground, no people, no cars, no text, dark moody atmosphere, blue and orange color grade, photorealistic 4K, vertical 9:16',
-  winter:  'Cinematic winter forest road, heavy snow falling slowly, pine trees covered in snow, soft blue cold light, slow camera movement forward, empty center frame, no people, no vehicles, no text, misty foggy atmosphere, photorealistic 4K, vertical 9:16',
-  city:    'Cinematic city street at blue hour, wet pavement with light reflections, skyscrapers bokeh background, slow parallax camera movement, empty foreground, no people, no cars, no text, dramatic shadows, photorealistic 4K, vertical 9:16',
-  offroad: 'Cinematic mountain off-road trail, rocky terrain, dramatic clouds, golden hour warm light, dust floating in air, slow low-angle camera movement, empty frame, no people, no text, photorealistic 4K, vertical 9:16',
+  dynamic:   'Динамичный монтаж крупных планов шины, быстрая смена ракурсов, тёплый золотой свет, пыль в воздухе, кинематографичный стиль, без людей, без текста',
+  cinematic: 'Кинематографичная сцена: плавное движение камеры вокруг шины, боке на фоне, мягкий студийный свет, профессиональная съёмка, без людей, без текста',
+  offroad:   'Сцена на бездорожье: каменистый грунт, пыль, яркое солнце, драматические тени, низкий угол камеры, суровая природа, без людей, без текста',
+  summer:    'Летняя трасса: горячий асфальт, далёкий горизонт, яркое небо, солнечные блики, плавное движение вперёд, без людей, без текста',
+  winter:    'Зимняя сцена: снег, лёд, холодный синий свет, заснеженные деревья, медленное движение камеры, атмосферный туман, без людей, без текста',
 };
+
+const AI_KEY_HINTS = {
+  runway:    'Ключ: <a href="https://app.runwayml.com/account/api-keys" target="_blank" style="color:#f5c518">app.runwayml.com → API Keys</a>',
+  kling:     'Ключ: <a href="https://platform.klingai.com" target="_blank" style="color:#f5c518">platform.klingai.com → API</a>',
+  pika:      'Ключ: <a href="https://pika.art/account" target="_blank" style="color:#f5c518">pika.art → Account → API</a>',
+  luma:      'Ключ: <a href="https://lumalabs.ai/dream-machine/api" target="_blank" style="color:#f5c518">lumalabs.ai → API</a>',
+  replicate: 'Ключ: <a href="https://replicate.com/account/api-tokens" target="_blank" style="color:#f5c518">replicate.com → API Tokens</a>',
+};
+
+let aiPhotos = [];
 
 function setPrompt(key){
   const el = document.getElementById('ai_prompt');
-  if(el && !el.disabled) el.value = AI_PROMPTS[key] || '';
+  if(el) el.value = AI_PROMPTS[key] || '';
+}
+
+function onAiVideoLoad(f){
+  if(!f) return;
+  const box = document.getElementById('ai_video_box');
+  box.classList.add('filled');
+  box.querySelector('.ic').textContent  = '✅';
+  box.querySelector('.tt').textContent  = f.name;
+  box.querySelector('.sb').textContent  = (f.size/1024/1024).toFixed(1)+' MB';
+  checkAiReady();
+}
+
+function onAiPhotosLoad(files){
+  for(const f of files){
+    if(aiPhotos.length >= 5) break;
+    if(!f.type.startsWith('image/')) continue;
+    const url = URL.createObjectURL(f);
+    aiPhotos.push({file:f, url});
+  }
+  renderAiThumbs();
+  checkAiReady();
+}
+
+function renderAiThumbs(){
+  const row = document.getElementById('ai_thumb_row');
+  row.innerHTML = '';
+  aiPhotos.forEach((p,i)=>{
+    const d = document.createElement('div'); d.className='ai-thumb';
+    d.innerHTML = `<img src="${p.url}">
+      <button class="ai-tdel" onclick="removeAiPhoto(${i})">✕</button>`;
+    row.appendChild(d);
+  });
+  const box = document.getElementById('ai_photos_box');
+  if(aiPhotos.length > 0){
+    box.classList.add('filled');
+    box.querySelector('.ic').textContent = '✅';
+    box.querySelector('.tt').textContent = `${aiPhotos.length} фото`;
+  } else {
+    box.classList.remove('filled');
+    box.querySelector('.ic').textContent = '📸';
+    box.querySelector('.tt').textContent = 'Фото для ИИ';
+  }
+}
+
+function removeAiPhoto(i){
+  URL.revokeObjectURL(aiPhotos[i].url);
+  aiPhotos.splice(i,1);
+  renderAiThumbs();
+  checkAiReady();
 }
 
 function onAiServiceChange(){
   const svc = document.getElementById('ai_service').value;
-  const hasService = svc !== '';
-  document.getElementById('ai_key').disabled    = !hasService;
-  document.getElementById('ai_prompt').disabled  = !hasService;
-  document.getElementById('ai_dur').disabled     = !hasService;
-  document.getElementById('ai_ratio').disabled   = !hasService;
-  // Button only enabled when key is also filled
-  onApiKeyInput();
+  const hint = document.getElementById('ai_key_hint');
+  hint.innerHTML = svc ? (AI_KEY_HINTS[svc]||'') : 'Выберите сервис — появится подсказка где взять ключ';
+  checkAiReady();
 }
 
-function onApiKeyInput(){
-  const svc = document.getElementById('ai_service').value;
-  const key = document.getElementById('ai_key').value.trim();
-  document.getElementById('ai_gen_btn').disabled = !(svc && key);
+function onApiKeyInput(){ checkAiReady(); }
+
+function checkAiReady(){
+  const svc    = document.getElementById('ai_service').value;
+  const key    = document.getElementById('ai_key').value.trim();
+  const hasVid = document.getElementById('ai_video_box').classList.contains('loaded');
+  const ready  = svc && key && (hasVid || aiPhotos.length > 0);
+  document.getElementById('ai_gen_btn').disabled = !ready;
 }
 
 function toggleKey(){
@@ -811,29 +958,45 @@ async function generateAiVideo(){
   const svc    = document.getElementById('ai_service').value;
   const key    = document.getElementById('ai_key').value.trim();
   const prompt = document.getElementById('ai_prompt').value.trim();
-  const dur    = document.getElementById('ai_dur').value;
-  const ratio  = document.getElementById('ai_ratio').value;
   const btn    = document.getElementById('ai_gen_btn');
   const status = document.getElementById('ai_status');
 
-  if(!svc || !key || !prompt){
-    status.className='ai-status err';
-    status.textContent='Заполните сервис, ключ и промт';
-    return;
-  }
-
   btn.disabled = true;
   status.className = 'ai-status';
-  status.innerHTML = '<div class="spin"></div> Отправка запроса...';
+  status.innerHTML = '<div class="spin"></div> Отправка материалов в ИИ...';
 
-  // Пока сервисы не подключены — показываем заглушку
   await new Promise(r => setTimeout(r, 1500));
 
+  // Placeholder — реальный API подключим после выбора сервиса
+  // Когда API будет подключён — здесь будет URL результата:
+  // const resultUrl = await callAiApi(svc, key, prompt, ...);
+  // autoLoadAiBg(resultUrl);
+
   status.className = 'ai-status err';
-  status.innerHTML = `⚠️ Сервис <b>${svc}</b> ещё не подключён.<br>
-    <span style="font-size:10px;color:#555;display:block;margin-top:4px">
-    Выберите подходящий API — подключим на следующем шаге</span>`;
+  status.innerHTML = `⚠️ API <b>${svc}</b> ещё не подключён.<br>
+    <span style="font-size:10px;color:#555;display:block;margin-top:3px">
+    Выберите конкретный сервис — подключим на следующем шаге</span>`;
   btn.disabled = false;
+}
+
+// Когда ИИ вернёт результат — вызываем эту функцию
+// Она автоматически загружает видео в предпросмотр и переключает на него
+function autoLoadAiBg(videoUrl){
+  const vid = document.createElement('video');
+  vid.src = videoUrl; vid.loop=true; vid.muted=true; vid.playsInline=true;
+  vid.onloadeddata = ()=>{
+    bgVid = vid; vid.play().catch(()=>{});
+    // Показать результат
+    const res = document.getElementById('ai_result');
+    const rv  = document.getElementById('ai_result_video');
+    rv.src = videoUrl; res.style.display='';
+    // Статус
+    document.getElementById('ai_status').className='ai-status ok';
+    document.getElementById('ai_status').innerHTML='✅ Фон готов — загружен в предпросмотр';
+    // Обновить предпросмотр
+    rp();
+  };
+  vid.load();
 }
 
 function setSt(h,c){const el=document.getElementById('st');el.className='st '+c;el.innerHTML=h;}
