@@ -182,7 +182,7 @@ select option{background:#1a1b26}
     <div class="font-row">
       <span class="flabel">Характер.</span>
       <select id="fn_feat" onchange="rp()"><option value="Oswald">Oswald (по умолч.)</option><option value="Roboto">Roboto</option><option value="Montserrat">Montserrat</option><option value="Bebas Neue">Bebas Neue</option><option value="Anton">Anton</option><option value="Russo One">Russo One</option><option value="Raleway">Raleway</option><option value="Nunito">Nunito</option><option value="Ubuntu">Ubuntu</option><option value="PT Sans">PT Sans</option><option value="Arial">Arial</option><option value="Georgia">Georgia</option><option value="Impact">Impact</option><option value="Verdana">Verdana</option><option value="Trebuchet MS">Trebuchet MS</option></select>
-      <input type="range" id="fs_feat" min="7" max="20" value="11" oninput="document.getElementById('fv_feat').textContent=this.value+'px';rp()">
+      <input type="range" id="fs_feat" min="7" max="40" value="11" oninput="document.getElementById('fv_feat').textContent=this.value+'px';rp()">
       <span class="fval" id="fv_feat">11px</span>
     </div>
 
@@ -329,11 +329,10 @@ function drawFrame(cv,cw,ch,gt,featAnim,vidSrc){
   };
 
   // ── Layout constants ───────────────────────────────────────────────────────
-  const PAD      = 18 * s;   // left margin
-  const TOP_PAD  = 22 * s;   // min top padding from accent bar
-  const VGAP     = 7  * s;   // vertical gap between blocks
-  const LINE_H   = 1.35;     // headline line-height multiplier
-  const LEFTWID  = cw * 0.58;// left text column width
+  const PAD      = 10 * s;   // левый отступ 10px
+  const TOP_PAD  = 20 * s;   // отступ сверху 20px
+  const VGAP     = 30 * s;   // расстояние между блоками 30px
+  const LEFTWID  = cw * 0.58;// ширина левой колонки текста
 
   ctx.clearRect(0, 0, cw, ch);
 
@@ -362,34 +361,35 @@ function drawFrame(cv,cw,ch,gt,featAnim,vidSrc){
   // 3. Top accent bar (3px)
   ctx.fillStyle = th.line; ctx.fillRect(0,0,cw,3*s);
 
-  // ── ADAPTIVE LAYOUT CALCULATOR ────────────────────────────────────────────
-  // Compute pixel heights of each block from font sizes
-  const brandH     = brand ? F.brand.px * 1.8          : 0;
-  const typeLineH  = F.type.px * LINE_H;
-  const typeLines  = typeText.split(' ');
-  const typeH      = typeLines.length >= 2
-                     ? typeLineH * 2           // two lines
-                     : typeLineH;              // one line
-  const badgeH     = F.size.px * 2.4;         // size badge height
-  const subH       = sub ? F.sub.px * 2.4     : 0;
-  const featRowH   = F.feat.px * 2.4;
-  const featGap    = 4 * s;
+  // ── ADAPTIVE LAYOUT — стек сверху вниз, 30px между блоками ──────────────
+  const brandH   = brand ? F.brand.px * 1.6   : 0;  // высота строки бренда
+  const typeH    = F.type.px * 1.6;                   // заголовок — ОДНА строка
+  const badgeH   = F.size.px  * 2.4;                  // плашка размера
+  const subH     = sub   ? F.sub.px  * 2.4    : 0;   // подзаголовок
+  const featRowH = F.feat.px  * 2.4;                  // высота одной характеристики
+  const featGap  = 6 * s;                              // зазор между характеристиками
   const activeFeat = feats.filter(f => f.trim()).slice(0,5);
-  const featsTotal = activeFeat.length * (featRowH + featGap) - featGap;
+  const featsTotal = activeFeat.length > 0
+    ? activeFeat.length * featRowH + (activeFeat.length - 1) * featGap
+    : 0;
 
-  // Y positions — stack top-down with TOP_PAD and VGAP
-  let cy     = 3*s + TOP_PAD;               // start below accent bar + top padding
-  const yBrand  = cy; cy += brandH  > 0 ? brandH  + VGAP : 0;
-  const yType   = cy; cy += typeH   + VGAP;
-  const yBadge  = cy; cy += badgeH  + VGAP * 0.5;
-  const ySub    = cy; cy += subH    > 0 ? subH    + VGAP * 0.5 : 0;
+  // Y позиции — стек с фиксированным VGAP=30px между каждым блоком
+  let cy = 3*s + TOP_PAD;
 
-  // Features are pinned to bottom
+  const yBrand = cy;
+  if(brandH > 0) cy += brandH + VGAP;
+
+  const yType  = cy; cy += typeH  + VGAP;
+  const yBadge = cy; cy += badgeH + VGAP;
+  const ySub   = cy; if(subH > 0) cy += subH + VGAP;
+
+  // Характеристики — прибиты к низу
   const yFeats = ch - featsTotal - 12 * s;
 
-  // Tire area: right column, from top to just above features
+  // Зона шины: правая колонка от верха до характеристик
   const tireX = cw * 0.33, tireY = 4*s;
-  const tireW = cw * 0.66, tireH = Math.max(ch * 0.28, yFeats - tireY - 8*s);
+  const tireW = cw * 0.66;
+  const tireH = Math.max(ch * 0.28, yFeats - tireY - 8*s);
 
   // 4. Tire image
   if(tireMask){
@@ -410,7 +410,7 @@ function drawFrame(cv,cw,ch,gt,featAnim,vidSrc){
   // ── 5. TEXT (fades in) ────────────────────────────────────────────────────
   ctx.globalAlpha = textA;
 
-  // Brand (top-left) + discount badge (top-right)
+  // Бренд (верх-лево) + бейдж скидки (верх-право)
   if(brand){
     ctx.font = F.brand.font;
     ctx.fillStyle = 'rgba(255,255,255,0.5)';
@@ -420,234 +420,62 @@ function drawFrame(cv,cw,ch,gt,featAnim,vidSrc){
   if(disc){
     ctx.font = F.brand.font;
     const mw  = ctx.measureText(disc).width;
-    const dbw = mw + 18*s, dbh = F.brand.px * 1.8;
+    const dbw = mw + 16*s;
+    const dbh = brandH > 0 ? brandH : F.brand.px * 1.6;
     const dbx = cw - dbw - PAD;
-    const dby = 3*s + TOP_PAD - (brand ? 0 : (brandH > 0 ? 0 : 0));
+    const dby = 3*s + TOP_PAD;
     ctx.fillStyle = '#cc1111'; rr(ctx, dbx, dby, dbw, dbh, 5*s); ctx.fill();
     ctx.fillStyle = '#fff'; ctx.textAlign = 'center';
-    ctx.fillText(disc, dbx + dbw/2, dby + dbh * 0.75);
+    ctx.fillText(disc, dbx + dbw/2, dby + dbh * 0.73);
   }
 
-  // Headline — two lines with proper line spacing
+  // Заголовок — ОДНА строка, не переносится
   ctx.font = F.type.font;
   ctx.fillStyle = '#ffffff';
   ctx.textAlign = 'left';
-  if(typeLines.length >= 2){
-    ctx.fillText(typeLines[0], PAD, yType + typeLineH * 0.82);
-    ctx.fillText(typeLines.slice(1).join(' '), PAD, yType + typeLineH * 0.82 + typeLineH * LINE_H);
-  } else {
-    ctx.fillText(typeText, PAD, yType + typeLineH * 0.88);
-  }
+  ctx.fillText(typeText, PAD, yType + F.type.px);
 
-  // Size badge — height adapts to font size
+  // Плашка размера — высота адаптируется к шрифту
   const sbw = LEFTWID - PAD;
-  ctx.font = F.size.font;
   const sbg = ctx.createLinearGradient(PAD, yBadge, PAD+sbw, yBadge);
   sbg.addColorStop(0, th.badge); sbg.addColorStop(1, th.badgeL);
   ctx.fillStyle = sbg; rr(ctx, PAD, yBadge, sbw, badgeH, 8*s); ctx.fill();
-  // Shine
   ctx.fillStyle = 'rgba(255,255,255,0.07)';
   rr(ctx, PAD, yBadge, sbw, badgeH*0.48, 8*s); ctx.fill();
-  // Badge text
   ctx.font = F.size.font;
   ctx.fillStyle = th.txt; ctx.textAlign = 'center';
   ctx.fillText(sizeText, PAD + sbw/2, yBadge + badgeH * 0.70);
 
-  // Sub badge — height adapts to font size
+  // Подзаголовок — высота адаптируется
   if(sub && subH > 0){
-    const sw = sbw * 0.75, sy = ySub;
-    ctx.fillStyle = 'rgba(255,255,255,0.07)'; rr(ctx, PAD, sy, sw, subH, 5*s); ctx.fill();
+    const sw = sbw * 0.75;
+    ctx.fillStyle = 'rgba(255,255,255,0.07)'; rr(ctx, PAD, ySub, sw, subH, 5*s); ctx.fill();
     ctx.font = F.sub.font;
     ctx.fillStyle = 'rgba(255,255,255,0.55)'; ctx.textAlign = 'center';
-    ctx.fillText(sub.toUpperCase(), PAD + sw/2, sy + subH * 0.74);
+    ctx.fillText(sub.toUpperCase(), PAD + sw/2, ySub + subH * 0.74);
   }
 
   ctx.globalAlpha = 1;
 
-  // 6. Features — pinned to bottom, appear one by one
+  // 6. Характеристики — прибиты к низу, появляются по одной
   activeFeat.forEach((feat, i) => {
     const fa = Math.max(0, Math.min(1, (featAnim - i * 0.15) * 2.5));
     if(fa <= 0) return;
     ctx.globalAlpha = fa;
-    const fy  = yFeats + i * (featRowH + featGap);
-    const fw  = LEFTWID - PAD;
-    const dotR = Math.max(3*s, F.feat.px * 0.35);
+    const fy   = yFeats + i * (featRowH + featGap);
+    const fw   = LEFTWID - PAD;
+    const dotR = Math.max(3*s, F.feat.px * 0.32);
     ctx.fillStyle = th.feat; rr(ctx, PAD, fy, fw, featRowH, 5*s); ctx.fill();
     ctx.fillStyle = th.dot; ctx.beginPath();
-    ctx.arc(PAD + dotR + 4*s, fy + featRowH/2, dotR, 0, Math.PI*2); ctx.fill();
+    ctx.arc(PAD + dotR + 5*s, fy + featRowH/2, dotR, 0, Math.PI*2); ctx.fill();
     ctx.font = F.feat.font;
     ctx.fillStyle = 'rgba(255,255,255,0.9)'; ctx.textAlign = 'left';
-    ctx.fillText(feat, PAD + dotR*2 + 10*s, fy + featRowH * 0.68);
+    ctx.fillText(feat, PAD + dotR*2 + 12*s, fy + featRowH * 0.68);
     ctx.globalAlpha = 1;
   });
 
   // 7. Bottom bar
   ctx.fillStyle = th.line; ctx.fillRect(0, ch-3*s, cw, 3*s);
-}
-  const ctx=cv.getContext('2d');
-  const s=cw/W;
-  const th=THEMES[v('f_accent')||'green'];
-  const typeText=v('f_type')||'ШИНА ЛЕТНЯЯ';
-  const sizeText=v('f_size')||'175/65 R14';
-  const brand=v('f_brand');
-  const sub=v('f_sub');
-  const disc=v('f_disc');
-  const textA=Math.min(1,gt*2.8);
-  const tireS=0.85+0.15*Math.min(1,gt*1.5);
-
-  // ── Font settings ─────────────────────────────────────────────────────────
-  const F={
-    type:  fnt('fn_type','fs_type','900'),
-    size:  fnt('fn_size','fs_size','700'),
-    brand: fnt('fn_brand','fs_brand','700'),
-    sub:   fnt('fn_sub','fs_sub','500'),
-    feat:  fnt('fn_feat','fs_feat','500'),
-  };
-
-  // ── Padding / gap constants (scale with canvas) ───────────────────────────
-  const PAD=12*s;          // left margin
-  const VGAP=6*s;          // gap between blocks
-
-  ctx.clearRect(0,0,cw,ch);
-
-  // 1. Background video
-  if(vidSrc&&vidSrc.readyState>=2){
-    const r=Math.max(cw/vidSrc.videoWidth,ch/vidSrc.videoHeight);
-    const vw=vidSrc.videoWidth*r,vh=vidSrc.videoHeight*r;
-    ctx.drawImage(vidSrc,(cw-vw)/2,(ch-vh)/2,vw,vh);
-  } else {
-    const bg=ctx.createLinearGradient(0,0,0,ch);
-    bg.addColorStop(0,'#060810');bg.addColorStop(0.5,'#080e08');bg.addColorStop(1,'#050805');
-    ctx.fillStyle=bg;ctx.fillRect(0,0,cw,ch);
-  }
-
-  // 2. Overlays
-  ctx.fillStyle=th.overlay;ctx.fillRect(0,0,cw,ch);
-  const panGrad=ctx.createLinearGradient(0,0,cw*0.72,0);
-  panGrad.addColorStop(0,'rgba(0,0,0,0.78)');
-  panGrad.addColorStop(0.65,'rgba(0,0,0,0.42)');
-  panGrad.addColorStop(1,'rgba(0,0,0,0)');
-  ctx.fillStyle=panGrad;ctx.fillRect(0,0,cw,ch);
-  const vig=ctx.createRadialGradient(cw/2,ch/2,ch*0.15,cw/2,ch/2,ch*0.78);
-  vig.addColorStop(0,'rgba(0,0,0,0)');vig.addColorStop(1,'rgba(0,0,0,0.6)');
-  ctx.fillStyle=vig;ctx.fillRect(0,0,cw,ch);
-
-  // 3. Top accent bar
-  ctx.fillStyle=th.line;ctx.fillRect(0,0,cw,3*s);
-
-  // ── LAYOUT ENGINE ─────────────────────────────────────────────────────────
-  // Measure all blocks, assign Y positions dynamically
-  const LEFTWID=cw*0.58; // text area width (left side)
-  let curY=8*s;           // current Y cursor
-
-  // Block heights
-  const brandH  = brand ? F.brand.size*s*1.8 : 0;
-  const discH   = disc  ? F.brand.size*s*1.8 : 0; // same row as brand
-  const tlineH  = F.type.size*s*1.25;
-  const typeLines= typeText.split(' ');
-  const typeH   = typeLines.length>=2 ? tlineH*2 + VGAP*0.5 : tlineH;
-  const sizeBadgeH = F.size.size*s*2.2;
-  const subBadgeH  = sub ? F.sub.size*s*2.4 : 0;
-  const featH      = F.feat.size*s*2.2;
-  const featCount  = feats.filter(f=>f).slice(0,5).length;
-  const featsH     = featCount * (featH + VGAP*0.5);
-
-  // Y positions
-  const yBrand   = curY; curY += brandH>0 ? brandH+VGAP : 0;
-  const yType    = curY; curY += typeH + VGAP;
-  const ySizeBadge = curY; curY += sizeBadgeH + VGAP*0.5;
-  const ySubBadge  = curY; curY += subBadgeH>0 ? subBadgeH+VGAP*0.5 : 0;
-  const textBottom = curY;
-  const yFeats     = ch - featsH - 10*s; // features pinned to bottom
-
-  // Tire image fills right side (from top to features area)
-  const tireAreaX=cw*0.33;
-  const tireAreaY=4*s;
-  const tireAreaW=cw*0.65;
-  const tireAreaH=Math.max(ch*0.3, yFeats - tireAreaY - 10*s);
-
-  // 4. Tire image (drawn before text so text is on top)
-  if(tireMask){
-    const tr=Math.min(tireAreaW/tireMask.width,tireAreaH/tireMask.height)*tireS;
-    const tw=tireMask.width*tr,tha=tireMask.height*tr;
-    ctx.save();
-    ctx.shadowColor='rgba(0,0,0,0.85)';ctx.shadowBlur=22*s;ctx.shadowOffsetX=-4*s;ctx.shadowOffsetY=12*s;
-    ctx.drawImage(tireMask,
-      tireAreaX+(tireAreaW-tw)/2,
-      tireAreaY+(tireAreaH-tha)*0.55,
-      tw, tha);
-    ctx.restore();
-  }
-
-  // ── 5. TEXT BLOCKS ────────────────────────────────────────────────────────
-  ctx.globalAlpha=textA;
-
-  // Brand (top left) + Discount badge (top right)
-  if(brand){
-    ctx.font=F.brand.font;
-    ctx.fillStyle='rgba(255,255,255,0.5)';ctx.textAlign='left';
-    ctx.fillText(brand.toUpperCase(), PAD, yBrand+F.brand.size*s);
-  }
-  if(disc){
-    const dbh=Math.max(F.brand.size*s*1.6, 20*s);
-    const dbw=Math.max(ctx.measureText(disc).width+16*s, 44*s);
-    const dbx=cw-dbw-10*s, dby=yBrand+(brandH-dbh)/2;
-    ctx.font=F.brand.font;
-    const mw=ctx.measureText(disc).width;
-    const dbw2=mw+20*s;
-    ctx.fillStyle='#cc1111';
-    rr(ctx,cw-dbw2-10*s,dby>0?dby:6*s,dbw2,dbh,5*s);ctx.fill();
-    ctx.fillStyle='#fff';ctx.textAlign='center';
-    ctx.fillText(disc,cw-dbw2/2-10*s,(dby>0?dby:6*s)+dbh*0.73);
-  }
-
-  // Type headline
-  ctx.font=F.type.font;ctx.fillStyle='#fff';ctx.textAlign='left';
-  if(typeLines.length>=2){
-    ctx.fillText(typeLines[0], PAD, yType+tlineH*0.85);
-    ctx.fillText(typeLines.slice(1).join(' '), PAD, yType+tlineH*0.85+tlineH*1.1);
-  } else {
-    ctx.fillText(typeText, PAD, yType+tlineH*0.9);
-  }
-
-  // Size badge
-  const sbw=LEFTWID-PAD, sbh=sizeBadgeH, sbx=PAD, sby=ySizeBadge;
-  const sbg=ctx.createLinearGradient(sbx,sby,sbx+sbw,sby);
-  sbg.addColorStop(0,th.badge);sbg.addColorStop(1,th.badgeL);
-  ctx.fillStyle=sbg;rr(ctx,sbx,sby,sbw,sbh,8*s);ctx.fill();
-  ctx.fillStyle='rgba(255,255,255,0.07)';rr(ctx,sbx,sby,sbw,sbh*0.48,8*s);ctx.fill();
-  ctx.font=F.size.font;ctx.fillStyle=th.txt;ctx.textAlign='center';
-  ctx.fillText(sizeText, sbx+sbw/2, sby+sbh*0.72);
-
-  // Sub badge
-  if(sub&&subBadgeH>0){
-    const sw=sbw*0.75, sh=subBadgeH, sx=PAD, sy=ySubBadge;
-    ctx.fillStyle='rgba(255,255,255,0.07)';rr(ctx,sx,sy,sw,sh,5*s);ctx.fill();
-    ctx.font=F.sub.font;ctx.fillStyle='rgba(255,255,255,0.55)';ctx.textAlign='center';
-    ctx.fillText(sub.toUpperCase(), sx+sw/2, sy+sh*0.74);
-  }
-
-  ctx.globalAlpha=1;
-
-  // 6. Features — pinned to bottom, appear one by one
-  feats.filter(f=>f).slice(0,5).forEach((feat,i)=>{
-    const fa=Math.max(0,Math.min(1,(featAnim-i*0.15)*2.5));
-    if(fa<=0)return;
-    ctx.globalAlpha=fa;
-    const fy=yFeats + i*(featH+VGAP*0.5);
-    const fw=LEFTWID-PAD, fh=featH;
-    ctx.fillStyle=th.feat;rr(ctx,PAD,fy,fw,fh,5*s);ctx.fill();
-    // dot
-    ctx.fillStyle=th.dot;ctx.beginPath();
-    ctx.arc(PAD+12*s, fy+fh*0.5, 4*s,0,Math.PI*2);ctx.fill();
-    // text
-    ctx.font=F.feat.font;ctx.fillStyle='rgba(255,255,255,0.9)';ctx.textAlign='left';
-    ctx.fillText(feat, PAD+22*s, fy+fh*0.68);
-    ctx.globalAlpha=1;
-  });
-
-  // 7. Bottom bar
-  ctx.fillStyle=th.line;ctx.fillRect(0,ch-3*s,cw,3*s);
 }
 
 // ── Preview loop ──────────────────────────────────────────────────────────────
