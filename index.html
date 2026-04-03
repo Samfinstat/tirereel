@@ -412,8 +412,12 @@ select option{background:#1a1b26}
 <div class="right">
   <div class="prev-wrap">
     <div style="text-align:center">
-      <div style="font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:#333;margin-bottom:10px">Предпросмотр</div>
-      <div class="phone"><canvas id="prevCv" width="270" height="480"></canvas></div>
+      <div style="font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:#333;margin-bottom:6px">Предпросмотр</div>
+      <div style="font-size:10px;color:#444;margin-bottom:8px" id="dragHint">☝️ Перетаскивайте элементы прямо на превью</div>
+      <div class="phone" style="cursor:default">
+        <canvas id="prevCv" width="270" height="480" style="cursor:default"></canvas>
+      </div>
+      <button type="button" onclick="resetPositions()" style="margin-top:8px;background:none;border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:#555;font-size:11px;padding:5px 12px;cursor:pointer">↺ Сброс позиций</button>
     </div>
   </div>
   <div class="gen-panel">
@@ -428,6 +432,106 @@ select option{background:#1a1b26}
 <script>
 const W=540,H=960,FPS=24;
 let bgVid=null,tireImg=null,tireMask=null,prevRaf=null,animT=0;
+
+// ── Element positions (fractions 0-1 of canvas size) ─────────────────────────
+// x,y = top-left anchor of each element
+const DEFAULT_POS = {
+  tire:  {x:0.33, y:0.03},  // шина — правая сторона
+  brand: {x:0.02, y:0.04},  // бренд
+  disc:  {x:0.72, y:0.03},  // скидка
+  type:  {x:0.02, y:0.12},  // заголовок
+  badge: {x:0.02, y:0.22},  // плашка размера
+  sub:   {x:0.02, y:0.35},  // подзаголовок
+  feats: {x:0.02, y:0.64},  // характеристики
+};
+let EP = JSON.parse(JSON.stringify(DEFAULT_POS)); // current positions (mutable)
+
+function resetPositions(){
+  EP = JSON.parse(JSON.stringify(DEFAULT_POS));
+  rp();
+}
+
+// Bounding boxes for hit-testing (set during draw, in canvas pixels)
+const BOXES = {};
+
+// ── Drag state ────────────────────────────────────────────────────────────────
+let drag = null; // {key, startMouseFX, startMouseFY, startEX, startEY}
+let hovered = null;
+
+function initDrag(){
+  const cv = document.getElementById('prevCv');
+
+  function canvasXY(e){
+    const rect = cv.getBoundingClientRect();
+    const touch = e.touches ? e.touches[0] : e;
+    return {
+      fx: (touch.clientX - rect.left) / rect.width,
+      fy: (touch.clientY - rect.top)  / rect.height,
+    };
+  }
+
+  function hitTest(fx,fy){
+    // Convert fraction → canvas px
+    const cx = fx * cv.width, cy = fy * cv.height;
+    const keys = Object.keys(BOXES).reverse(); // top elements first
+    for(const k of keys){
+      const b = BOXES[k];
+      if(!b) continue;
+      if(cx>=b.x && cx<=b.x+b.w && cy>=b.y && cy<=b.y+b.h) return k;
+    }
+    return null;
+  }
+
+  function onDown(e){
+    e.preventDefault();
+    const {fx,fy} = canvasXY(e);
+    const key = hitTest(fx,fy);
+    if(!key) return;
+    drag = {key, startFX:fx, startFY:fy, startEX:EP[key].x, startEY:EP[key].y};
+    cv.style.cursor='grabbing';
+    document.getElementById('dragHint').textContent='🔵 Перемещаю: '+keyLabel(key);
+  }
+
+  function onMove(e){
+    e.preventDefault();
+    const {fx,fy} = canvasXY(e);
+    if(drag){
+      const dx = fx - drag.startFX;
+      const dy = fy - drag.startFY;
+      EP[drag.key].x = Math.max(0, Math.min(1, drag.startEX + dx));
+      EP[drag.key].y = Math.max(0, Math.min(1, drag.startEY + dy));
+    } else {
+      const h = hitTest(fx,fy);
+      if(h !== hovered){
+        hovered = h;
+        cv.style.cursor = h ? 'grab' : 'default';
+      }
+    }
+  }
+
+  function onUp(e){
+    if(drag){
+      cv.style.cursor = 'grab';
+      document.getElementById('dragHint').textContent='☝️ Перетаскивайте элементы прямо на превью';
+      drag = null;
+    }
+  }
+
+  cv.addEventListener('mousedown',  onDown, {passive:false});
+  cv.addEventListener('mousemove',  onMove, {passive:false});
+  cv.addEventListener('mouseup',    onUp);
+  cv.addEventListener('mouseleave', onUp);
+  cv.addEventListener('touchstart', onDown, {passive:false});
+  cv.addEventListener('touchmove',  onMove, {passive:false});
+  cv.addEventListener('touchend',   onUp);
+}
+
+function keyLabel(k){
+  return {tire:'Фото шины',brand:'Бренд',disc:'Скидка',type:'Заголовок',badge:'Размер',sub:'Подзаголовок',feats:'Характеристики'}[k]||k;
+}
+
+// Register bounding box helper
+function regBox(key, x,y,w,h){ BOXES[key]={x,y,w,h}; }
 
 const THEMES={
   green: {badge:'#1e5c1e',badgeL:'#2d8a2d',txt:'#6dff6d',line:'#2a7a2a',feat:'rgba(20,60,20,0.85)',dot:'#4dc94d',overlay:'rgba(5,15,5,0.55)'},
@@ -590,12 +694,7 @@ function drawFrame(cv,cw,ch,gt,vidSrc){
     feat:  fnt('fn_feat',  'fs_feat',  '500', s),
   };
 
-  // ── Layout constants ───────────────────────────────────────────────────────
-  const PAD      = 10 * s;   // левый отступ 10px
-  const TOP_PAD  = 20 * s;   // отступ сверху 20px
-  const VGAP     = 30 * s;   // расстояние между блоками 30px
-  const LEFTWID  = cw * 0.58;// ширина левой колонки текста
-
+  // ── POSITIONS from EP (draggable) ─────────────────────────────────────────
   ctx.clearRect(0, 0, cw, ch);
 
   // 1. Background video / fallback
@@ -605,187 +704,185 @@ function drawFrame(cv,cw,ch,gt,vidSrc){
     ctx.drawImage(vidSrc, (cw-vw)/2, (ch-vh)/2, vw, vh);
   } else {
     const bg = ctx.createLinearGradient(0,0,0,ch);
-    bg.addColorStop(0,'#060810'); bg.addColorStop(0.5,'#080e08'); bg.addColorStop(1,'#050805');
-    ctx.fillStyle = bg; ctx.fillRect(0,0,cw,ch);
+    bg.addColorStop(0,'#060810');bg.addColorStop(0.5,'#080e08');bg.addColorStop(1,'#050805');
+    ctx.fillStyle=bg;ctx.fillRect(0,0,cw,ch);
   }
-
   // 2. Overlays
-  ctx.fillStyle = th.overlay; ctx.fillRect(0,0,cw,ch);
-  const panG = ctx.createLinearGradient(0,0,cw*0.72,0);
-  panG.addColorStop(0,'rgba(0,0,0,0.80)');
-  panG.addColorStop(0.65,'rgba(0,0,0,0.44)');
-  panG.addColorStop(1,'rgba(0,0,0,0)');
-  ctx.fillStyle = panG; ctx.fillRect(0,0,cw,ch);
-  const vig = ctx.createRadialGradient(cw/2,ch/2,ch*0.15, cw/2,ch/2,ch*0.78);
-  vig.addColorStop(0,'rgba(0,0,0,0)'); vig.addColorStop(1,'rgba(0,0,0,0.6)');
-  ctx.fillStyle = vig; ctx.fillRect(0,0,cw,ch);
+  ctx.fillStyle=th.overlay;ctx.fillRect(0,0,cw,ch);
+  const panG=ctx.createLinearGradient(0,0,cw*0.72,0);
+  panG.addColorStop(0,'rgba(0,0,0,0.80)');panG.addColorStop(0.65,'rgba(0,0,0,0.44)');panG.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle=panG;ctx.fillRect(0,0,cw,ch);
+  const vig=ctx.createRadialGradient(cw/2,ch/2,ch*0.15,cw/2,ch/2,ch*0.78);
+  vig.addColorStop(0,'rgba(0,0,0,0)');vig.addColorStop(1,'rgba(0,0,0,0.6)');
+  ctx.fillStyle=vig;ctx.fillRect(0,0,cw,ch);
+  // 3. Top accent bar
+  ctx.fillStyle=th.line;ctx.fillRect(0,0,cw,3*s);
 
-  // 3. Top accent bar (3px)
-  ctx.fillStyle = th.line; ctx.fillRect(0,0,cw,3*s);
+  const PAD      = 10 * s;
+  const LEFTWID  = cw * 0.58;
+  const VGAP     = 30 * s;
 
-  // ── ADAPTIVE LAYOUT — стек сверху вниз, 30px между блоками ──────────────
-  const brandH   = brand ? F.brand.px * 1.6   : 0;  // высота строки бренда
-  const typeH    = F.type.px * 1.6;                   // заголовок — ОДНА строка
-  const badgeH   = F.size.px  * 2.4;                  // плашка размера
-  const subH     = sub   ? F.sub.px  * 2.4    : 0;   // подзаголовок
-  const featRowH = F.feat.px  * 2.4;                  // высота одной характеристики
-  const featGap  = 6 * s;                              // зазор между характеристиками
+  // Heights from font sizes (unchanged)
+  const brandH   = brand ? F.brand.px * 1.6   : 0;
+  const typeH    = F.type.px * 1.6;
+  const badgeH   = F.size.px  * 2.4;
+  const subH     = sub   ? F.sub.px  * 2.4    : 0;
+  const featRowH = F.feat.px  * 2.4;
+  const featGap  = 6 * s;
   const activeFeat = feats.filter(f => f.trim()).slice(0,5);
   const featsTotal = activeFeat.length > 0
-    ? activeFeat.length * featRowH + (activeFeat.length - 1) * featGap
-    : 0;
+    ? activeFeat.length * featRowH + (activeFeat.length - 1) * featGap : 0;
 
-  // Y позиции — стек с фиксированным VGAP=30px между каждым блоком
-  let cy = 3*s + TOP_PAD;
+  // Convert EP fractions → canvas pixels for each element's top-left
+  const px = k => EP[k].x * cw;
+  const py = k => EP[k].y * ch;
 
-  const yBrand = cy;
-  if(brandH > 0) cy += brandH + VGAP;
-
-  const yType  = cy; cy += typeH  + VGAP;
-  const yBadge = cy; cy += badgeH + VGAP;
-  const ySub   = cy; if(subH > 0) cy += subH + VGAP;
-
-  // Характеристики — прибиты к низу
-  const yFeats = ch - featsTotal - 12 * s;
-
-  // Зона шины: правая колонка от верха до характеристик
-  const tireX = cw * 0.33, tireY = 4*s;
-  const tireW = cw * 0.66;
-  const tireH = Math.max(ch * 0.28, yFeats - tireY - 8*s);
+  // Tire area
+  const tireX = px('tire'), tireY = py('tire');
+  const tireW = cw * 0.66, tireH2 = ch * 0.55;
 
   // 4. Tire image
   if(tireMask){
-    const tr  = Math.min(tireW/tireMask.width, tireH/tireMask.height) * tireS;
+    const tr  = Math.min(tireW/tireMask.width, tireH2/tireMask.height) * tireS;
     const tw  = tireMask.width  * tr;
     const tha = tireMask.height * tr;
+    const tx  = tireX + (tireW-tw)/2;
+    const ty  = tireY;
+    regBox('tire', tx, ty, tw, tha);
     ctx.save();
-    ctx.shadowColor = 'rgba(0,0,0,0.85)';
-    ctx.shadowBlur  = 22*s;
-    ctx.shadowOffsetX = -4*s; ctx.shadowOffsetY = 12*s;
-    ctx.drawImage(tireMask,
-      tireX + (tireW - tw) / 2,
-      tireY + (tireH - tha) * 0.55,
-      tw, tha);
+    ctx.shadowColor='rgba(0,0,0,0.85)';ctx.shadowBlur=22*s;
+    ctx.shadowOffsetX=-4*s;ctx.shadowOffsetY=12*s;
+    ctx.drawImage(tireMask, tx, ty, tw, tha);
     ctx.restore();
+    // Drag highlight
+    if(hovered==='tire'||drag?.key==='tire'){
+      ctx.save();ctx.strokeStyle='rgba(245,197,24,0.7)';ctx.lineWidth=2*s;
+      ctx.setLineDash([4*s,4*s]);ctx.strokeRect(tx,ty,tw,tha);ctx.restore();
+    }
   }
 
-  // ── 5. TEXT — каждый блок со своей анимацией ─────────────────────────────
+  // ── 5. TEXT — each element uses EP position ────────────────────────────────
+  function drawHover(key,x,y,w,h){
+    if(hovered===key||drag?.key===key){
+      ctx.save();ctx.strokeStyle='rgba(245,197,24,0.55)';ctx.lineWidth=1.5*s;
+      ctx.setLineDash([3*s,3*s]);ctx.strokeRect(x-3*s,y-3*s,w+6*s,h+6*s);ctx.restore();
+    }
+  }
 
   // Бренд
   if(brand){
     const a = elemAnim('ae_brand','at_brand');
-    withAnim(a, ()=>{
-      ctx.font = F.brand.font;
-      ctx.fillStyle = 'rgba(255,255,255,0.5)';
-      ctx.textAlign = 'left';
-      ctx.fillText(brand.toUpperCase(), PAD, yBrand + F.brand.px);
+    const bx=px('brand'), by=py('brand');
+    regBox('brand', bx, by, LEFTWID*0.7, brandH||F.brand.px*1.6);
+    drawHover('brand',bx,by,LEFTWID*0.7,brandH||F.brand.px*1.6);
+    withAnim(a,()=>{
+      ctx.font=F.brand.font;ctx.fillStyle='rgba(255,255,255,0.5)';
+      ctx.textAlign='left';ctx.fillText(brand.toUpperCase(),bx,by+F.brand.px);
     });
   }
 
-  // Бейдж скидки (вместе с брендом)
+  // Скидка
   if(disc){
     const a = elemAnim('ae_brand','at_brand');
-    withAnim(a, ()=>{
-      ctx.font = F.brand.font;
-      const mw  = ctx.measureText(disc).width;
-      const dbw = mw + 16*s;
-      const dbh = brandH > 0 ? brandH : F.brand.px * 1.6;
-      const dbx = cw - dbw - PAD;
-      const dby = 3*s + TOP_PAD;
-      ctx.fillStyle = '#cc1111'; rr(ctx, dbx, dby, dbw, dbh, 5*s); ctx.fill();
-      ctx.fillStyle = '#fff'; ctx.textAlign = 'center';
-      ctx.fillText(disc, dbx + dbw/2, dby + dbh * 0.73);
+    withAnim(a,()=>{
+      ctx.font=F.brand.font;
+      const mw=ctx.measureText(disc).width;
+      const dbw=mw+16*s, dbh=F.brand.px*1.8;
+      const dbx=px('disc'), dby=py('disc');
+      regBox('disc',dbx,dby,dbw,dbh);
+      drawHover('disc',dbx,dby,dbw,dbh);
+      ctx.fillStyle='#cc1111';rr(ctx,dbx,dby,dbw,dbh,5*s);ctx.fill();
+      ctx.fillStyle='#fff';ctx.textAlign='center';
+      ctx.fillText(disc,dbx+dbw/2,dby+dbh*0.73);
     });
   }
 
   // Заголовок
   {
-    const a = elemAnim('ae_type','at_type');
-    withAnim(a, (an)=>{
-      ctx.font = F.type.font;
-      ctx.fillStyle = '#ffffff';
-      ctx.textAlign = 'left';
-      if(an.effect === 'typewriter'){
-        // Печатная машинка — показываем по символу
-        const total = typeText.length;
-        const shown = Math.ceil(an.p * total);
-        ctx.fillText(typeText.slice(0, shown), PAD, yType + F.type.px);
+    const a=elemAnim('ae_type','at_type');
+    const tx=px('type'), ty2=py('type');
+    ctx.font=F.type.font;
+    const tw2=ctx.measureText(typeText).width;
+    regBox('type',tx,ty2,tw2,typeH);
+    drawHover('type',tx,ty2,tw2,typeH);
+    withAnim(a,(an)=>{
+      ctx.font=F.type.font;ctx.fillStyle='#fff';ctx.textAlign='left';
+      if(an.effect==='typewriter'){
+        const shown=Math.ceil(an.p*typeText.length);
+        ctx.fillText(typeText.slice(0,shown),tx,ty2+F.type.px);
       } else {
-        ctx.fillText(typeText, PAD, yType + F.type.px);
+        ctx.fillText(typeText,tx,ty2+F.type.px);
       }
     });
   }
 
   // Плашка размера
   {
-    const a = elemAnim('ae_size','at_size');
-    withAnim(a, ()=>{
-      const sbw = LEFTWID - PAD;
-      const sbg = ctx.createLinearGradient(PAD, yBadge, PAD+sbw, yBadge);
-      sbg.addColorStop(0, th.badge); sbg.addColorStop(1, th.badgeL);
-      ctx.fillStyle = sbg; rr(ctx, PAD, yBadge, sbw, badgeH, 8*s); ctx.fill();
-      ctx.fillStyle = 'rgba(255,255,255,0.07)';
-      rr(ctx, PAD, yBadge, sbw, badgeH*0.48, 8*s); ctx.fill();
-      ctx.font = F.size.font;
-      ctx.fillStyle = th.txt; ctx.textAlign = 'center';
-      ctx.fillText(sizeText, PAD + sbw/2, yBadge + badgeH * 0.70);
+    const a=elemAnim('ae_size','at_size');
+    const bx=px('badge'), by=py('badge');
+    const sbw=LEFTWID-PAD;
+    regBox('badge',bx,by,sbw,badgeH);
+    drawHover('badge',bx,by,sbw,badgeH);
+    withAnim(a,()=>{
+      const sbg=ctx.createLinearGradient(bx,by,bx+sbw,by);
+      sbg.addColorStop(0,th.badge);sbg.addColorStop(1,th.badgeL);
+      ctx.fillStyle=sbg;rr(ctx,bx,by,sbw,badgeH,8*s);ctx.fill();
+      ctx.fillStyle='rgba(255,255,255,0.07)';rr(ctx,bx,by,sbw,badgeH*0.48,8*s);ctx.fill();
+      ctx.font=F.size.font;ctx.fillStyle=th.txt;ctx.textAlign='center';
+      ctx.fillText(sizeText,bx+sbw/2,by+badgeH*0.70);
     });
   }
 
   // Подзаголовок
-  if(sub && subH > 0){
-    const a = elemAnim('ae_sub','at_sub');
-    withAnim(a, ()=>{
-      const sw = (LEFTWID - PAD) * 0.75;
-      ctx.fillStyle = 'rgba(255,255,255,0.07)'; rr(ctx, PAD, ySub, sw, subH, 5*s); ctx.fill();
-      ctx.font = F.sub.font;
-      ctx.fillStyle = 'rgba(255,255,255,0.55)'; ctx.textAlign = 'center';
-      ctx.fillText(sub.toUpperCase(), PAD + sw/2, ySub + subH * 0.74);
+  if(sub&&subH>0){
+    const a=elemAnim('ae_sub','at_sub');
+    const bx=px('sub'), by=py('sub');
+    const sw=(LEFTWID-PAD)*0.75;
+    regBox('sub',bx,by,sw,subH);
+    drawHover('sub',bx,by,sw,subH);
+    withAnim(a,()=>{
+      ctx.fillStyle='rgba(255,255,255,0.07)';rr(ctx,bx,by,sw,subH,5*s);ctx.fill();
+      ctx.font=F.sub.font;ctx.fillStyle='rgba(255,255,255,0.55)';ctx.textAlign='center';
+      ctx.fillText(sub.toUpperCase(),bx+sw/2,by+subH*0.74);
     });
   }
 
-  // Характеристики — появляются по одной с задержкой между ними
+  // Характеристики
   {
-    const baseDelay = parseFloat(document.getElementById('at_feat')?.value || '4');
-    const effect    = document.getElementById('ae_feat')?.value || 'slideLeft';
-    activeFeat.forEach((feat, i) => {
-      const delay = baseDelay + i * 0.35;
-      const t     = Math.max(0, gt - delay);
-      const p     = Math.min(1, t / animFadeDur);
-      const ease  = p < 0.5 ? 2*p*p : -1+(4-2*p)*p;
-      if(p <= 0) return;
-
-      let alpha=ease, ox=0, oy=0, sc=1;
+    const baseDelay=parseFloat(document.getElementById('at_feat')?.value||'4');
+    const effect=document.getElementById('ae_feat')?.value||'slideLeft';
+    const fx2=px('feats'), fy2=py('feats');
+    regBox('feats',fx2,fy2,LEFTWID-PAD,featsTotal||featRowH);
+    drawHover('feats',fx2,fy2,LEFTWID-PAD,featsTotal||featRowH);
+    activeFeat.forEach((feat,i)=>{
+      const delay=baseDelay+i*0.35;
+      const t=Math.max(0,gt-delay);
+      const p=Math.min(1,t/animFadeDur);
+      const ease=p<0.5?2*p*p:-1+(4-2*p)*p;
+      if(p<=0)return;
+      let alpha=ease,ox=0,oy=0,sc=1;
       switch(effect){
-        case 'fade':     alpha=ease; break;
-        case 'slideLeft':ox=(1-ease)*-60*s; alpha=ease; break;
-        case 'slideUp':  oy=(1-ease)*30*s;  alpha=ease; break;
-        case 'slideDown':oy=(1-ease)*-30*s; alpha=ease; break;
-        case 'zoom':     sc=0.6+ease*0.4;   alpha=ease; break;
-        case 'typewriter':alpha=1; break;
+        case 'fade':break;
+        case 'slideLeft':ox=(1-ease)*-60*s;break;
+        case 'slideUp':oy=(1-ease)*30*s;break;
+        case 'slideDown':oy=(1-ease)*-30*s;break;
+        case 'zoom':sc=0.6+ease*0.4;break;
       }
-
-      ctx.save();
-      ctx.globalAlpha = alpha;
-      ctx.translate(ox, oy);
-      if(sc !== 1){ ctx.translate(PAD, yFeats+i*(featRowH+featGap)+featRowH/2); ctx.scale(sc,sc); ctx.translate(-PAD,-(yFeats+i*(featRowH+featGap)+featRowH/2)); }
-
-      const fy   = yFeats + i * (featRowH + featGap);
-      const fw   = LEFTWID - PAD;
-      const dotR = Math.max(3*s, F.feat.px * 0.32);
-      ctx.fillStyle = th.feat; rr(ctx, PAD, fy, fw, featRowH, 5*s); ctx.fill();
-      ctx.fillStyle = th.dot; ctx.beginPath();
-      ctx.arc(PAD + dotR + 5*s, fy + featRowH/2, dotR, 0, Math.PI*2); ctx.fill();
-      ctx.font = F.feat.font;
-
-      if(effect === 'typewriter'){
-        const shown = Math.ceil(p * feat.length);
-        const txt = feat.slice(0, shown);
-        ctx.fillStyle = 'rgba(255,255,255,0.9)'; ctx.textAlign = 'left';
-        ctx.fillText(txt, PAD + dotR*2 + 12*s, fy + featRowH * 0.68);
+      ctx.save();ctx.globalAlpha=alpha;ctx.translate(ox,oy);
+      if(sc!==1){ctx.translate(fx2,fy2+i*(featRowH+featGap)+featRowH/2);ctx.scale(sc,sc);ctx.translate(-fx2,-(fy2+i*(featRowH+featGap)+featRowH/2));}
+      const fy=fy2+i*(featRowH+featGap);
+      const fw=LEFTWID-PAD;
+      const dotR=Math.max(3*s,F.feat.px*0.32);
+      ctx.fillStyle=th.feat;rr(ctx,fx2,fy,fw,featRowH,5*s);ctx.fill();
+      ctx.fillStyle=th.dot;ctx.beginPath();ctx.arc(fx2+dotR+5*s,fy+featRowH/2,dotR,0,Math.PI*2);ctx.fill();
+      ctx.font=F.feat.font;
+      if(effect==='typewriter'){
+        const shown=Math.ceil(p*feat.length);
+        ctx.fillStyle='rgba(255,255,255,0.9)';ctx.textAlign='left';
+        ctx.fillText(feat.slice(0,shown),fx2+dotR*2+12*s,fy+featRowH*0.68);
       } else {
-        ctx.fillStyle = 'rgba(255,255,255,0.9)'; ctx.textAlign = 'left';
-        ctx.fillText(feat, PAD + dotR*2 + 12*s, fy + featRowH * 0.68);
+        ctx.fillStyle='rgba(255,255,255,0.9)';ctx.textAlign='left';
+        ctx.fillText(feat,fx2+dotR*2+12*s,fy+featRowH*0.68);
       }
       ctx.restore();
     });
@@ -803,6 +900,7 @@ function loop(){
   prevRaf=requestAnimationFrame(loop);
 }
 loop();
+initDrag();
 
 // ── Generate ──────────────────────────────────────────────────────────────────
 async function startGen(){
