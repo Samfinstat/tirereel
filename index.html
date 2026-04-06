@@ -1,2080 +1,3871 @@
 <!DOCTYPE html>
-<html lang="ru">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>TireCard — WB стиль</title>
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700;900&family=Roboto:wght@300;400;500;700;900&family=Montserrat:wght@400;500;700;900&family=Bebas+Neue&family=Anton&family=Russo+One&family=PT+Sans:wght@400;700&family=Raleway:wght@400;700;900&family=Nunito:wght@400;700;900&family=Ubuntu:wght@400;700&display=swap" rel="stylesheet">
-<style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{background:#0d0e14;color:#e8eaf2;font-family:'Roboto',sans-serif;font-size:14px;min-height:100vh}
-header{background:#13141f;border-bottom:1px solid rgba(255,255,255,0.06);padding:0 24px;height:52px;display:flex;align-items:center;gap:12px}
-.logo{font-family:'Oswald',sans-serif;font-size:20px;font-weight:700;color:#fff}
-.logo span{color:#f5c518}
-.logo-sub{font-size:11px;color:#444;letter-spacing:.1em;text-transform:uppercase}
-.layout{display:grid;grid-template-columns:1fr 1fr;min-height:calc(100vh - 52px)}
-.left{padding:20px 24px;display:flex;flex-direction:column;gap:16px;border-right:1px solid rgba(255,255,255,0.05);overflow-y:auto;max-height:calc(100vh - 52px)}
-.right{display:flex;flex-direction:column;background:#080a10;position:sticky;top:0;height:calc(100vh - 52px)}
-.fmt-bar{display:flex;gap:0;border-bottom:1px solid rgba(255,255,255,0.06);flex-shrink:0}
-.fmt-btn{flex:1;padding:8px 2px;background:none;border:none;border-right:1px solid rgba(255,255,255,0.06);color:#444;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:1px;transition:all .15s}
-.fmt-btn:last-child{border-right:none}
-.fmt-btn:hover{background:rgba(255,255,255,0.04);color:#888}
-.fmt-btn.active{background:rgba(245,197,24,0.08);color:#f5c518;border-bottom:2px solid #f5c518}
-.fmt-btn .fl{font-family:"Oswald",sans-serif;font-size:12px;font-weight:700;line-height:1}
-.fmt-btn .fs{font-size:9px;opacity:.7}
-.sec{font-size:10px;font-weight:500;color:#f5c518;text-transform:uppercase;letter-spacing:.12em;margin-bottom:8px}
-.ubox{border:1.5px dashed rgba(245,197,24,.22);border-radius:10px;padding:18px 14px;text-align:center;cursor:pointer;transition:all .2s;background:rgba(245,197,24,.02);display:flex;flex-direction:column;align-items:center;gap:5px}
-.ubox:hover,.ubox.over{border-color:#f5c518;background:rgba(245,197,24,.05)}
-.ubox .ic{font-size:26px}
-.ubox .tt{font-size:13px;font-weight:500;color:#bbb}
-.ubox .sb{font-size:11px;color:#444}
-.ubox.filled{border-color:rgba(245,197,24,.45)}
-.uploads-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-label.f{display:block;font-size:10px;font-weight:500;color:#555;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;margin-top:10px}
-label.f:first-child{margin-top:0}
-input[type=text],textarea,select{width:100%;background:#1a1b26;border:1px solid rgba(255,255,255,0.06);border-radius:6px;padding:7px 10px;color:#e8eaf2;font-family:'Roboto',sans-serif;font-size:13px;outline:none;transition:border-color .2s}
-input[type=text]:focus,textarea:focus,select:focus{border-color:#f5c518}
-textarea{resize:vertical;min-height:70px}
-select{cursor:pointer}
-select option{background:#1a1b26}
-.row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.feat-list{display:flex;flex-direction:column;gap:5px;margin-top:6px}
-.feat-item{display:flex;gap:6px;align-items:center}
-.feat-item input{flex:1;font-size:12px}
-.feat-del{background:none;border:none;color:#444;cursor:pointer;font-size:15px;padding:0 4px;line-height:1}
-.feat-del:hover{color:#ff6b6b}
-.add-feat{background:rgba(245,197,24,.07);border:1px solid rgba(245,197,24,.18);border-radius:6px;color:#f5c518;cursor:pointer;padding:7px;font-size:12px;width:100%;transition:background .2s;margin-top:6px}
-.add-feat:hover{background:rgba(245,197,24,.14)}
-.prev-wrap{flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#080a10;padding:8px;position:relative}
-.prev-top-bar{display:flex;align-items:center;justify-content:space-between;width:100%;max-width:360px;margin-bottom:10px}
-.prev-top-bar .prev-label{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:#333}
-.prev-top-bar .prev-hint{font-size:10px;color:#444}
 
-#prevCv{border-radius:10px;border:1.5px solid rgba(255,255,255,0.1);box-shadow:0 12px 40px rgba(0,0,0,.8);display:block;max-width:100%;max-height:100%;cursor:default}
-.gen-panel{border-top:1px solid rgba(255,255,255,0.05);padding:12px 16px;flex-shrink:0}
-.btn{width:100%;padding:12px;background:#f5c518;color:#0d0e14;border:none;border-radius:7px;font-family:'Oswald',sans-serif;font-size:14px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:background .2s}
-.btn:hover{background:#ffe066}
-.btn:disabled{background:#1e1e28;color:#444;cursor:not-allowed}
-.st{margin-top:8px;font-size:11px;text-align:center;min-height:14px;display:flex;align-items:center;justify-content:center;gap:6px;color:#555}
-.st.err{color:#ff6b6b}.st.ok{color:#4caf88}
-.prog{height:2px;background:rgba(255,255,255,.04);border-radius:1px;margin-top:7px;overflow:hidden;display:none}
-.pb{height:100%;background:#f5c518;width:0%;transition:width .2s}
-.btn-dl{display:flex;align-items:center;justify-content:center;gap:7px;padding:9px;background:#1d3a28;color:#5dde9a;border:1px solid #2a5e3a;border-radius:7px;font-size:12px;font-weight:500;text-decoration:none;margin-top:7px;width:100%;cursor:pointer;transition:background .2s}
-.btn-dl:hover{background:#254a32}
-.spin{width:11px;height:11px;border:2px solid rgba(245,197,24,.2);border-top-color:#f5c518;border-radius:50%;animation:sp .7s linear infinite;flex-shrink:0}
-@keyframes sp{to{transform:rotate(360deg)}}
-.font-row{display:grid;grid-template-columns:auto 1fr 80px 32px;gap:6px;align-items:center;margin-bottom:6px}
-.font-row .flabel{font-size:10px;color:#666;white-space:nowrap;letter-spacing:.04em}
-.font-row select{font-size:11px;padding:5px 7px}
-.font-row input[type=range]{-webkit-appearance:none;height:3px;background:rgba(255,255,255,0.1);border-radius:2px;outline:none;padding:0;border:none}
-.font-row input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:#f5c518;cursor:pointer}
-.font-row .fval{font-size:11px;color:#f5c518;text-align:right;font-weight:500;min-width:28px}
-.ai-flow{display:flex;align-items:center;gap:6px;margin-top:12px;flex-wrap:wrap}
-.ai-flow-step{display:flex;flex-direction:column;align-items:center;gap:2px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:6px 8px;min-width:44px}
-.ai-flow-result{background:rgba(245,197,24,0.08);border-color:rgba(245,197,24,0.2)}
-.ai-flow-icon{font-size:16px}
-.ai-flow-text{font-size:9px;color:#666;text-align:center;white-space:nowrap}
-.ai-flow-arrow{color:#444;font-size:14px;font-weight:700}
-.ai-upload-box{display:flex;flex-direction:column;align-items:center;gap:3px;border:1.5px dashed rgba(255,255,255,0.1);border-radius:8px;padding:12px;text-align:center;cursor:pointer;transition:all .2s}
-.ai-upload-box:hover{border-color:rgba(245,197,24,0.35);background:rgba(245,197,24,0.03)}
-.ai-upload-box.loaded{border-color:rgba(245,197,24,0.4);background:rgba(245,197,24,0.05)}
-.ai-upl-icon{font-size:20px}
-.ai-upl-text{font-size:12px;color:#888;font-weight:500}
-.ai-upl-sub{font-size:10px;color:#444}
-.ai-thumb-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
-.ai-thumb{width:48px;height:48px;border-radius:6px;overflow:hidden;border:1px solid rgba(255,255,255,0.08);position:relative}
-.ai-thumb img{width:100%;height:100%;object-fit:cover}
-.ai-thumb .ai-tdel{position:absolute;top:1px;right:1px;width:14px;height:14px;background:rgba(0,0,0,0.7);border:none;border-radius:50%;cursor:pointer;color:#fff;font-size:9px;display:flex;align-items:center;justify-content:center;padding:0}
-.ai-thumb .ai-tdel:hover{background:#c0392b}
-.ai-card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:16px;position:relative;overflow:hidden}
-.ai-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(245,197,24,0.04) 0%,rgba(100,80,255,0.04) 100%);pointer-events:none}
-.ai-badge{display:inline-block;background:rgba(245,197,24,0.15);color:#f5c518;border:1px solid rgba(245,197,24,0.3);border-radius:4px;font-size:10px;font-weight:600;letter-spacing:.08em;padding:2px 8px;text-transform:uppercase;margin-bottom:8px}
-.ai-title{font-family:'Oswald',sans-serif;font-size:15px;font-weight:600;color:#fff;margin-bottom:6px}
-.ai-desc{font-size:11px;color:#666;line-height:1.55}
-.ai-btn{width:100%;margin-top:14px;padding:11px;background:linear-gradient(90deg,#7c3aed,#4f46e5);color:#fff;border:none;border-radius:8px;font-family:'Oswald',sans-serif;font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:opacity .2s;opacity:0.45}
+<html lang="ru">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<title>TireCard — WB стиль</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700;900&family=Roboto:wght@300;400;500;700;900&family=Montserrat:wght@400;500;700;900&family=Bebas+Neue&family=Anton&family=Russo+One&family=PT+Sans:wght@400;700&family=Raleway:wght@400;700;900&family=Nunito:wght@400;700;900&family=Ubuntu:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0d0e14;color:#e0e2f0;font-family:'Roboto',sans-serif;font-size:13px;min-height:100vh}
+header{background:#0a0b10;border-bottom:1px solid rgba(255,255,255,0.06);padding:0 16px;height:46px;display:flex;align-items:center;gap:10px}
+.logo{font-family:'Oswald',sans-serif;font-size:18px;font-weight:700;color:#fff;letter-spacing:.04em}
+.logo span{color:#f5c518}
+.logo-sub{font-size:10px;color:#333;letter-spacing:.08em;text-transform:uppercase}
+.layout{display:grid;grid-template-columns:380px 1fr;min-height:calc(100vh - 46px)}
+.left{display:flex;flex-direction:column;gap:0;border-right:1px solid rgba(255,255,255,0.05);overflow-y:auto;max-height:calc(100vh - 46px);background:#0d0e14;min-width:0}
+.panel{border-bottom:1px solid rgba(255,255,255,0.05)}
+.panel-hd{display:flex;align-items:center;gap:7px;padding:8px 12px;cursor:pointer;background:#0d0e14;transition:background .12s;user-select:none;position:relative}
+.panel-hd::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:transparent;transition:background .15s}
+.panel.open .panel-hd::before{background:#f5c518}
+.panel-hd:hover{background:#13141f}
+.panel.open .panel-hd{background:#13141f}
+.p-icon{font-size:13px;flex-shrink:0;opacity:.7}
+.p-title{font-size:11px;font-weight:600;color:#888;flex:1;letter-spacing:.03em;text-transform:uppercase}
+.panel.open .p-title{color:#ddd}
+.p-arr{font-size:10px;color:#333;transition:transform .18s}
+.panel.open .p-arr{transform:rotate(180deg);color:#f5c518}
+.panel-bd{padding:8px 11px 11px;display:none;flex-direction:column;gap:7px}
+.panel.open .panel-bd{display:flex}
+.inner-tabs{display:flex;gap:3px;background:rgba(0,0,0,0.2);border-radius:7px;padding:3px;margin-bottom:4px}
+.itab{flex:1;padding:5px 4px;background:none;border:none;border-radius:5px;color:#555;font-size:10px;font-weight:500;cursor:pointer;transition:all .12s;text-align:center}
+.itab:hover{color:#888}
+.itab.active{background:rgba(245,197,24,0.12);color:#f5c518;font-weight:600}
+.ubl{font-size:9px;color:#444;text-transform:uppercase;letter-spacing:.07em;margin-bottom:3px}
+.ubox{border:1px dashed rgba(245,197,24,.18);border-radius:7px;padding:10px 8px;text-align:center;cursor:pointer;transition:all .15s;background:rgba(245,197,24,.01);display:flex;flex-direction:column;align-items:center;gap:3px}
+.ubox:hover,.ubox.over{border-color:#f5c518;background:rgba(245,197,24,.04)}
+.ubox.filled{border-color:rgba(245,197,24,.4);background:rgba(245,197,24,.04)}
+.ubox .ic{font-size:18px;line-height:1}
+.ubox .tt{font-size:10px;font-weight:500;color:#888}
+.ubox .sb{font-size:9px;color:#444}
+.uploads-row{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+label.f{display:block;font-size:9px;font-weight:600;color:#444;text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px;margin-top:6px}
+label.f:first-child{margin-top:0}
+input[type=text],textarea,select{width:100%;background:#141520;border:1px solid rgba(255,255,255,0.07);border-radius:5px;padding:5px 8px;color:#e0e2f0;font-family:'Roboto',sans-serif;font-size:12px;outline:none;transition:border-color .15s}
+input[type=text]:focus,textarea:focus,select:focus{border-color:rgba(245,197,24,.5)}
+textarea{resize:vertical;min-height:44px}
+select{cursor:pointer}select option{background:#141520}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.cslider{-webkit-appearance:none;width:100%;height:2px;background:rgba(255,255,255,0.08);border-radius:2px;outline:none;border:none;cursor:pointer;margin-top:4px}
+.cslider::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;border-radius:50%;background:#f5c518;cursor:pointer}
+.block-toggles{display:flex;flex-wrap:wrap;gap:4px}
+.btog{display:flex;align-items:center;gap:4px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:5px;padding:3px 6px;cursor:pointer;font-size:10px;color:#555;transition:all .12s;user-select:none}
+.btog:hover{color:#888;border-color:rgba(255,255,255,0.1)}
+.btog input{accent-color:#f5c518;cursor:pointer;margin:0;width:11px;height:11px}
+.btog input:checked+span{color:#f5c518}
+.feat-list{display:flex;flex-direction:column;gap:4px}
+.feat-item{display:flex;gap:5px;align-items:center}
+.feat-item input{flex:1;font-size:11px}
+.feat-del{background:none;border:none;color:#333;cursor:pointer;font-size:14px;padding:0 3px;line-height:1;flex-shrink:0}
+.feat-del:hover{color:#ff6b6b}
+.add-feat{background:rgba(245,197,24,.06);border:1px solid rgba(245,197,24,.16);border-radius:5px;color:#f5c518;cursor:pointer;padding:5px 8px;font-size:10px;width:100%;transition:background .15s}
+.add-feat:hover{background:rgba(245,197,24,.12)}
+.font-row{display:grid;grid-template-columns:42px 1fr 68px 28px;gap:5px;align-items:center;margin-bottom:4px}
+.font-row .flabel,.anim-row .alabel{font-size:9px;color:#555;white-space:nowrap;letter-spacing:.04em}
+.font-row select,.anim-row select{font-size:10px;padding:3px 5px}
+.font-row input[type=range],.anim-row input[type=range]{-webkit-appearance:none;height:2px;background:rgba(255,255,255,0.08);border-radius:2px;outline:none;padding:0;border:none}
+.font-row input[type=range]::-webkit-slider-thumb,.anim-row input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;border-radius:50%;background:#f5c518;cursor:pointer}
+.font-row .fval,.anim-row .aval{font-size:10px;color:#f5c518;text-align:right;font-weight:500}
+.anim-row{display:grid;grid-template-columns:42px 1fr 64px 26px;gap:5px;align-items:center;margin-bottom:4px}
+.src-tabs{display:flex;gap:4px}
+.src-tab{flex:1;padding:6px 5px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:6px;color:#555;font-size:11px;font-weight:500;cursor:pointer;transition:all .15s;text-align:center}
+.src-tab:hover{color:#888}
+.src-tab.active{background:rgba(245,197,24,0.09);border-color:rgba(245,197,24,.3);color:#f5c518}
+.ai-card{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:10px}
+.ai-flow{display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin-bottom:6px}
+.ai-flow-step{display:flex;flex-direction:column;align-items:center;gap:1px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:6px;padding:4px 6px;min-width:38px}
+.ai-flow-result{background:rgba(245,197,24,0.06);border-color:rgba(245,197,24,0.18)}
+.ai-flow-icon{font-size:13px}
+.ai-flow-text{font-size:8px;color:#555;text-align:center;white-space:nowrap}
+.ai-flow-arrow{color:#333;font-size:11px;font-weight:700}
+.ai-badge{display:inline-block;background:rgba(245,197,24,0.12);color:#f5c518;border:1px solid rgba(245,197,24,0.25);border-radius:3px;font-size:9px;font-weight:600;letter-spacing:.08em;padding:1px 6px;text-transform:uppercase;margin-bottom:6px}
+.ai-btn{width:100%;margin-top:8px;padding:7px;background:linear-gradient(90deg,#7c3aed,#4f46e5);color:#fff;border:none;border-radius:6px;font-family:'Oswald',sans-serif;font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;transition:opacity .2s;opacity:.4}
 .ai-btn:not(:disabled){opacity:1}
 .ai-btn:not(:disabled):hover{opacity:.85}
 .ai-btn:disabled{cursor:not-allowed}
-.ai-status{margin-top:8px;font-size:11px;text-align:center;min-height:14px;color:#666;display:flex;align-items:center;justify-content:center;gap:6px}
+.ai-status{margin-top:5px;font-size:10px;text-align:center;color:#555;display:flex;align-items:center;justify-content:center;gap:5px}
 .ai-status.ok{color:#4caf88}.ai-status.err{color:#ff6b6b}
-.ai-prompts{margin-top:12px}
-.ai-prompts-title{font-size:10px;color:#555;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
-.ai-prompt-chip{display:inline-block;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:20px;padding:4px 11px;font-size:11px;color:#888;cursor:pointer;margin:0 4px 4px 0;transition:all .15s}
-.ai-prompt-chip:hover{background:rgba(245,197,24,0.1);border-color:rgba(245,197,24,0.3);color:#f5c518}
-.ai-card input:disabled,.ai-card select:disabled,.ai-card textarea:disabled{opacity:0.4;cursor:not-allowed}
-.anim-row{display:grid;grid-template-columns:60px 1fr 70px 30px;gap:6px;align-items:center;margin-bottom:6px}
-.anim-row .alabel{font-size:10px;color:#666;white-space:nowrap;letter-spacing:.04em}
-.anim-row select{font-size:11px;padding:5px 7px}
-.anim-row input[type=range]{-webkit-appearance:none;height:3px;background:rgba(255,255,255,0.1);border-radius:2px;outline:none;padding:0;border:none}
-.anim-row input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:#f5c518;cursor:pointer}
-.anim-row .aval{font-size:11px;color:#f5c518;text-align:right;font-weight:500;min-width:26px}
-.block-toggles{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:4px}
-.btog{display:flex;align-items:center;gap:5px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:6px;padding:4px 8px;cursor:pointer;font-size:11px;color:#666;transition:all .15s;user-select:none}
-.btog:hover{background:rgba(255,255,255,0.07);color:#aaa}
-.btog input{width:auto;accent-color:#f5c518;cursor:pointer;margin:0}
-.btog input:checked+span{color:#f5c518}
-.shape-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px}
-.shape-card{background:#1a1b26;border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:8px 4px;cursor:pointer;transition:all .15s;display:flex;flex-direction:column;align-items:center;gap:4px}
-.shape-card:hover{border-color:rgba(245,197,24,0.4);background:rgba(245,197,24,0.06);transform:translateY(-1px)}
-.shape-card svg{width:32px;height:32px;display:block}
-.shape-card span{font-size:9px;color:#555;text-transform:uppercase;letter-spacing:.05em}
-.shape-card:hover span{color:#888}
-.shape-editor-head{display:flex;align-items:center;justify-content:space-between;background:#14161f;border-radius:7px 7px 0 0;padding:7px 10px;border:1px solid rgba(255,255,255,0.07);border-bottom:none}
-.shape-editor-head span{font-size:11px;color:#888;font-weight:500}
-.shape-props{background:#1a1b26;border:1px solid rgba(255,255,255,0.07);border-radius:0 0 7px 7px;padding:10px}
-.tmpl-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:8px}
-.tmpl-card{background:#1a1b26;border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:8px 6px;cursor:pointer;transition:all .15s;display:flex;flex-direction:column;align-items:center;gap:5px;text-align:center;position:relative;overflow:hidden}
-.tmpl-card:hover{border-color:rgba(245,197,24,0.4);background:rgba(245,197,24,0.06);transform:translateY(-1px)}
-.tmpl-card:active{transform:translateY(0)}
-.tmpl-preview{width:100%;height:36px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;letter-spacing:.04em;overflow:hidden;flex-shrink:0}
-.tmpl-name{font-size:9px;color:#555;text-transform:uppercase;letter-spacing:.06em;white-space:nowrap}
-.tmpl-card:hover .tmpl-name{color:#888}
-.add-ctext-btn{background:rgba(245,197,24,0.12);border:1px solid rgba(245,197,24,0.3);border-radius:6px;color:#f5c518;font-size:11px;font-weight:600;padding:3px 10px;cursor:pointer;transition:background .15s}
-.add-ctext-btn:hover{background:rgba(245,197,24,0.2)}
-/* Word-style card */
-.ctext-card{background:#1c1e2a;border:1px solid rgba(255,255,255,0.08);border-radius:10px;overflow:hidden;position:relative;margin-bottom:2px}
-.ctext-card-head{display:flex;align-items:center;justify-content:space-between;padding:6px 10px 4px;border-bottom:1px solid rgba(255,255,255,0.05)}
-.ctext-card-head span{font-size:10px;color:#555;letter-spacing:.04em}
-.ctext-del{background:none;border:none;color:#444;cursor:pointer;font-size:15px;line-height:1;padding:2px 4px}
+.ai-prompts{display:flex;flex-wrap:wrap;gap:3px;margin-top:4px}
+.ai-prompt-chip{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:3px 8px;font-size:10px;color:#666;cursor:pointer;transition:all .12s}
+.ai-prompt-chip:hover{background:rgba(245,197,24,0.08);border-color:rgba(245,197,24,.25);color:#f5c518}
+.ai-thumb-row{display:flex;gap:4px;flex-wrap:wrap;margin-top:5px}
+.ai-thumb{width:40px;height:40px;border-radius:5px;overflow:hidden;border:1px solid rgba(255,255,255,0.07);position:relative}
+.ai-thumb img{width:100%;height:100%;object-fit:cover}
+.ai-thumb .ai-tdel{position:absolute;top:1px;right:1px;width:12px;height:12px;background:rgba(0,0,0,.7);border:none;border-radius:50%;cursor:pointer;color:#fff;font-size:8px;display:flex;align-items:center;justify-content:center;padding:0}
+.tmpl-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}
+.tmpl-card{background:#141520;border:1px solid rgba(255,255,255,0.06);border-radius:6px;padding:6px 4px;cursor:pointer;transition:all .12s;display:flex;flex-direction:column;align-items:center;gap:4px}
+.tmpl-card:hover{border-color:rgba(245,197,24,.35);background:rgba(245,197,24,.05);transform:translateY(-1px)}
+.tmpl-preview{width:100%;height:30px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;overflow:hidden;flex-shrink:0}
+.tmpl-name{font-size:8px;color:#444;text-transform:uppercase;letter-spacing:.05em;white-space:nowrap}
+.tmpl-card:hover .tmpl-name{color:#777}
+.shape-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
+.shape-card{background:#141520;border:1px solid rgba(255,255,255,0.06);border-radius:6px;padding:6px 3px;cursor:pointer;transition:all .12s;display:flex;flex-direction:column;align-items:center;gap:3px}
+.shape-card:hover{border-color:rgba(245,197,24,.35);background:rgba(245,197,24,.05);transform:translateY(-1px)}
+.shape-card svg{width:26px;height:26px}
+.shape-card span{font-size:8px;color:#444;text-transform:uppercase;text-align:center;line-height:1.2}
+.shape-card:hover span{color:#777}
+.shape-editor-head{display:flex;align-items:center;justify-content:space-between;background:#141520;border-radius:6px 6px 0 0;padding:5px 8px;border:1px solid rgba(255,255,255,0.06);border-bottom:none;margin-top:8px}
+.shape-editor-head span{font-size:10px;color:#777}
+.shape-props{background:#141520;border:1px solid rgba(255,255,255,0.06);border-radius:0 0 6px 6px;padding:8px}
+.add-ctext-btn{background:rgba(245,197,24,0.1);border:1px solid rgba(245,197,24,0.25);border-radius:5px;color:#f5c518;font-size:10px;font-weight:600;padding:3px 8px;cursor:pointer;transition:background .12s}
+.add-ctext-btn:hover{background:rgba(245,197,24,0.18)}
+.ctext-card{background:#141520;border:1px solid rgba(255,255,255,0.06);border-radius:8px;overflow:hidden;margin-bottom:2px}
+.ctext-card-head{display:flex;align-items:center;justify-content:space-between;padding:5px 8px 3px;border-bottom:1px solid rgba(255,255,255,0.04)}
+.ctext-card-head span{font-size:9px;color:#444;letter-spacing:.04em}
+.ctext-del{background:none;border:none;color:#333;cursor:pointer;font-size:14px;line-height:1;padding:1px 3px}
 .ctext-del:hover{color:#ff6b6b}
-/* Word toolbar */
-.word-toolbar{background:#14161f;border-bottom:1px solid rgba(255,255,255,0.06);padding:5px 8px;display:flex;flex-direction:column;gap:4px}
-.word-row{display:flex;align-items:center;gap:3px;flex-wrap:wrap}
-.word-sep{width:1px;height:18px;background:rgba(255,255,255,0.1);margin:0 2px;flex-shrink:0}
-.wsel{background:#1a1b26;border:1px solid rgba(255,255,255,0.1);border-radius:4px;color:#ccc;font-size:11px;padding:3px 5px;outline:none;cursor:pointer;height:24px}
-.wsel:focus{border-color:#f5c518}
-.wsel.font-sel{min-width:100px;max-width:130px}
-.wsel.size-sel{width:52px}
-.wnuminput{background:#1a1b26;border:1px solid rgba(255,255,255,0.1);border-radius:4px;color:#ccc;font-size:11px;padding:3px 5px;outline:none;width:44px;height:24px;text-align:center}
-.wnuminput:focus{border-color:#f5c518}
-.wbtn{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;background:none;border:1px solid transparent;border-radius:4px;color:#888;cursor:pointer;font-size:12px;transition:all .12s;flex-shrink:0;padding:0}
-.wbtn:hover{background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.12);color:#ccc}
-.wbtn.on{background:rgba(245,197,24,0.15);border-color:rgba(245,197,24,0.35);color:#f5c518}
-.wbtn svg{width:13px;height:13px;fill:currentColor}
-.wcolor{width:24px;height:24px;padding:2px;border-radius:4px;border:1px solid rgba(255,255,255,0.1);background:#1a1b26;cursor:pointer}
-.wopacity{-webkit-appearance:none;height:3px;background:rgba(255,255,255,0.1);border-radius:2px;outline:none;padding:0;border:none;width:60px;cursor:pointer}
-.wopacity::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;border-radius:50%;background:#f5c518;cursor:pointer}
-.wlabel{font-size:9px;color:#555;white-space:nowrap}
-.ctext-body{padding:8px}
-.ctext-input{width:100%;background:#1a1b26;border:1px solid rgba(255,255,255,0.08);border-radius:6px;padding:7px 10px;color:#e8eaf2;font-size:13px;outline:none;resize:vertical;min-height:44px;font-family:inherit}
-.ctext-input:focus{border-color:#f5c518}
-.src-tabs{display:flex;gap:6px;margin-bottom:2px}
-.src-tab{flex:1;padding:9px 6px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:#666;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s;text-align:center}
-.src-tab:hover{background:rgba(255,255,255,0.07);color:#aaa}
-.src-tab.active{background:rgba(245,197,24,0.1);border-color:rgba(245,197,24,0.35);color:#f5c518}
-.tip{background:rgba(245,197,24,.04);border:1px solid rgba(245,197,24,.12);border-radius:7px;padding:8px 11px;font-size:11px;color:rgba(245,197,24,.65);line-height:1.5}
-::-webkit-scrollbar{width:4px}
-::-webkit-scrollbar-thumb{background:rgba(255,255,255,.07);border-radius:2px}
-@media(max-width:900px){.layout{grid-template-columns:1fr}.right{position:static;height:auto;border-top:1px solid rgba(255,255,255,0.05)}.left{max-height:none;padding:14px}.uploads-row{grid-template-columns:1fr}.phone{max-height:70vw}}
+.word-toolbar{background:#0d0f1a;border-bottom:1px solid rgba(255,255,255,0.05);padding:4px 7px;display:flex;flex-direction:column;gap:3px}
+.word-row{display:flex;align-items:center;gap:2px;flex-wrap:wrap}
+.word-sep{width:1px;height:16px;background:rgba(255,255,255,0.08);margin:0 2px;flex-shrink:0}
+.wsel{background:#141520;border:1px solid rgba(255,255,255,0.08);border-radius:4px;color:#bbb;font-size:10px;padding:2px 4px;outline:none;cursor:pointer;height:22px}
+.wsel.font-sel{min-width:90px;max-width:120px}
+.wnuminput{background:#141520;border:1px solid rgba(255,255,255,0.08);border-radius:4px;color:#bbb;font-size:10px;padding:2px 4px;outline:none;width:40px;height:22px;text-align:center}
+.wbtn{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;background:none;border:1px solid transparent;border-radius:3px;color:#777;cursor:pointer;font-size:11px;transition:all .1s;flex-shrink:0;padding:0}
+.wbtn:hover{background:rgba(255,255,255,0.07);color:#bbb}
+.wbtn.on{background:rgba(245,197,24,0.13);border-color:rgba(245,197,24,.3);color:#f5c518}
+.wbtn svg{width:12px;height:12px;fill:currentColor}
+.wcolor{width:22px;height:22px;padding:2px;border-radius:3px;border:1px solid rgba(255,255,255,0.08);background:#141520;cursor:pointer}
+.wopacity{-webkit-appearance:none;height:2px;background:rgba(255,255,255,0.08);border-radius:2px;outline:none;padding:0;border:none;width:54px;cursor:pointer}
+.wopacity::-webkit-slider-thumb{-webkit-appearance:none;width:11px;height:11px;border-radius:50%;background:#f5c518;cursor:pointer}
+.wlabel{font-size:8px;color:#444;white-space:nowrap}
+.ctext-body{padding:6px 7px}
+.ctext-input{width:100%;background:#141520;border:1px solid rgba(255,255,255,0.07);border-radius:5px;padding:5px 8px;color:#dde0f0;font-size:12px;outline:none;resize:vertical;min-height:38px;font-family:inherit}
+.ctext-input:focus{border-color:rgba(245,197,24,.4)}
+.tip{background:rgba(245,197,24,.03);border:1px solid rgba(245,197,24,.1);border-radius:5px;padding:5px 8px;font-size:9px;color:rgba(245,197,24,.55);line-height:1.45}
+.right{display:flex;flex-direction:column;background:#080a10;position:sticky;top:0;height:calc(100vh - 46px)}
+.fmt-bar{display:flex;border-bottom:1px solid rgba(255,255,255,0.06);flex-shrink:0}
+.fmt-btn{flex:1;padding:7px 2px;background:none;border:none;border-right:1px solid rgba(255,255,255,0.06);color:#444;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:1px;transition:all .15s}
+.fmt-btn:last-child{border-right:none}
+.fmt-btn:hover{background:rgba(255,255,255,0.04);color:#888}
+.fmt-btn.active{background:rgba(245,197,24,0.08);color:#f5c518;border-bottom:2px solid #f5c518}
+.fmt-btn .fl{font-family:'Oswald',sans-serif;font-size:12px;font-weight:700;line-height:1}
+.fmt-btn .fs{font-size:9px;opacity:.7}
+.prev-wrap{flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#080a10;padding:8px;position:relative}
+#prevCv{border-radius:10px;border:1.5px solid rgba(255,255,255,0.1);box-shadow:0 12px 40px rgba(0,0,0,.8);display:block;max-width:100%;max-height:100%;cursor:default}
+.gen-panel{border-top:1px solid rgba(255,255,255,0.05);padding:10px 14px;flex-shrink:0}
+.btn{flex:1;padding:10px;background:#f5c518;color:#0d0e14;border:none;border-radius:6px;font-family:'Oswald',sans-serif;font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:background .2s}
+.btn:hover{background:#ffe066}
+.btn:disabled{background:#1a1b26;color:#444;cursor:not-allowed}
+.st{margin-top:6px;font-size:10px;text-align:center;min-height:12px;display:flex;align-items:center;justify-content:center;gap:5px;color:#555}
+.st.err{color:#ff6b6b}.st.ok{color:#4caf88}
+.prog{height:2px;background:rgba(255,255,255,.04);border-radius:1px;margin-top:5px;overflow:hidden;display:none}
+.pb{height:100%;background:#f5c518;width:0%;transition:width .2s}
+.btn-dl{display:flex;align-items:center;justify-content:center;gap:6px;padding:8px;background:#1d3a28;color:#5dde9a;border:1px solid #2a5e3a;border-radius:6px;font-size:11px;font-weight:500;text-decoration:none;margin-top:6px;width:100%;cursor:pointer;transition:background .2s}
+.btn-dl:hover{background:#254a32}
+.spin{width:10px;height:10px;border:2px solid rgba(245,197,24,.2);border-top-color:#f5c518;border-radius:50%;animation:sp .7s linear infinite;flex-shrink:0}
+@keyframes sp{to{transform:rotate(360deg)}}
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.06);border-radius:2px}
+@media(max-width:900px){.layout{grid-template-columns:1fr}.right{position:static;height:auto;border-top:1px solid rgba(255,255,255,0.05)}.left{max-height:none}.uploads-row{grid-template-columns:1fr}}
+
 </style>
+
 </head>
+
 <body>
+
 <header>
+
   <div class="logo">Tire<span>Card</span></div>
+
   <div class="logo-sub">WB / Avito — видео карточка</div>
+
 </header>
+
 <div class="layout">
+
 <div class="left">
 
-  <!-- 01: Источник видео — два пути -->
-  <div>
-    <div class="sec">01 — Источник фонового видео</div>
 
-    <!-- Таб-переключатель -->
+
+<!-- ══ ACCORDION PANELS ══════════════════════════════════════════════════ -->
+
+
+
+<!-- 1. Фон -->
+
+<div class="panel open" id="p_bg">
+
+  <div class="panel-hd" onclick="togglePanel('p_bg')">
+
+    <span class="p-icon">🎬</span><span class="p-title">Фон видео</span><span class="p-arr">▾</span>
+
+  </div>
+
+  <div class="panel-bd">
+
     <div class="src-tabs">
-      <button type="button" class="src-tab active" id="tab_manual" onclick="switchTab('manual')">
-        📁 Загрузить своё
-      </button>
-      <button type="button" class="src-tab" id="tab_ai" onclick="switchTab('ai')">
-        ✨ Создать через ИИ
-      </button>
+
+      <button type="button" class="src-tab active" id="tab_manual" onclick="switchTab('manual')">📁 Своё</button>
+
+      <button type="button" class="src-tab" id="tab_ai" onclick="switchTab('ai')">✨ Через ИИ</button>
+
     </div>
 
-    <!-- Путь 1: Своё видео -->
     <div id="panel_manual">
-      <div class="uploads-row" style="margin-top:10px">
+
+      <div class="uploads-row" style="margin-top:8px">
+
         <div>
-          <div style="font-size:10px;color:#666;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em">Фоновое видео</div>
+
+          <div class="ubl">Фоновое видео</div>
+
           <input type="file" id="bgInput" accept="video/*" style="display:none" onchange="loadBg(this.files[0])">
-          <label for="bgInput" class="ubox" id="bgBox">
-            <span class="ic">🎬</span>
-            <div class="tt" style="font-size:11px">Загрузить видео</div>
-            <div class="sb">MP4, MOV</div>
-          </label>
+
+          <label for="bgInput" class="ubox" id="bgBox"><span class="ic">🎬</span><div class="tt">Загрузить</div><div class="sb">MP4, MOV</div></label>
+
         </div>
+
         <div>
-          <div style="font-size:10px;color:#666;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em">Фото шины</div>
+
+          <div class="ubl">Фото товара</div>
+
           <input type="file" id="tireInput" accept="image/*" style="display:none" onchange="loadTire(this.files[0])">
-          <label for="tireInput" class="ubox" id="tireBox">
-            <span class="ic">📸</span>
-            <div class="tt" style="font-size:11px">Загрузить фото</div>
-            <div class="sb">JPG, PNG</div>
-          </label>
+
+          <label for="tireInput" class="ubox" id="tireBox"><span class="ic">📸</span><div class="tt">Загрузить</div><div class="sb">JPG, PNG</div></label>
+
         </div>
+
       </div>
-      <div class="tip" style="margin-top:8px">💡 Фото на белом фоне — фон удалится автоматически. Видео — красивая сцена без текста.</div>
+
+      <div class="tip c" style="margin-top:6px">💡 Фото на белом фоне — фон удалится авто</div>
+
     </div>
 
-    <!-- Путь 2: ИИ сборка -->
     <div id="panel_ai" style="display:none">
-      <div class="ai-card" style="margin-top:10px">
 
-        <!-- Схема -->
+      <div class="ai-card" style="margin-top:8px">
+
         <div class="ai-flow">
-          <div class="ai-flow-step"><div class="ai-flow-icon">🎬</div><div class="ai-flow-text">Ваше видео</div></div>
+
+          <div class="ai-flow-step"><div class="ai-flow-icon">🎬</div><div class="ai-flow-text">Видео</div></div>
+
           <div class="ai-flow-arrow">+</div>
-          <div class="ai-flow-step"><div class="ai-flow-icon">📸</div><div class="ai-flow-text">Фото шин</div></div>
+
+          <div class="ai-flow-step"><div class="ai-flow-icon">📸</div><div class="ai-flow-text">Фото</div></div>
+
           <div class="ai-flow-arrow">+</div>
+
           <div class="ai-flow-step"><div class="ai-flow-icon">✍️</div><div class="ai-flow-text">Промт</div></div>
+
           <div class="ai-flow-arrow">→</div>
-          <div class="ai-flow-step ai-flow-result"><div class="ai-flow-icon">✨</div><div class="ai-flow-text">Фон готов</div></div>
+
+          <div class="ai-flow-step ai-flow-result"><div class="ai-flow-icon">✨</div><div class="ai-flow-text">Фон</div></div>
+
         </div>
 
-        <!-- Загрузка материалов -->
-        <div class="uploads-row" style="margin-top:12px">
+        <div class="uploads-row" style="margin-top:8px">
+
           <div>
-            <div style="font-size:10px;color:#666;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em">Видео-база</div>
+
+            <div class="ubl">Видео-база</div>
+
             <input type="file" id="ai_video_input" accept="video/*" style="display:none" onchange="onAiVideoLoad(this.files[0])">
-            <label for="ai_video_input" class="ubox" id="ai_video_box">
-              <span class="ic">🎬</span>
-              <div class="tt" style="font-size:11px">Видео-заготовка</div>
-              <div class="sb">MP4, MOV</div>
-            </label>
+
+            <label for="ai_video_input" class="ubox" id="ai_video_box"><span class="ic">🎬</span><div class="tt">Видео</div><div class="sb">MP4, MOV</div></label>
+
           </div>
+
           <div>
-            <div style="font-size:10px;color:#666;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em">Фото шин (до 5)</div>
+
+            <div class="ubl">Фото (до 5)</div>
+
             <input type="file" id="ai_photos_input" accept="image/*" multiple style="display:none" onchange="onAiPhotosLoad(this.files)">
-            <label for="ai_photos_input" class="ubox" id="ai_photos_box">
-              <span class="ic">📸</span>
-              <div class="tt" style="font-size:11px">Фото для ИИ</div>
-              <div class="sb">JPG, PNG</div>
-            </label>
+
+            <label for="ai_photos_input" class="ubox" id="ai_photos_box"><span class="ic">📸</span><div class="tt">Фото</div><div class="sb">JPG, PNG</div></label>
+
           </div>
+
         </div>
+
         <div class="ai-thumb-row" id="ai_thumb_row"></div>
 
-        <!-- Сервис + ключ -->
-        <label class="f" style="margin-top:12px">ИИ-сервис</label>
+        <label class="f" style="margin-top:8px">Сервис</label>
+
         <select id="ai_service" onchange="onAiServiceChange()">
-          <option value="">— Выбрать сервис —</option>
+
+          <option value="">— Выбрать —</option>
+
           <option value="runway">Runway ML Gen-3</option>
+
           <option value="kling">Kling AI</option>
+
           <option value="pika">Pika Labs</option>
+
           <option value="luma">Luma Dream Machine</option>
+
           <option value="replicate">Replicate API</option>
+
         </select>
-        <div style="font-size:10px;color:#444;margin-top:3px" id="ai_key_hint">Выберите сервис — покажем где взять ключ</div>
+
+        <div style="font-size:10px;color:#444;margin-top:2px" id="ai_key_hint">Выберите сервис</div>
 
         <label class="f">API ключ</label>
+
         <div style="position:relative">
-          <input type="text" id="ai_key" placeholder="Вставьте API ключ..."
-                 style="padding-right:36px;font-family:monospace;font-size:12px" oninput="onApiKeyInput()">
-          <button type="button" onclick="toggleKey()"
-                  style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;color:#555;cursor:pointer;font-size:16px;padding:0">👁</button>
+
+          <input type="text" id="ai_key" placeholder="Вставьте ключ..." style="padding-right:32px;font-family:monospace;font-size:11px" oninput="onApiKeyInput()">
+
+          <button type="button" onclick="toggleKey()" style="position:absolute;right:7px;top:50%;transform:translateY(-50%);background:none;border:none;color:#555;cursor:pointer;font-size:14px;padding:0">👁</button>
+
         </div>
 
-        <!-- Промт -->
-        <label class="f">Промт — как собрать видео</label>
-        <textarea id="ai_prompt" rows="3"
-          placeholder="Смонтируй динамичную сцену: крупный план шины, тёплый золотой свет, пыль, кинематографичный стиль..."></textarea>
-        <div class="ai-prompts" style="margin-top:6px">
-          <div class="ai-prompts-title">Быстрые промты:</div>
+        <label class="f">Промт</label>
+
+        <textarea id="ai_prompt" rows="2" placeholder="Динамичная сцена: шина крупным планом, золотой свет..."></textarea>
+
+        <div class="ai-prompts" style="margin-top:5px">
+
           <div class="ai-prompt-chip" onclick="setPrompt('dynamic')">🔥 Динамика</div>
+
           <div class="ai-prompt-chip" onclick="setPrompt('cinematic')">🎬 Кино</div>
-          <div class="ai-prompt-chip" onclick="setPrompt('offroad')">🏔 Внедорожье</div>
+
+          <div class="ai-prompt-chip" onclick="setPrompt('offroad')">🏔 Бездорожье</div>
+
           <div class="ai-prompt-chip" onclick="setPrompt('summer')">☀️ Лето</div>
+
           <div class="ai-prompt-chip" onclick="setPrompt('winter')">❄️ Зима</div>
+
         </div>
 
-        <!-- Настройки -->
-        <div class="row2" style="margin-top:10px">
-          <div>
-            <label class="f">Длительность</label>
-            <select id="ai_dur">
-              <option value="5">5 сек</option>
-              <option value="8" selected>8 сек</option>
-              <option value="10">10 сек</option>
-            </select>
-          </div>
-          <div>
-            <label class="f">Стиль</label>
-            <select id="ai_style">
-              <option value="smooth">Плавный</option>
-              <option value="dynamic">Динамичный</option>
-              <option value="slow">Замедленный</option>
-            </select>
-          </div>
+        <div class="row2" style="margin-top:8px">
+
+          <div><label class="f">Длит.</label>
+
+            <select id="ai_dur"><option value="5">5 с</option><option value="8" selected>8 с</option><option value="10">10 с</option></select></div>
+
+          <div><label class="f">Стиль</label>
+
+            <select id="ai_style"><option value="smooth">Плавный</option><option value="dynamic">Динамичный</option><option value="slow">Медленный</option></select></div>
+
         </div>
 
-        <button type="button" class="ai-btn" id="ai_gen_btn" onclick="generateAiVideo()" disabled>
-          ✨ Собрать фон через ИИ
-        </button>
+        <button type="button" class="ai-btn" id="ai_gen_btn" onclick="generateAiVideo()" disabled>✨ Создать фон</button>
+
         <div class="ai-status" id="ai_status"></div>
 
-        <!-- Результат — автоматически становится фоновым видео -->
-        <div id="ai_result" style="display:none;margin-top:10px">
-          <div style="font-size:10px;color:#4caf88;margin-bottom:6px;letter-spacing:.06em">
-            ✅ Фон готов — автоматически загружен в предпросмотр
-          </div>
-          <video id="ai_result_video" controls muted
-                 style="width:100%;border-radius:8px;border:1px solid rgba(255,255,255,0.08)"></video>
-          <div class="tip" style="margin-top:8px">
-            💡 Теперь заполните данные шины ниже и нажмите «Сгенерировать видео»
-          </div>
+        <div id="ai_result" style="display:none;margin-top:8px">
+
+          <div style="font-size:10px;color:#4caf88;margin-bottom:4px">✅ Фон готов — загружен в предпросмотр</div>
+
+          <video id="ai_result_video" controls muted style="width:100%;border-radius:6px;border:1px solid rgba(255,255,255,0.08)"></video>
+
         </div>
 
       </div>
-    </div>
-  </div>
 
-  <!-- Текст -->
-  <div>
-    <div class="sec">02 — Стандартные блоки</div>
-
-    <!-- Тогглы видимости -->
-    <div class="block-toggles">
-      <label class="btog"><input type="checkbox" id="vis_type"  checked onchange="rp()"><span>Заголовок</span></label>
-      <label class="btog"><input type="checkbox" id="vis_badge" checked onchange="rp()"><span>Размер</span></label>
-      <label class="btog"><input type="checkbox" id="vis_brand" checked onchange="rp()"><span>Бренд</span></label>
-      <label class="btog"><input type="checkbox" id="vis_sub"   checked onchange="rp()"><span>Подзагол.</span></label>
-      <label class="btog"><input type="checkbox" id="vis_disc"  checked onchange="rp()"><span>Скидка</span></label>
-      <label class="btog"><input type="checkbox" id="vis_feats" checked onchange="rp()"><span>Характер.</span></label>
-      <label class="btog"><input type="checkbox" id="vis_tire"  checked onchange="rp()"><span>Фото шины</span></label>
     </div>
 
-    <label class="f" style="margin-top:10px">Тип шины (заголовок)</label>
-    <input type="text" id="f_type" value="ШИНА ЛЕТНЯЯ" oninput="rp()">
-    <label class="f">Размер *</label>
-    <input type="text" id="f_size" value="175/65 R14" oninput="rp()">
-    <div class="row2">
-      <div><label class="f">Бренд</label>
-        <input type="text" id="f_brand" value="SAILUN" oninput="rp()"></div>
-      <div><label class="f">Подзаголовок</label>
-        <input type="text" id="f_sub" value="РЕЗИНА ЛЕТНЯЯ" oninput="rp()"></div>
-    </div>
-    <label class="f">Скидка (необязательно)</label>
-    <input type="text" id="f_disc" placeholder="-66%" oninput="rp()">
-  </div>
-
-  <!-- Характеристики -->
-  <div>
-    <div class="sec">03 — Характеристики</div>
-    <div class="feat-list" id="featList"></div>
-    <button type="button" class="add-feat" onclick="addFeat()">+ Добавить характеристику</button>
-  </div>
-
-  <!-- Свои тексты -->
-  <div>
-    <div class="sec" style="display:flex;align-items:center;justify-content:space-between">
-      <span>03б — Свои текстовые блоки</span>
-      <button type="button" class="add-ctext-btn" onclick="addCustomText()">+ Добавить</button>
-    </div>
-    <div id="customTextList" style="display:flex;flex-direction:column;gap:10px;margin-top:8px"></div>
-    <div style="font-size:10px;color:#444;margin-top:6px">
-      💡 Перетаскивайте свои тексты прямо на предпросмотре
-    </div>
-  </div>
-
-  <!-- Шаблоны элементов -->
-  <div>
-    <div class="sec">03в — Готовые элементы</div>
-    <div class="tmpl-grid" id="tmplGrid"></div>
-    <div style="font-size:10px;color:#444;margin-top:8px">
-      💡 Нажмите на элемент — он появится на холсте. Затем перетащите куда нужно.
-    </div>
-  </div>
-
-  <!-- Фигуры -->
-  <div>
-    <div class="sec">03г — Фигуры</div>
-    <div class="shape-grid" id="shapeGrid"></div>
-
-    <!-- Редактор выбранной фигуры -->
-    <div id="shapeEditor" style="display:none;margin-top:10px">
-      <div class="shape-editor-head">
-        <span id="shapeEditorTitle">Фигура</span>
-        <button type="button" onclick="deleteSelectedShape()" style="background:none;border:none;color:#ff6b6b;cursor:pointer;font-size:12px;padding:0">🗑 Удалить</button>
-      </div>
-      <div class="shape-props">
-        <div class="row2">
-          <div><label class="f">Заливка</label>
-            <input type="color" id="sp_fill" style="width:100%;height:28px;padding:2px;border-radius:5px;background:#1a1b26;border:1px solid rgba(255,255,255,0.1);cursor:pointer" oninput="updateShapeProp('fill',this.value)"></div>
-          <div><label class="f">Обводка</label>
-            <input type="color" id="sp_stroke" style="width:100%;height:28px;padding:2px;border-radius:5px;background:#1a1b26;border:1px solid rgba(255,255,255,0.1);cursor:pointer" oninput="updateShapeProp('stroke',this.value)"></div>
-        </div>
-        <label class="f">Толщина обводки</label>
-        <input type="range" id="sp_strokeW" min="0" max="20" value="0"
-               style="-webkit-appearance:none;width:100%;height:3px;background:rgba(255,255,255,0.1);border-radius:2px;outline:none;border:none"
-               oninput="updateShapeProp('strokeW',+this.value)">
-        <label class="f">Прозрачность</label>
-        <input type="range" id="sp_opacity" min="10" max="100" value="100"
-               style="-webkit-appearance:none;width:100%;height:3px;background:rgba(255,255,255,0.1);border-radius:2px;outline:none;border:none"
-               oninput="updateShapeProp('opacity',+this.value)">
-        <label class="f">Скругление углов</label>
-        <input type="range" id="sp_radius" min="0" max="50" value="0"
-               style="-webkit-appearance:none;width:100%;height:3px;background:rgba(255,255,255,0.1);border-radius:2px;outline:none;border:none"
-               oninput="updateShapeProp('radius',+this.value)">
-      </div>
-    </div>
-    <div style="font-size:10px;color:#444;margin-top:8px">
-      💡 Перетаскивайте фигуру · тяните за уголки чтобы изменить размер
-    </div>
-  </div>
-
-  <!-- Оформление -->
-  <div>
-    <div class="sec">04 — Оформление</div>
-    <div class="row2">
-      <div><label class="f">Цвет темы</label>
-        <select id="f_accent" onchange="rp()">
-          <option value="green">🟢 Зелёный</option>
-          <option value="yellow">🟡 Жёлтый</option>
-          <option value="red">🔴 Красный</option>
-          <option value="blue">🔵 Синий</option>
-          <option value="purple">🟣 Фиолетовый</option>
-        </select></div>
-      <div><label class="f">Длительность</label>
-        <select id="f_dur">
-          <option value="8">8 сек</option>
-          <option value="10" selected>10 сек</option>
-          <option value="12">12 сек</option>
-        </select></div>
-    </div>
-  </div>
-
-  <!-- Шрифты и размеры -->
-  <div>
-    <div class="sec">05 — Шрифты и размеры</div>
-
-    <div style="font-size:10px;color:#555;margin-bottom:8px;letter-spacing:.04em">ПОЛЕ · ШРИФТ · РАЗМЕР</div>
-
-    <div class="font-row">
-      <span class="flabel">Заголовок</span>
-      <select id="fn_type" onchange="rp()"><option value="Oswald">Oswald (по умолч.)</option><option value="Roboto">Roboto</option><option value="Montserrat">Montserrat</option><option value="Bebas Neue">Bebas Neue</option><option value="Anton">Anton</option><option value="Russo One">Russo One</option><option value="Raleway">Raleway</option><option value="Nunito">Nunito</option><option value="Ubuntu">Ubuntu</option><option value="PT Sans">PT Sans</option><option value="Arial">Arial</option><option value="Georgia">Georgia</option><option value="Impact">Impact</option><option value="Verdana">Verdana</option><option value="Trebuchet MS">Trebuchet MS</option></select>
-      <input type="range" id="fs_type" min="20" max="60" value="38" oninput="document.getElementById('fv_type').textContent=this.value+'px';rp()">
-      <span class="fval" id="fv_type">38px</span>
-    </div>
-
-    <div class="font-row">
-      <span class="flabel">Размер</span>
-      <select id="fn_size" onchange="rp()"><option value="Oswald">Oswald (по умолч.)</option><option value="Roboto">Roboto</option><option value="Montserrat">Montserrat</option><option value="Bebas Neue">Bebas Neue</option><option value="Anton">Anton</option><option value="Russo One">Russo One</option><option value="Raleway">Raleway</option><option value="Nunito">Nunito</option><option value="Ubuntu">Ubuntu</option><option value="PT Sans">PT Sans</option><option value="Arial">Arial</option><option value="Georgia">Georgia</option><option value="Impact">Impact</option><option value="Verdana">Verdana</option><option value="Trebuchet MS">Trebuchet MS</option></select>
-      <input type="range" id="fs_size" min="14" max="50" value="27" oninput="document.getElementById('fv_size').textContent=this.value+'px';rp()">
-      <span class="fval" id="fv_size">27px</span>
-    </div>
-
-    <div class="font-row">
-      <span class="flabel">Бренд</span>
-      <select id="fn_brand" onchange="rp()"><option value="Oswald">Oswald (по умолч.)</option><option value="Roboto">Roboto</option><option value="Montserrat">Montserrat</option><option value="Bebas Neue">Bebas Neue</option><option value="Anton">Anton</option><option value="Russo One">Russo One</option><option value="Raleway">Raleway</option><option value="Nunito">Nunito</option><option value="Ubuntu">Ubuntu</option><option value="PT Sans">PT Sans</option><option value="Arial">Arial</option><option value="Georgia">Georgia</option><option value="Impact">Impact</option><option value="Verdana">Verdana</option><option value="Trebuchet MS">Trebuchet MS</option></select>
-      <input type="range" id="fs_brand" min="8" max="28" value="13" oninput="document.getElementById('fv_brand').textContent=this.value+'px';rp()">
-      <span class="fval" id="fv_brand">13px</span>
-    </div>
-
-    <div class="font-row">
-      <span class="flabel">Подзагол.</span>
-      <select id="fn_sub" onchange="rp()"><option value="Oswald">Oswald (по умолч.)</option><option value="Roboto">Roboto</option><option value="Montserrat">Montserrat</option><option value="Bebas Neue">Bebas Neue</option><option value="Anton">Anton</option><option value="Russo One">Russo One</option><option value="Raleway">Raleway</option><option value="Nunito">Nunito</option><option value="Ubuntu">Ubuntu</option><option value="PT Sans">PT Sans</option><option value="Arial">Arial</option><option value="Georgia">Georgia</option><option value="Impact">Impact</option><option value="Verdana">Verdana</option><option value="Trebuchet MS">Trebuchet MS</option></select>
-      <input type="range" id="fs_sub" min="7" max="22" value="10" oninput="document.getElementById('fv_sub').textContent=this.value+'px';rp()">
-      <span class="fval" id="fv_sub">10px</span>
-    </div>
-
-    <div class="font-row">
-      <span class="flabel">Характер.</span>
-      <select id="fn_feat" onchange="rp()"><option value="Oswald">Oswald (по умолч.)</option><option value="Roboto">Roboto</option><option value="Montserrat">Montserrat</option><option value="Bebas Neue">Bebas Neue</option><option value="Anton">Anton</option><option value="Russo One">Russo One</option><option value="Raleway">Raleway</option><option value="Nunito">Nunito</option><option value="Ubuntu">Ubuntu</option><option value="PT Sans">PT Sans</option><option value="Arial">Arial</option><option value="Georgia">Georgia</option><option value="Impact">Impact</option><option value="Verdana">Verdana</option><option value="Trebuchet MS">Trebuchet MS</option></select>
-      <input type="range" id="fs_feat" min="7" max="40" value="11" oninput="document.getElementById('fv_feat').textContent=this.value+'px';rp()">
-      <span class="fval" id="fv_feat">11px</span>
-    </div>
-
-  </div>
-
-  <div>
-    <div class="sec">06 — Анимация появления</div>
-
-    <div style="font-size:10px;color:#555;margin-bottom:10px;letter-spacing:.04em">БЛОК · ЭФФЕКТ · ЗАДЕРЖКА (сек)</div>
-
-    <div class="anim-row">
-      <span class="alabel">Бренд</span>
-      <select id="ae_brand" onchange="rp()"><option value="fade">Плавное появление</option><option value="slideLeft">Сдвиг слева</option><option value="slideUp">Сдвиг снизу</option><option value="slideDown">Сдвиг сверху</option><option value="zoom">Масштаб</option><option value="typewriter">Печать</option></select>
-      <input type="range" id="at_brand" min="0" max="8" step="0.5" value="0.5" oninput="document.getElementById('av_brand').textContent=this.value+'с';rp()">
-      <span class="aval" id="av_brand">0.5с</span>
-    </div>
-
-    <div class="anim-row">
-      <span class="alabel">Заголовок</span>
-      <select id="ae_type" onchange="rp()"><option value="fade">Плавное появление</option><option value="slideLeft">Сдвиг слева</option><option value="slideUp">Сдвиг снизу</option><option value="slideDown">Сдвиг сверху</option><option value="zoom">Масштаб</option><option value="typewriter">Печать</option></select>
-      <input type="range" id="at_type" min="0" max="8" step="0.5" value="1.5" oninput="document.getElementById('av_type').textContent=this.value+'с';rp()">
-      <span class="aval" id="av_type">1.5с</span>
-    </div>
-
-    <div class="anim-row">
-      <span class="alabel">Размер</span>
-      <select id="ae_size" onchange="rp()"><option value="fade">Плавное появление</option><option value="slideLeft">Сдвиг слева</option><option value="slideUp">Сдвиг снизу</option><option value="slideDown">Сдвиг сверху</option><option value="zoom">Масштаб</option><option value="typewriter">Печать</option></select>
-      <input type="range" id="at_size" min="0" max="8" step="0.5" value="2.5" oninput="document.getElementById('av_size').textContent=this.value+'с';rp()">
-      <span class="aval" id="av_size">2.5с</span>
-    </div>
-
-    <div class="anim-row">
-      <span class="alabel">Подзагол.</span>
-      <select id="ae_sub" onchange="rp()"><option value="fade">Плавное появление</option><option value="slideLeft">Сдвиг слева</option><option value="slideUp">Сдвиг снизу</option><option value="slideDown">Сдвиг сверху</option><option value="zoom">Масштаб</option><option value="typewriter">Печать</option></select>
-      <input type="range" id="at_sub" min="0" max="8" step="0.5" value="3.0" oninput="document.getElementById('av_sub').textContent=this.value+'с';rp()">
-      <span class="aval" id="av_sub">3.0с</span>
-    </div>
-
-    <div class="anim-row">
-      <span class="alabel">Характер.</span>
-      <select id="ae_feat" onchange="rp()"><option value="fade">Плавное появление</option><option value="slideLeft">Сдвиг слева</option><option value="slideUp">Сдвиг снизу</option><option value="slideDown">Сдвиг сверху</option><option value="zoom">Масштаб</option><option value="typewriter">Печать</option></select>
-      <input type="range" id="at_feat" min="0" max="8" step="0.5" value="4.0" oninput="document.getElementById('av_feat').textContent=this.value+'с';rp()">
-      <span class="aval" id="av_feat">4.0с</span>
-    </div>
-
-    <div style="margin-top:10px">
-      <label class="f">Длительность эффекта (сек)</label>
-      <select id="anim_dur" onchange="rp()">
-        <option value="0.3">Быстро (0.3 с)</option>
-        <option value="0.5" selected>Нормально (0.5 с)</option>
-        <option value="0.8">Медленно (0.8 с)</option>
-        <option value="1.2">Очень медленно (1.2 с)</option>
-      </select>
-    </div>
   </div>
 
 </div>
+
+
+
+<!-- 2. Товар -->
+
+<div class="panel" id="p_product">
+
+  <div class="panel-hd" onclick="togglePanel('p_product')">
+
+    <span class="p-icon">🏷</span><span class="p-title">Данные товара</span><span class="p-arr">▾</span>
+
+  </div>
+
+  <div class="panel-bd">
+
+    <!-- Тогглы -->
+
+    <div class="block-toggles">
+
+      <label class="btog"><input type="checkbox" id="vis_type"  checked onchange="rp()"><span>Тип</span></label>
+
+      <label class="btog"><input type="checkbox" id="vis_badge" checked onchange="rp()"><span>Размер</span></label>
+
+      <label class="btog"><input type="checkbox" id="vis_brand" checked onchange="rp()"><span>Бренд</span></label>
+
+      <label class="btog"><input type="checkbox" id="vis_sub"   checked onchange="rp()"><span>Подзагол.</span></label>
+
+      <label class="btog"><input type="checkbox" id="vis_disc"  checked onchange="rp()"><span>Скидка</span></label>
+
+      <label class="btog"><input type="checkbox" id="vis_feats" checked onchange="rp()"><span>Свойства</span></label>
+
+      <label class="btog"><input type="checkbox" id="vis_tire"  checked onchange="rp()"><span>Фото</span></label>
+
+    </div>
+
+    <label class="f" style="margin-top:8px">Тип товара</label>
+
+    <input type="text" id="f_type" value="ШИНА ЛЕТНЯЯ" oninput="rp()">
+
+    <label class="f">Артикул / Размер *</label>
+
+    <input type="text" id="f_size" value="175/65 R14" oninput="rp()">
+
+    <div class="row2">
+
+      <div><label class="f">Бренд</label><input type="text" id="f_brand" value="SAILUN" oninput="rp()"></div>
+
+      <div><label class="f">Подзаголовок</label><input type="text" id="f_sub" value="РЕЗИНА ЛЕТНЯЯ" oninput="rp()"></div>
+
+    </div>
+
+    <label class="f">Скидка</label>
+
+    <input type="text" id="f_disc" placeholder="-66%" oninput="rp()">
+
+  </div>
+
+</div>
+
+
+
+<!-- 3. Свойства -->
+
+<div class="panel" id="p_feats">
+
+  <div class="panel-hd" onclick="togglePanel('p_feats')">
+
+    <span class="p-icon">✅</span><span class="p-title">Свойства / Характеристики</span><span class="p-arr">▾</span>
+
+  </div>
+
+  <div class="panel-bd">
+
+    <div class="feat-list" id="featList"></div>
+
+    <button type="button" class="add-feat" onclick="addFeat()">+ Добавить свойство</button>
+
+  </div>
+
+</div>
+
+
+
+<!-- 4. Текст + Элементы + Фигуры -->
+
+<div class="panel" id="p_layers">
+
+  <div class="panel-hd" onclick="togglePanel('p_layers')">
+
+    <span class="p-icon">🎨</span><span class="p-title">Слои и элементы</span><span class="p-arr">▾</span>
+
+  </div>
+
+  <div class="panel-bd">
+
+    <!-- Вкладки внутри -->
+
+    <div class="inner-tabs">
+
+      <button type="button" class="itab active" id="it_txt"   onclick="switchInner('txt')">✍️ Текст</button>
+
+      <button type="button" class="itab"        id="it_tmpl"  onclick="switchInner('tmpl')">⭐ Элементы</button>
+
+      <button type="button" class="itab"        id="it_shape" onclick="switchInner('shape')">⬛ Фигуры</button>
+
+    </div>
+
+
+
+    <!-- Свои тексты -->
+
+    <div id="ip_txt">
+
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+
+        <span style="font-size:10px;color:#555">Свои текстовые блоки</span>
+
+        <button type="button" class="add-ctext-btn" onclick="addCustomText()">+ Добавить</button>
+
+      </div>
+
+      <div id="customTextList" style="display:flex;flex-direction:column;gap:8px"></div>
+
+    </div>
+
+
+
+    <!-- Готовые элементы -->
+
+    <div id="ip_tmpl" style="display:none">
+
+      <div class="tmpl-grid" id="tmplGrid"></div>
+
+    </div>
+
+
+
+    <!-- Фигуры -->
+
+    <div id="ip_shape" style="display:none">
+
+      <div class="shape-grid" id="shapeGrid"></div>
+
+      <div id="shapeEditor" style="display:none;margin-top:8px">
+
+        <div class="shape-editor-head">
+
+          <span id="shapeEditorTitle">Фигура</span>
+
+          <button type="button" onclick="deleteSelectedShape()" style="background:none;border:none;color:#ff6b6b;cursor:pointer;font-size:12px;padding:0">🗑 Удалить</button>
+
+        </div>
+
+        <div class="shape-props">
+
+          <div class="row2">
+
+            <div><label class="f">Заливка</label>
+
+              <input type="color" id="sp_fill" style="width:100%;height:26px;padding:2px;border-radius:5px;background:#1a1b26;border:1px solid rgba(255,255,255,0.1);cursor:pointer" oninput="updateShapeProp('fill',this.value)"></div>
+
+            <div><label class="f">Обводка</label>
+
+              <input type="color" id="sp_stroke" style="width:100%;height:26px;padding:2px;border-radius:5px;background:#1a1b26;border:1px solid rgba(255,255,255,0.1);cursor:pointer" oninput="updateShapeProp('stroke',this.value)"></div>
+
+          </div>
+
+          <label class="f">Толщина обводки</label>
+
+          <input type="range" id="sp_strokeW" min="0" max="20" value="0" class="cslider" oninput="updateShapeProp('strokeW',+this.value)">
+
+          <label class="f">Прозрачность</label>
+
+          <input type="range" id="sp_opacity" min="10" max="100" value="100" class="cslider" oninput="updateShapeProp('opacity',+this.value)">
+
+          <label class="f">Скругление</label>
+
+          <input type="range" id="sp_radius" min="0" max="50" value="0" class="cslider" oninput="updateShapeProp('radius',+this.value)">
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+
+<!-- 5. Оформление + Шрифты -->
+
+<div class="panel" id="p_style">
+
+  <div class="panel-hd" onclick="togglePanel('p_style')">
+
+    <span class="p-icon">🎨</span><span class="p-title">Стиль и шрифты</span><span class="p-arr">▾</span>
+
+  </div>
+
+  <div class="panel-bd">
+
+    <div class="row2">
+
+      <div><label class="f">Цвет темы</label>
+
+        <select id="f_accent" onchange="rp()">
+
+          <option value="green">🟢 Зелёный</option>
+
+          <option value="yellow">🟡 Жёлтый</option>
+
+          <option value="red">🔴 Красный</option>
+
+          <option value="blue">🔵 Синий</option>
+
+          <option value="purple">🟣 Фиолетовый</option>
+
+        </select></div>
+
+      <div><label class="f">Длительность</label>
+
+        <select id="f_dur">
+
+          <option value="8">8 сек</option>
+
+          <option value="10" selected>10 сек</option>
+
+          <option value="12">12 сек</option>
+
+        </select></div>
+
+    </div>
+
+    <div style="font-size:10px;color:#555;margin:8px 0 4px;letter-spacing:.04em">ПОЛЕ · ШРИФТ · РАЗМЕР</div>
+
+    <div class="font-row">
+
+      <span class="flabel">Тип</span>
+
+      <select id="fn_type" onchange="rp()"><option value="Oswald">Oswald</option><option value="Roboto">Roboto</option><option value="Montserrat">Montserrat</option><option value="Bebas Neue">Bebas Neue</option><option value="Anton">Anton</option><option value="Russo One">Russo One</option><option value="Raleway">Raleway</option><option value="Nunito">Nunito</option><option value="Ubuntu">Ubuntu</option><option value="PT Sans">PT Sans</option><option value="Arial">Arial</option><option value="Georgia">Georgia</option><option value="Impact">Impact</option><option value="Verdana">Verdana</option></select>
+
+      <input type="range" id="fs_type" min="20" max="60" value="38" oninput="document.getElementById('fv_type').textContent=this.value+'px';rp()">
+
+      <span class="fval" id="fv_type">38px</span>
+
+    </div>
+
+    <div class="font-row">
+
+      <span class="flabel">Размер</span>
+
+      <select id="fn_size" onchange="rp()"><option value="Oswald">Oswald</option><option value="Roboto">Roboto</option><option value="Montserrat">Montserrat</option><option value="Bebas Neue">Bebas Neue</option><option value="Anton">Anton</option><option value="Russo One">Russo One</option><option value="Raleway">Raleway</option><option value="Nunito">Nunito</option><option value="Ubuntu">Ubuntu</option><option value="PT Sans">PT Sans</option><option value="Arial">Arial</option><option value="Georgia">Georgia</option><option value="Impact">Impact</option><option value="Verdana">Verdana</option></select>
+
+      <input type="range" id="fs_size" min="14" max="50" value="27" oninput="document.getElementById('fv_size').textContent=this.value+'px';rp()">
+
+      <span class="fval" id="fv_size">27px</span>
+
+    </div>
+
+    <div class="font-row">
+
+      <span class="flabel">Бренд</span>
+
+      <select id="fn_brand" onchange="rp()"><option value="Oswald">Oswald</option><option value="Roboto">Roboto</option><option value="Montserrat">Montserrat</option><option value="Bebas Neue">Bebas Neue</option><option value="Anton">Anton</option><option value="Russo One">Russo One</option><option value="Raleway">Raleway</option><option value="Nunito">Nunito</option><option value="Ubuntu">Ubuntu</option><option value="PT Sans">PT Sans</option><option value="Arial">Arial</option><option value="Georgia">Georgia</option><option value="Impact">Impact</option><option value="Verdana">Verdana</option></select>
+
+      <input type="range" id="fs_brand" min="8" max="28" value="13" oninput="document.getElementById('fv_brand').textContent=this.value+'px';rp()">
+
+      <span class="fval" id="fv_brand">13px</span>
+
+    </div>
+
+    <div class="font-row">
+
+      <span class="flabel">Подзагол.</span>
+
+      <select id="fn_sub" onchange="rp()"><option value="Oswald">Oswald</option><option value="Roboto">Roboto</option><option value="Montserrat">Montserrat</option><option value="Bebas Neue">Bebas Neue</option><option value="Anton">Anton</option><option value="Russo One">Russo One</option><option value="Raleway">Raleway</option><option value="Nunito">Nunito</option><option value="Ubuntu">Ubuntu</option><option value="PT Sans">PT Sans</option><option value="Arial">Arial</option><option value="Georgia">Georgia</option><option value="Impact">Impact</option><option value="Verdana">Verdana</option></select>
+
+      <input type="range" id="fs_sub" min="7" max="22" value="10" oninput="document.getElementById('fv_sub').textContent=this.value+'px';rp()">
+
+      <span class="fval" id="fv_sub">10px</span>
+
+    </div>
+
+    <div class="font-row">
+
+      <span class="flabel">Свойства</span>
+
+      <select id="fn_feat" onchange="rp()"><option value="Oswald">Oswald</option><option value="Roboto">Roboto</option><option value="Montserrat">Montserrat</option><option value="Bebas Neue">Bebas Neue</option><option value="Anton">Anton</option><option value="Russo One">Russo One</option><option value="Raleway">Raleway</option><option value="Nunito">Nunito</option><option value="Ubuntu">Ubuntu</option><option value="PT Sans">PT Sans</option><option value="Arial">Arial</option><option value="Georgia">Georgia</option><option value="Impact">Impact</option><option value="Verdana">Verdana</option></select>
+
+      <input type="range" id="fs_feat" min="7" max="40" value="11" oninput="document.getElementById('fv_feat').textContent=this.value+'px';rp()">
+
+      <span class="fval" id="fv_feat">11px</span>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+
+<!-- 6. Анимация -->
+
+<div class="panel" id="p_anim">
+
+  <div class="panel-hd" onclick="togglePanel('p_anim')">
+
+    <span class="p-icon">▶</span><span class="p-title">Анимация появления</span><span class="p-arr">▾</span>
+
+  </div>
+
+  <div class="panel-bd">
+
+    <div style="font-size:10px;color:#555;margin-bottom:6px">БЛОК · ЭФФЕКТ · ЗАДЕРЖКА</div>
+
+    <div class="anim-row">
+
+      <span class="alabel">Бренд</span>
+
+      <select id="ae_brand" onchange="rp()"><option value="fade">Плавное</option><option value="slideLeft">← Слева</option><option value="slideUp">↑ Снизу</option><option value="slideDown">↓ Сверху</option><option value="zoom">Масштаб</option><option value="typewriter">Печать</option></select>
+
+      <input type="range" id="at_brand" min="0" max="8" step="0.5" value="0.5" oninput="document.getElementById('av_brand').textContent=this.value+'с';rp()">
+
+      <span class="aval" id="av_brand">0.5с</span>
+
+    </div>
+
+    <div class="anim-row">
+
+      <span class="alabel">Тип</span>
+
+      <select id="ae_type" onchange="rp()"><option value="fade">Плавное</option><option value="slideLeft">← Слева</option><option value="slideUp">↑ Снизу</option><option value="slideDown">↓ Сверху</option><option value="zoom">Масштаб</option><option value="typewriter">Печать</option></select>
+
+      <input type="range" id="at_type" min="0" max="8" step="0.5" value="1.5" oninput="document.getElementById('av_type').textContent=this.value+'с';rp()">
+
+      <span class="aval" id="av_type">1.5с</span>
+
+    </div>
+
+    <div class="anim-row">
+
+      <span class="alabel">Размер</span>
+
+      <select id="ae_size" onchange="rp()"><option value="fade">Плавное</option><option value="slideLeft">← Слева</option><option value="slideUp">↑ Снизу</option><option value="slideDown">↓ Сверху</option><option value="zoom">Масштаб</option><option value="typewriter">Печать</option></select>
+
+      <input type="range" id="at_size" min="0" max="8" step="0.5" value="2.5" oninput="document.getElementById('av_size').textContent=this.value+'с';rp()">
+
+      <span class="aval" id="av_size">2.5с</span>
+
+    </div>
+
+    <div class="anim-row">
+
+      <span class="alabel">Подзагол.</span>
+
+      <select id="ae_sub" onchange="rp()"><option value="fade">Плавное</option><option value="slideLeft">← Слева</option><option value="slideUp">↑ Снизу</option><option value="slideDown">↓ Сверху</option><option value="zoom">Масштаб</option><option value="typewriter">Печать</option></select>
+
+      <input type="range" id="at_sub" min="0" max="8" step="0.5" value="3.0" oninput="document.getElementById('av_sub').textContent=this.value+'с';rp()">
+
+      <span class="aval" id="av_sub">3.0с</span>
+
+    </div>
+
+    <div class="anim-row">
+
+      <span class="alabel">Свойства</span>
+
+      <select id="ae_feat" onchange="rp()"><option value="fade">Плавное</option><option value="slideLeft">← Слева</option><option value="slideUp">↑ Снизу</option><option value="slideDown">↓ Сверху</option><option value="zoom">Масштаб</option><option value="typewriter">Печать</option></select>
+
+      <input type="range" id="at_feat" min="0" max="8" step="0.5" value="4.0" oninput="document.getElementById('av_feat').textContent=this.value+'с';rp()">
+
+      <span class="aval" id="av_feat">4.0с</span>
+
+    </div>
+
+    <label class="f" style="margin-top:8px">Длительность эффекта</label>
+
+    <select id="anim_dur" onchange="rp()">
+
+      <option value="0.3">Быстро (0.3 с)</option>
+
+      <option value="0.5" selected>Нормально (0.5 с)</option>
+
+      <option value="0.8">Медленно (0.8 с)</option>
+
+      <option value="1.2">Очень медленно (1.2 с)</option>
+
+    </select>
+
+  </div>
+
+</div>
+
+
+
+</div>
+
+
 
 <!-- RIGHT: Preview + Generate -->
+
 <div class="right">
 
+
+
   <!-- Подписи -->
+
   <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 14px 0;flex-shrink:0">
+
     <span style="font-size:10px;color:#333;text-transform:uppercase;letter-spacing:.08em">Предпросмотр</span>
+
     <span style="font-size:10px;color:#555" id="dragHint">☝️ Перетаскивайте элементы</span>
+
   </div>
+
+
 
   <!-- Формат видео -->
+
   <div class="fmt-bar" id="fmtBar">
+
     <button type="button" class="fmt-btn active" onclick="setFormat('9:16')">
+
       <span class="fl">9:16</span><span class="fs">Reels/TikTok</span>
+
     </button>
+
     <button type="button" class="fmt-btn" onclick="setFormat('3:4')">
+
       <span class="fl">3:4</span><span class="fs">Portrait</span>
+
     </button>
+
     <button type="button" class="fmt-btn" onclick="setFormat('1:1')">
+
       <span class="fl">1:1</span><span class="fs">Квадрат</span>
+
     </button>
+
     <button type="button" class="fmt-btn" onclick="setFormat('4:3')">
+
       <span class="fl">4:3</span><span class="fs">Классик</span>
+
     </button>
+
     <button type="button" class="fmt-btn" onclick="setFormat('16:9')">
+
       <span class="fl">16:9</span><span class="fs">YouTube</span>
+
     </button>
+
   </div>
+
+
 
   <!-- Предпросмотр -->
+
   <div class="prev-wrap">
+
     <canvas id="prevCv" width="540" height="960"></canvas>
+
   </div>
+
+
 
   <!-- Панель генерации -->
+
   <div class="gen-panel">
+
     <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+
       <button type="button" onclick="resetPositions()"
+
         style="background:none;border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:#555;font-size:11px;padding:7px 12px;cursor:pointer;white-space:nowrap">
+
         ↺ Сброс
+
       </button>
+
       <button type="button" class="btn" id="genBtn" onclick="startGen()">▶ Сгенерировать видео</button>
+
     </div>
+
     <div class="prog" id="prog"><div class="pb" id="pb"></div></div>
+
     <div class="st" id="st"></div>
+
     <div id="dlArea"></div>
+
   </div>
 
+
+
 </div>
+
 </div>
+
+
 
 <script>
+
 const W=540,H=960,FPS=24;
+
 let bgVid=null,tireImg=null,tireMask=null,prevRaf=null,animT=0;
 
+
+
 // ── All state & constants declared at top ─────────────────────────────────────
+
 let shapeElements  = [];
+
 let shapeIdSeq     = 0;
+
 let canvasShapes   = [];
+
 let shapeSeqId     = 0;
+
 let selectedShape  = null;
+
 let selectedEl     = null; // key of selected standard element
+
 const HANDLE_R     = 6;
 
+
+
 const TEMPLATES = [
+
   { id:'badge_new',  name:'Новинка',   preview:'background:#1e6e28;color:#7fff7f', previewText:'НОВИНКА',
+
     shape:'badge', text:'НОВИНКА', bgColor:'#1e6e28', textColor:'#7fff7f', font:'Oswald', size:22, radius:8, padX:20, padY:10 },
+
   { id:'badge_hit',  name:'Хит',       preview:'background:#aa1818;color:#fff', previewText:'🔥 ХИТ',
+
     shape:'badge', text:'🔥 ХИТ ПРОДАЖ', bgColor:'#aa1818', textColor:'#fff', font:'Oswald', size:20, radius:8, padX:18, padY:10 },
+
   { id:'badge_sale', name:'Акция',     preview:'background:#c49a00;color:#fff', previewText:'⚡ АКЦИЯ',
+
     shape:'badge', text:'⚡ АКЦИЯ', bgColor:'#c49a00', textColor:'#fff', font:'Oswald', size:20, radius:8, padX:18, padY:10 },
+
   { id:'badge_pct',  name:'Скидка %',  preview:'background:#cc1111;color:#fff;border-radius:40px', previewText:'-30%',
+
     shape:'badge', text:'-30%', bgColor:'#cc1111', textColor:'#ffffff', font:'Oswald', size:30, radius:40, padX:22, padY:10 },
+
   { id:'badge_free', name:'Доставка',  preview:'background:#1a3399;color:#88aaff', previewText:'🚚 Доставка',
+
     shape:'badge', text:'🚚 Бесплатная доставка', bgColor:'#1a3399', textColor:'#88aaff', font:'Roboto', size:16, radius:6, padX:16, padY:9 },
+
   { id:'badge_ok',   name:'В наличии', preview:'background:#1e5c1e;color:#6dff6d', previewText:'✓ В наличии',
+
     shape:'badge', text:'✓ В наличии', bgColor:'#1e5c1e', textColor:'#6dff6d', font:'Roboto', size:16, radius:6, padX:16, padY:9 },
+
   { id:'price',      name:'Цена',      preview:'background:none;color:#fff;font-size:15px;font-weight:900', previewText:'от 990 ₽',
+
     shape:'text', text:'от 990 ₽', textColor:'#ffffff', font:'Oswald', size:36, bold:true },
+
   { id:'stars',      name:'Рейтинг',   preview:'background:none;color:#f5c518;font-size:18px', previewText:'★★★★★',
+
     shape:'text', text:'★★★★★', textColor:'#f5c518', font:'Arial', size:32 },
+
   { id:'arrow',      name:'Стрелка',   preview:'background:none;color:#fff;font-size:22px', previewText:'→',
+
     shape:'text', text:'→', textColor:'#ffffff', font:'Arial', size:60 },
+
   { id:'check',      name:'Галочка',   preview:'background:none;color:#6dff6d;font-size:12px', previewText:'✓ Гарантия',
+
     shape:'text', text:'✓ Гарантия 1 год', textColor:'#6dff6d', font:'Roboto', size:20 },
+
   { id:'divider',    name:'Линия',     preview:'background:rgba(255,255,255,0.18);height:3px;border-radius:2px;width:80%', previewText:'',
+
     shape:'line', lineColor:'rgba(255,255,255,0.4)', lineWidth:3 },
+
   { id:'box_dark',   name:'Плашка',    preview:'background:rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.15)', previewText:'',
+
     shape:'rect', fillColor:'rgba(0,0,0,0.55)', strokeColor:'rgba(255,255,255,0.18)', width:0.5, height:0.08, radius:10 },
+
 ];
+
+
 
 const SHAPE_DEFS = [
+
   {type:'rect',      label:'Прямоугольник', color:'#2a6aaa'},
+
   {type:'rounded',   label:'Скруглённый',   color:'#1e7a3e'},
+
   {type:'circle',    label:'Круг',          color:'#aa2a2a'},
+
   {type:'ellipse',   label:'Эллипс',        color:'#7a2aaa'},
+
   {type:'triangle',  label:'Треугольник',   color:'#c49a00'},
+
   {type:'rtriangle', label:'Прав. треуг.',  color:'#1a6a6a'},
+
   {type:'star',      label:'Звезда',        color:'#aa6600'},
+
   {type:'diamond',   label:'Ромб',          color:'#2a2aaa'},
+
   {type:'hexagon',   label:'Шестиугольник', color:'#3a7a1a'},
+
   {type:'arrow',     label:'Стрелка →',     color:'#888'},
+
   {type:'line',      label:'Линия',         color:'#aaa'},
+
   {type:'cross',     label:'Крест ✕',       color:'#aa3333'},
+
 ];
 
+
+
 // ── Video format system ───────────────────────────────────────────────────────
+
 const FORMATS = {
+
   '9:16': {w:540,  h:960,  label:'9:16'},
+
   '3:4':  {w:540,  h:720,  label:'3:4'},
+
   '1:1':  {w:540,  h:540,  label:'1:1'},
+
   '4:3':  {w:720,  h:540,  label:'4:3'},
+
   '16:9': {w:960,  h:540,  label:'16:9'},
+
 };
+
 let currentFmt = '9:16';
+
 let FW = 540, FH = 960; // current frame dimensions
 
+
+
 function setFormat(key){
+
   currentFmt = key;
+
   const fmt = FORMATS[key];
+
   FW = fmt.w; FH = fmt.h;
+
   // Update canvas dimensions
+
   const cv = document.getElementById('prevCv');
+
   cv.width  = FW;
+
   cv.height = FH;
+
   // Update active button
+
   document.querySelectorAll('.fmt-btn').forEach(b=>b.classList.remove('active'));
+
   event.currentTarget.classList.add('active');
+
   EP = JSON.parse(JSON.stringify(DEFAULT_POS));
+
   sizeCanvas();
+
   rp();
+
 }
+
+
 
 function sizeCanvas(){
+
   const cv = document.getElementById('prevCv');
+
   const wrap = cv.parentElement;
+
   const aw = wrap.clientWidth  - 16;
+
   const ah = wrap.clientHeight - 16;
+
   const ratio = FW / FH;
+
   let cw = aw, ch = aw / ratio;
+
   if(ch > ah){ ch = ah; cw = ah * ratio; }
+
   cv.style.width  = Math.round(cw) + 'px';
+
   cv.style.height = Math.round(ch) + 'px';
+
 }
+
 window.addEventListener('resize', sizeCanvas);
+
 // Call after DOM ready
+
 setTimeout(sizeCanvas, 50);
 
+
+
 // ── Custom text blocks — объявляем ДО всех функций ───────────────────────────
+
 let customTexts = [];
+
 let ctxtIdSeq   = 0;
+
 const FONT_LIST = ['Oswald','Roboto','Montserrat','Bebas Neue','Anton','Russo One','Raleway','Nunito','Ubuntu','PT Sans','Arial','Georgia','Impact','Verdana'];
 
+
+
 // ── Standard block visibility ─────────────────────────────────────────────────
+
 function vis(key){ const el=document.getElementById('vis_'+key); return !el||el.checked; }
 
+
+
 // ── Features list ─────────────────────────────────────────────────────────────
+
 let feats=['Легкая балансировка','Быстрый отвод воды','Устойчивость на поворотах','Ненаправленный рисунок'];
 
+
+
 // ── Element positions (fractions 0-1 of canvas size) ─────────────────────────
+
 // x,y = top-left anchor of each element
+
 const DEFAULT_POS = {
+
   tire:  {x:0.33, y:0.03},  // шина — правая сторона
+
   brand: {x:0.02, y:0.04},  // бренд
+
   disc:  {x:0.72, y:0.03},  // скидка
+
   type:  {x:0.02, y:0.12},  // заголовок
+
   badge: {x:0.02, y:0.22},  // плашка размера
+
   sub:   {x:0.02, y:0.35},  // подзаголовок
+
   feats: {x:0.02, y:0.64},  // характеристики
+
 };
+
 let EP = JSON.parse(JSON.stringify(DEFAULT_POS)); // current positions (mutable)
 
+
+
 function resetPositions(){
+
   EP = JSON.parse(JSON.stringify(DEFAULT_POS));
+
   rp();
+
 }
+
+
 
 // Bounding boxes for hit-testing (set during draw, in canvas pixels)
+
 const BOXES = {};
 
+
+
 // ── Drag state ────────────────────────────────────────────────────────────────
+
 let drag = null;
+
 let hovered = null;
+
 let snapLines = []; // lines to draw: [{x1,y1,x2,y2,type}]
 
+
+
 // Snap threshold in fraction units
+
 const SNAP_THR = 0.025;
 
+
+
 // Snap guide positions (fraction of canvas)
+
 const SNAP_H = [0, 0.25, 0.5, 0.75, 1.0]; // horizontal snap X
+
 const SNAP_V = [0, 1/3, 0.5, 2/3, 1.0];   // vertical snap Y
 
+
+
 function calcSnap(key, rawX, rawY){
+
   const b = BOXES[key];
+
   if(!b) return {x:rawX, y:rawY};
+
   const cw = FW, ch = FH;
 
+
+
   // Element center & edges in fraction space
+
   const ew = b.w/cw, eh = b.h/ch;
+
   const cx = rawX + ew/2;   // element center X
+
   const cy = rawY + eh/2;   // element center Y
+
   const rx = rawX + ew;     // element right edge X
 
+
+
   let snapX = rawX, snapY = rawY;
+
   const lines = [];
 
+
+
   // Check horizontal snaps (for X)
+
   for(const sx of SNAP_H){
+
     // Left edge snaps
+
     if(Math.abs(rawX - sx) < SNAP_THR){ snapX = sx; lines.push({x1:sx,y1:0,x2:sx,y2:1,t:'x'}); break; }
+
     // Center snaps
+
     if(Math.abs(cx - sx) < SNAP_THR){ snapX = sx - ew/2; lines.push({x1:sx,y1:0,x2:sx,y2:1,t:'x'}); break; }
+
     // Right edge snaps
+
     if(Math.abs(rx - sx) < SNAP_THR){ snapX = sx - ew; lines.push({x1:sx,y1:0,x2:sx,y2:1,t:'x'}); break; }
+
   }
+
+
 
   // Check vertical snaps (for Y)
+
   for(const sy of SNAP_V){
+
     if(Math.abs(rawY - sy) < SNAP_THR){ snapY = sy; lines.push({x1:0,y1:sy,x2:1,y2:sy,t:'y'}); break; }
+
     if(Math.abs(cy - sy) < SNAP_THR){ snapY = sy - eh/2; lines.push({x1:0,y1:sy,x2:1,y2:sy,t:'y'}); break; }
+
   }
+
+
 
   snapLines = lines;
+
   return {x: Math.max(0, Math.min(1, snapX)), y: Math.max(0, Math.min(1, snapY))};
+
 }
+
+
 
 function drawSnapLines(ctx, cw, ch){
+
   if(!drag || snapLines.length===0) return;
+
   ctx.save();
+
   snapLines.forEach(l=>{
+
     ctx.strokeStyle = l.t==='x' ? 'rgba(245,197,24,0.85)' : 'rgba(100,180,255,0.85)';
+
     ctx.lineWidth = 1.5;
+
     ctx.setLineDash([6,4]);
+
     ctx.lineDashOffset = 0;
+
     ctx.beginPath();
+
     ctx.moveTo(l.x1*cw, l.y1*ch);
+
     ctx.lineTo(l.x2*cw, l.y2*ch);
+
     ctx.stroke();
+
     // Label
+
     const labelMap = {
+
       0:'◀ Край',0.25:'¼',0.5:'⊕ Центр',0.75:'¾',1.0:'Край ▶',
+
       0.333:'⅓',0.667:'⅔',
+
     };
+
     const val = l.t==='x' ? l.x1 : l.y1;
+
     const label = labelMap[Math.round(val*1000)/1000] || (Math.round(val*100)+'%');
+
     ctx.setLineDash([]);
+
     ctx.font = `bold ${Math.round(10*(cw/FW))}px sans-serif`;
+
     ctx.fillStyle = l.t==='x' ? 'rgba(245,197,24,0.9)' : 'rgba(100,180,255,0.9)';
+
     ctx.textAlign = l.t==='x' ? 'center' : 'left';
+
     if(l.t==='x') ctx.fillText(label, l.x1*cw, 14*(ch/FH));
+
     else ctx.fillText(label, 4*(cw/FW), l.y1*ch - 4*(ch/FH));
+
   });
+
   ctx.restore();
+
 }
+
+
 
 function initDrag(){
+
   const cv = document.getElementById('prevCv');
 
+
+
   function canvasXY(e){
+
     const rect = cv.getBoundingClientRect();
+
     const touch = e.touches ? e.touches[0] : e;
+
     return {
+
       fx: (touch.clientX - rect.left) / rect.width,
+
       fy: (touch.clientY - rect.top)  / rect.height,
+
     };
+
   }
+
+
 
   function hitTest(fx,fy){
+
     const cx2 = fx * cv.width, cy2 = fy * cv.height;
+
     const keys = Object.keys(BOXES).reverse();
+
     for(const k of keys){
+
       const b = BOXES[k];
+
       if(!b) continue;
+
       if(cx2>=b.x && cx2<=b.x+b.w && cy2>=b.y && cy2<=b.y+b.h) return k;
+
     }
+
     return null;
+
   }
+
+
 
   function onDown(e){
+
     e.preventDefault();
+
     const {fx,fy} = canvasXY(e);
+
     const key = hitTest(fx,fy);
 
+
+
     // Nothing hit — deselect all
+
     if(!key){
+
       selectedEl=null; selectedShape=null;
+
       document.getElementById('shapeEditor').style.display='none';
+
       rp(); return;
+
     }
+
+
 
     // Shape resize handle
+
     if(key.startsWith('svh_')){
+
       const b=BOXES[key];
+
       const sh=canvasShapes.find(s=>s.id===b.shId);
+
       if(sh){
+
         drag={mode:'resize',key,shId:b.shId,hk:b.hk,
+
           startFX:fx,startFY:fy,startX:sh.x,startY:sh.y,startW:sh.w,startH:sh.h};
+
         cv.style.cursor=b.hCur||'se-resize';
+
       }
+
       return;
+
     }
+
+
 
     // Element resize handle (standard blocks)
+
     if(key.startsWith('elh_')){
+
       const b=BOXES[key];
+
       const elKey=b.elKey;
+
       const box=BOXES[elKey];
+
       if(box){
+
         // Get current raw font size
+
         const EL_SIZE_SLIDER={brand:'fs_brand',type:'fs_type',badge:'fs_size',sub:'fs_sub',feats:'fs_feat'};
+
         const sliderId=EL_SIZE_SLIDER[elKey];
+
         const curSize=sliderId?parseInt(document.getElementById(sliderId)?.value||'20'):20;
+
         drag={mode:'elResize',key,elKey,hk:b.hk,
+
           startFX:fx,startFY:fy,
+
           startW:box.w,startH:box.h,
+
           startSize:curSize,sliderId};
+
         cv.style.cursor=b.hCur||'se-resize';
+
       }
+
       return;
+
     }
+
+
 
     // Custom text resize handle
+
     if(key.startsWith('cth_')){
+
       const b=BOXES[key];
+
       const ctKey=b.ctKey;
+
       const box=BOXES[ctKey];
+
       if(box){
+
         const ctId=parseInt(ctKey.replace('ct_',''));
+
         const ct=customTexts.find(t=>t.id===ctId);
+
         if(ct) drag={mode:'ctResize',key,ctKey,hk:b.hk,startFX:fx,startFY:fy,startSize:ct.size,ct};
+
         cv.style.cursor=b.hCur||'se-resize';
+
       }
+
       return;
+
     }
+
+
 
     // Shape move
+
     if(key.startsWith('sv_')){
+
       const shId=parseInt(key.replace('sv_',''));
+
       selectShape(shId);
+
       selectedEl=null;
+
       const sh=canvasShapes.find(s=>s.id===shId);
+
       if(sh) drag={mode:'shMove',key,startFX:fx,startFY:fy,startX:sh.x,startY:sh.y};
+
       cv.style.cursor='grabbing';
+
       return;
+
     }
+
+
 
     // Standard element or custom text — select + move
+
     selectedShape=null; document.getElementById('shapeEditor').style.display='none';
+
     // Set selectedEl for standard elements and custom texts
+
     if(!key.startsWith('sh_')) selectedEl=key;
+
     else selectedEl=null;
+
     if(!EP[key]) EP[key]={x:fx,y:fy};
+
     drag={mode:'move',key,startFX:fx,startFY:fy,startEX:EP[key].x,startEY:EP[key].y};
+
     cv.style.cursor='grabbing';
+
     document.getElementById('dragHint').textContent='🔵 '+keyLabel(key)+' — жёлтая = центр X, синяя = центр Y';
+
   }
+
+
 
   function onMove(e){
+
     e.preventDefault();
+
     const {fx,fy} = canvasXY(e);
+
     if(drag){
+
       const dx=fx-drag.startFX, dy=fy-drag.startFY;
 
+
+
       if(drag.mode==='resize'){
+
         // Shape resize
+
         const sh=canvasShapes.find(s=>s.id===drag.shId);
+
         if(!sh) return;
+
         const hk=drag.hk;
+
         let nx=drag.startX,ny=drag.startY,nw=drag.startW,nh=drag.startH;
+
         if(hk.includes('e'))  nw=Math.max(0.02,drag.startW+dx);
+
         if(hk.includes('s'))  nh=Math.max(0.02,drag.startH+dy);
+
         if(hk.includes('w')){ nw=Math.max(0.02,drag.startW-dx); nx=drag.startX+drag.startW-nw; }
+
         if(hk.includes('n')){ nh=Math.max(0.02,drag.startH-dy); ny=drag.startY+drag.startH-nh; }
+
         sh.x=nx; sh.y=ny; sh.w=nw; sh.h=nh;
 
+
+
       } else if(drag.mode==='elResize'){
+
         // Standard element font resize — use diagonal delta
+
         const delta = (dx+dy)/2;
+
         const scaleFactor = (drag.startW + delta*FW) / Math.max(drag.startW, 1);
+
         let newSize = Math.round(drag.startSize * scaleFactor);
+
         newSize = Math.max(6, Math.min(200, newSize));
+
         if(drag.sliderId){
+
           const sl=document.getElementById(drag.sliderId);
+
           if(sl){
+
             sl.value=newSize;
+
             const valEl=document.getElementById(drag.sliderId.replace('fs_','fv_'));
+
             if(valEl) valEl.textContent=newSize+'px';
+
           }
+
         }
+
+
 
       } else if(drag.mode==='ctResize'){
+
         // Custom text font resize
+
         const delta=(dx+dy)/2;
+
         const box=BOXES[drag.ctKey];
+
         const scaleFactor=(box?(box.w+delta*FW)/Math.max(box.w,1):1+delta);
+
         let newSize=Math.round(drag.startSize*scaleFactor);
+
         newSize=Math.max(6,Math.min(200,newSize));
+
         drag.ct.size=newSize;
+
         renderCustomTextList();
 
+
+
       } else if(drag.mode==='shMove'){
+
         // Shape move
+
         const sh=canvasShapes.find(s=>s.id===parseInt(drag.key.replace('sv_','')));
+
         if(sh){ sh.x=Math.max(0,Math.min(1,drag.startX+dx)); sh.y=Math.max(0,Math.min(1,drag.startY+dy)); }
 
+
+
       } else {
+
         // Standard move with snap
+
         const rawX=drag.startEX+dx, rawY=drag.startEY+dy;
+
         if(drag.key.startsWith('sv_')){
+
           const sh=canvasShapes.find(s=>s.id===parseInt(drag.key.replace('sv_','')));
+
           if(sh){ sh.x=Math.max(0,Math.min(1,rawX)); sh.y=Math.max(0,Math.min(1,rawY)); }
+
           EP[drag.key]={x:sh?.x||rawX,y:sh?.y||rawY};
+
         } else {
+
           const snapped=calcSnap(drag.key,rawX,rawY);
+
           if(EP[drag.key]){EP[drag.key].x=snapped.x;EP[drag.key].y=snapped.y;}
+
         }
+
       }
+
     } else {
+
       const h=hitTest(fx,fy);
+
       if(h!==hovered){
+
         hovered=h;
+
         if(h&&(BOXES[h]?.isHandle||BOXES[h]?.isElHandle)) cv.style.cursor=BOXES[h].hCur||'se-resize';
+
         else cv.style.cursor=h?'grab':'default';
+
       }
+
     }
+
   }
+
+
 
   function onUp(e){
+
     if(drag){
+
       snapLines = [];
+
       cv.style.cursor = 'default';
+
       document.getElementById('dragHint').textContent='☝️ Перетаскивайте элементы прямо на превью';
+
       drag = null;
+
     }
+
   }
+
+
 
   cv.addEventListener('mousedown',  onDown, {passive:false});
+
   cv.addEventListener('mousemove',  onMove, {passive:false});
+
   cv.addEventListener('mouseup',    onUp);
+
   cv.addEventListener('mouseleave', onUp);
+
   cv.addEventListener('touchstart', onDown, {passive:false});
+
   cv.addEventListener('touchmove',  onMove, {passive:false});
+
   cv.addEventListener('touchend',   onUp);
+
 }
+
+
 
 function keyLabel(k){
+
   return {tire:'Фото шины',brand:'Бренд',disc:'Скидка',type:'Заголовок',badge:'Размер',sub:'Подзаголовок',feats:'Характеристики'}[k]||k;
+
 }
+
+
 
 // Register bounding box helper
+
 function regBox(key, x,y,w,h){ BOXES[key]={x,y,w,h}; }
 
+
+
 const THEMES={
+
   green: {badge:'#1e5c1e',badgeL:'#2d8a2d',txt:'#6dff6d',line:'#2a7a2a',feat:'rgba(20,60,20,0.85)',dot:'#4dc94d',overlay:'rgba(5,15,5,0.55)'},
+
   yellow:{badge:'#7a5e00',badgeL:'#b88a00',txt:'#ffe566',line:'#c49a00',feat:'rgba(40,32,0,0.85)',dot:'#f5c518',overlay:'rgba(15,12,0,0.55)'},
+
   red:   {badge:'#7a1111',badgeL:'#aa1818',txt:'#ff8888',line:'#cc2020',feat:'rgba(40,8,8,0.85)',dot:'#ff5555',overlay:'rgba(15,4,4,0.55)'},
+
   blue:  {badge:'#112266',badgeL:'#1a3399',txt:'#88aaff',line:'#1e44cc',feat:'rgba(8,14,40,0.85)',dot:'#5588ff',overlay:'rgba(4,6,18,0.55)'},
+
   purple:{badge:'#3d1166',badgeL:'#5a1a99',txt:'#cc88ff',line:'#7722cc',feat:'rgba(18,8,36,0.85)',dot:'#aa55ff',overlay:'rgba(8,4,16,0.55)'},
+
 };
 
+
+
 function renderFeatList(){
+
   const el=document.getElementById('featList');el.innerHTML='';
+
   feats.forEach((f,i)=>{
+
     const row=document.createElement('div');row.className='feat-item';
+
     row.innerHTML=`<input type="text" value="${he(f)}" oninput="feats[${i}]=this.value;rp()">
+
       <button class="feat-del" onclick="feats.splice(${i},1);renderFeatList();rp()">×</button>`;
+
     el.appendChild(row);
+
   });
+
 }
+
 function addFeat(){feats.push('Новое свойство');renderFeatList();rp();}
+
 renderFeatList();
+
 function he(t){const d=document.createElement('div');d.textContent=t;return d.innerHTML;}
 
+
+
 // Load background video
+
 function loadBg(f){
+
   if(!f)return;
+
   const url=URL.createObjectURL(f);
+
   const vid=document.createElement('video');
+
   vid.src=url;vid.loop=true;vid.muted=true;vid.playsInline=true;
+
   vid.onloadeddata=()=>{
+
     bgVid=vid;vid.play().catch(()=>{});
+
     const b=document.getElementById('bgBox');
+
     b.classList.add('filled');
+
     b.querySelector('.tt').textContent='✅ '+f.name;
+
     rp();
+
   };vid.load();
+
 }
+
+
 
 // Load tire image + remove white bg
+
 function loadTire(f){
+
   if(!f)return;
+
   const url=URL.createObjectURL(f);
+
   const img=new Image();
+
   img.onload=()=>{
+
     tireImg=img;tireMask=removeWhiteBg(img);
+
     const b=document.getElementById('tireBox');
+
     b.classList.add('filled');b.querySelector('.tt').textContent='✅ '+f.name;
+
     rp();
+
   };img.src=url;
+
 }
+
+
 
 function removeWhiteBg(img){
+
   const c=document.createElement('canvas');c.width=img.width;c.height=img.height;
+
   const ctx=c.getContext('2d');ctx.drawImage(img,0,0);
+
   const id=ctx.getImageData(0,0,c.width,c.height);const d=id.data;
+
   for(let i=0;i<d.length;i+=4){
+
     const r=d[i],g=d[i+1],b=d[i+2];
+
     const br=(r+g+b)/3;
+
     const sat=Math.max(r,g,b)-Math.min(r,g,b);
+
     if(br>210&&sat<40) d[i+3]=Math.max(0,Math.round(d[i+3]*(1-(br-210)/45)));
+
   }
+
   ctx.putImageData(id,0,0);return c;
+
 }
 
+
+
 // Drag & drop
+
 ['bgBox','tireBox'].forEach(id=>{
+
   const el=document.getElementById(id);
+
   el.addEventListener('dragover',e=>{e.preventDefault();el.classList.add('over')});
+
   el.addEventListener('dragleave',()=>el.classList.remove('over'));
+
   el.addEventListener('drop',e=>{
+
     e.preventDefault();el.classList.remove('over');
+
     const f=e.dataTransfer.files[0];
+
     if(!f)return;
+
     if(id==='bgBox') loadBg(f);
+
     else loadTire(f);
+
   });
+
 });
+
+
 
 function v(id){return document.getElementById(id).value.trim();}
 
+
+
 function rr(ctx,x,y,w,h,r){
+
   ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.arcTo(x+w,y,x+w,y+r,r);
+
   ctx.lineTo(x+w,y+h-r);ctx.arcTo(x+w,y+h,x+w-r,y+h,r);ctx.lineTo(x+r,y+h);
+
   ctx.arcTo(x,y+h,x,y+h-r,r);ctx.lineTo(x,y+r);ctx.arcTo(x,y,x+r,y,r);ctx.closePath();
+
 }
+
+
 
 // ── Main draw function — adaptive layout ──────────────────────────────────────
+
 function gf(id){return document.getElementById(id);}
 
+
+
 // Returns scaled font string AND raw/scaled sizes
+
 function fnt(nameId, sizeId, weight, s){
+
   const name = gf(nameId) ? gf(nameId).value : 'Oswald';
+
   const rawSz = gf(sizeId) ? parseInt(gf(sizeId).value) : 16;
+
   const px = Math.round(rawSz * s);
+
   return { font:`${weight} ${px}px '${name}',sans-serif`, px, raw:rawSz };
+
 }
+
+
 
 function drawFrame(cv,cw,ch,gt,vidSrc){
+
   const ctx = cv.getContext('2d');
+
   const s   = cw / W;
+
   const th  = THEMES[v('f_accent')||'green'];
 
+
+
   const typeText = v('f_type') || 'ШИНА ЛЕТНЯЯ';
+
   const sizeText = v('f_size') || '175/65 R14';
+
   const brand    = v('f_brand');
+
   const sub      = v('f_sub');
+
   const disc     = v('f_disc');
+
   const tireS    = 0.85 + 0.15 * Math.min(1, gt * 1.5);
 
+
+
   // ── Per-element animation engine ─────────────────────────────────────────
+
   const animFadeDur = parseFloat(document.getElementById('anim_dur')?.value||'0.5');
 
+
+
   // Returns {alpha, offsetX, offsetY, scale} for a given element at time gt
+
   function elemAnim(typeId, delayId, cx, cy2){
+
     const effect = document.getElementById(typeId)?.value || 'fade';
+
     const delay  = parseFloat(document.getElementById(delayId)?.value || '0');
+
     const t      = Math.max(0, gt - delay);          // local time after delay
+
     const p      = Math.min(1, t / animFadeDur);     // 0→1 progress
+
     const ease   = p < 0.5 ? 2*p*p : -1+(4-2*p)*p; // ease-in-out
 
+
+
     let alpha=ease, ox=0, oy=0, sc=1;
+
     if(p <= 0) return {alpha:0, ox:0, oy:0, sc:1};
 
+
+
     switch(effect){
+
       case 'fade':     alpha=ease; break;
+
       case 'slideLeft':ox=(1-ease)*-60*s; alpha=ease; break;
+
       case 'slideUp':  oy=(1-ease)*40*s;  alpha=ease; break;
+
       case 'slideDown':oy=(1-ease)*-40*s; alpha=ease; break;
+
       case 'zoom':     sc=0.6+ease*0.4;   alpha=ease; break;
+
       case 'typewriter': alpha=1; break; // handled separately
+
     }
+
     return {alpha, ox, oy, sc, p, effect};
+
   }
+
+
 
   // Helper: apply transform + alpha, draw text or shape, restore
+
   function withAnim(anim, drawFn){
+
     if(anim.alpha <= 0) return;
+
     ctx.save();
+
     ctx.globalAlpha = anim.alpha;
+
     if(anim.ox !== 0 || anim.oy !== 0 || anim.sc !== 1){
+
       // find approximate center from drawFn — use translate
+
       ctx.translate(anim.ox, anim.oy);
+
       if(anim.sc !== 1){
+
         ctx.translate(cw*0.29, 0);
+
         ctx.scale(anim.sc, anim.sc);
+
         ctx.translate(-cw*0.29, 0);
+
       }
+
     }
+
     drawFn(anim);
+
     ctx.restore();
+
   }
+
+
 
   // ── Font objects (all sizes scaled to canvas) ─────────────────────────────
+
   const F = {
+
     type:  fnt('fn_type',  'fs_type',  '900', s),
+
     size:  fnt('fn_size',  'fs_size',  '700', s),
+
     brand: fnt('fn_brand', 'fs_brand', '700', s),
+
     sub:   fnt('fn_sub',   'fs_sub',   '500', s),
+
     feat:  fnt('fn_feat',  'fs_feat',  '500', s),
+
   };
+
+
 
   // ── POSITIONS from EP (draggable) ─────────────────────────────────────────
+
   ctx.clearRect(0, 0, cw, ch);
 
+
+
   // 1. Background video / fallback
+
   if(vidSrc && vidSrc.readyState >= 2){
+
     const r  = Math.max(cw/vidSrc.videoWidth, ch/vidSrc.videoHeight);
+
     const vw = vidSrc.videoWidth * r, vh = vidSrc.videoHeight * r;
+
     ctx.drawImage(vidSrc, (cw-vw)/2, (ch-vh)/2, vw, vh);
+
   } else {
+
     const bg = ctx.createLinearGradient(0,0,0,ch);
+
     bg.addColorStop(0,'#060810');bg.addColorStop(0.5,'#080e08');bg.addColorStop(1,'#050805');
+
     ctx.fillStyle=bg;ctx.fillRect(0,0,cw,ch);
+
   }
+
   // 2. Overlays
+
   ctx.fillStyle=th.overlay;ctx.fillRect(0,0,cw,ch);
+
   const panG=ctx.createLinearGradient(0,0,cw*0.72,0);
+
   panG.addColorStop(0,'rgba(0,0,0,0.80)');panG.addColorStop(0.65,'rgba(0,0,0,0.44)');panG.addColorStop(1,'rgba(0,0,0,0)');
+
   ctx.fillStyle=panG;ctx.fillRect(0,0,cw,ch);
+
   const vig=ctx.createRadialGradient(cw/2,ch/2,ch*0.15,cw/2,ch/2,ch*0.78);
+
   vig.addColorStop(0,'rgba(0,0,0,0)');vig.addColorStop(1,'rgba(0,0,0,0.6)');
+
   ctx.fillStyle=vig;ctx.fillRect(0,0,cw,ch);
+
   // 3. Top accent bar
+
   ctx.fillStyle=th.line;ctx.fillRect(0,0,cw,3*s);
 
+
+
   const PAD      = 10 * s;
+
   const LEFTWID  = cw * 0.58;
+
   const VGAP     = 30 * s;
 
+
+
   // Heights from font sizes (unchanged)
+
   const brandH   = brand ? F.brand.px * 1.6   : 0;
+
   const typeH    = F.type.px * 1.6;
+
   const badgeH   = F.size.px  * 2.4;
+
   const subH     = sub   ? F.sub.px  * 2.4    : 0;
+
   const featRowH = F.feat.px  * 2.4;
+
   const featGap  = 6 * s;
+
   const activeFeat = feats.filter(f => f.trim()).slice(0,5);
+
   const featsTotal = activeFeat.length > 0
+
     ? activeFeat.length * featRowH + (activeFeat.length - 1) * featGap : 0;
 
+
+
   // Convert EP fractions → canvas pixels for each element's top-left
+
   const px = k => EP[k].x * cw;
+
   const py = k => EP[k].y * ch;
 
+
+
   // Tire area
+
   const tireX = px('tire'), tireY = py('tire');
+
   const tireW = cw * 0.66, tireH2 = ch * 0.55;
 
+
+
   // 4. Tire image
+
   if(tireMask && vis('tire')){
+
     const tr  = Math.min(tireW/tireMask.width, tireH2/tireMask.height) * tireS;
+
     const tw  = tireMask.width  * tr;
+
     const tha = tireMask.height * tr;
+
     const tx  = tireX + (tireW-tw)/2;
+
     const ty  = tireY;
+
     regBox('tire', tx, ty, tw, tha);
+
     ctx.save();
+
     ctx.shadowColor='rgba(0,0,0,0.85)';ctx.shadowBlur=22*s;
+
     ctx.shadowOffsetX=-4*s;ctx.shadowOffsetY=12*s;
+
     ctx.drawImage(tireMask, tx, ty, tw, tha);
+
     ctx.restore();
+
     // Drag highlight
+
     if(hovered==='tire'||drag?.key==='tire'){
+
       ctx.save();ctx.strokeStyle='rgba(245,197,24,0.7)';ctx.lineWidth=2*s;
+
       ctx.setLineDash([4*s,4*s]);ctx.strokeRect(tx,ty,tw,tha);ctx.restore();
+
     }
+
   }
+
+
 
   // ── 5. TEXT — each element uses EP position ────────────────────────────────
+
   // Font size slider IDs per element key
+
   const EL_SIZE_SLIDER = {
+
     brand:'fs_brand', type:'fs_type', badge:'fs_size',
+
     sub:'fs_sub', feats:'fs_feat',
+
   };
 
+
+
   function drawHover(key,x,y,w,h){
+
     const isHov  = hovered===key || drag?.key===key;
+
     const isSel  = selectedEl===key;
+
     if(!isHov && !isSel) return;
+
     ctx.save();
+
     ctx.strokeStyle = isSel ? 'rgba(245,197,24,0.9)' : 'rgba(245,197,24,0.45)';
+
     ctx.lineWidth   = 1.5*s;
+
     ctx.setLineDash([3*s,3*s]);
+
     ctx.strokeRect(x-2*s, y-2*s, w+4*s, h+4*s);
+
     ctx.setLineDash([]);
+
     ctx.restore();
+
+
 
     if(isSel){
+
       // Draw 4 corner handles + 4 edge handles
+
       const hr = HANDLE_R*s;
+
       const handles=[
+
         {hx:x,   hy:y,   hk:'nw'},{hx:x+w/2,hy:y,   hk:'n'},{hx:x+w,hy:y,   hk:'ne'},
+
         {hx:x+w, hy:y+h/2,hk:'e'},{hx:x+w,hy:y+h,  hk:'se'},{hx:x+w/2,hy:y+h,hk:'s'},
+
         {hx:x,   hy:y+h, hk:'sw'},{hx:x,  hy:y+h/2,hk:'w'},
+
       ];
+
       const CURSOR={nw:'nw-resize',n:'n-resize',ne:'ne-resize',e:'e-resize',se:'se-resize',s:'s-resize',sw:'sw-resize',w:'w-resize'};
+
       handles.forEach(hd=>{
+
         ctx.save();
+
         ctx.fillStyle='#fff'; ctx.strokeStyle='#f5c518'; ctx.lineWidth=1.5*s;
+
         ctx.beginPath(); ctx.arc(hd.hx,hd.hy,hr,0,Math.PI*2); ctx.fill(); ctx.stroke();
+
         ctx.restore();
+
         BOXES['elh_'+key+'_'+hd.hk]={x:hd.hx-hr*1.5,y:hd.hy-hr*1.5,w:hr*3,h:hr*3,
+
           isElHandle:true, elKey:key, hk:hd.hk, hCur:CURSOR[hd.hk]};
+
       });
+
     }
+
   }
+
+
 
   // Бренд
+
   if(brand && vis('brand')){
+
     const a = elemAnim('ae_brand','at_brand');
+
     const bx=px('brand'), by=py('brand');
+
     ctx.font=F.brand.font; // установить шрифт ДО измерения
+
     const brandW = ctx.measureText(brand.toUpperCase()).width + 6*s;
+
     const brandH2 = brandH||F.brand.px*1.6;
+
     regBox('brand', bx, by, brandW, brandH2);
+
     drawHover('brand', bx, by, brandW, brandH2);
+
     withAnim(a,()=>{
+
       ctx.font=F.brand.font;ctx.fillStyle='rgba(255,255,255,0.5)';
+
       ctx.textAlign='left';ctx.fillText(brand.toUpperCase(),bx,by+F.brand.px);
+
     });
+
   }
+
+
 
   // Скидка
+
   if(disc && vis('disc')){
+
     const a = elemAnim('ae_brand','at_brand');
+
     withAnim(a,()=>{
+
       ctx.font=F.brand.font;
+
       const mw=ctx.measureText(disc).width;
+
       const dbw=mw+16*s, dbh=F.brand.px*1.8;
+
       const dbx=px('disc'), dby=py('disc');
+
       regBox('disc',dbx,dby,dbw,dbh);
+
       drawHover('disc',dbx,dby,dbw,dbh);
+
       ctx.fillStyle='#cc1111';rr(ctx,dbx,dby,dbw,dbh,5*s);ctx.fill();
+
       ctx.fillStyle='#fff';ctx.textAlign='center';
+
       ctx.fillText(disc,dbx+dbw/2,dby+dbh*0.73);
+
     });
+
   }
+
+
 
   // Заголовок
+
   if(vis('type')){
+
     const a=elemAnim('ae_type','at_type');
+
     const tx=px('type'), ty2=py('type');
+
     ctx.font=F.type.font;
+
     const tw2=ctx.measureText(typeText).width;
+
     regBox('type',tx,ty2,tw2,typeH);
+
     drawHover('type',tx,ty2,tw2,typeH);
+
     withAnim(a,(an)=>{
+
       ctx.font=F.type.font;ctx.fillStyle='#fff';ctx.textAlign='left';
+
       if(an.effect==='typewriter'){
+
         const shown=Math.ceil(an.p*typeText.length);
+
         ctx.fillText(typeText.slice(0,shown),tx,ty2+F.type.px);
+
       } else {
+
         ctx.fillText(typeText,tx,ty2+F.type.px);
+
       }
+
     });
+
   }
+
+
 
   // Плашка размера
+
   if(vis('badge')){
+
     const a=elemAnim('ae_size','at_size');
+
     const bx=px('badge'), by=py('badge');
+
     ctx.font=F.size.font;
+
     const sbw=Math.max(ctx.measureText(sizeText).width+30*s, 120*s);
+
     regBox('badge',bx,by,sbw,badgeH);
+
     drawHover('badge',bx,by,sbw,badgeH);
+
     withAnim(a,()=>{
+
       const sbg=ctx.createLinearGradient(bx,by,bx+sbw,by);
+
       sbg.addColorStop(0,th.badge);sbg.addColorStop(1,th.badgeL);
+
       ctx.fillStyle=sbg;rr(ctx,bx,by,sbw,badgeH,8*s);ctx.fill();
+
       ctx.fillStyle='rgba(255,255,255,0.07)';rr(ctx,bx,by,sbw,badgeH*0.48,8*s);ctx.fill();
+
       ctx.font=F.size.font;ctx.fillStyle=th.txt;ctx.textAlign='center';
+
       ctx.fillText(sizeText,bx+sbw/2,by+badgeH*0.70);
+
     });
+
   }
+
+
 
   // Подзаголовок
+
   if(sub && subH>0 && vis('sub')){
+
     const a=elemAnim('ae_sub','at_sub');
+
     const bx=px('sub'), by=py('sub');
+
     ctx.font=F.sub.font;
+
     const sw=Math.max(ctx.measureText(sub.toUpperCase()).width+24*s, 60*s);
+
     regBox('sub',bx,by,sw,subH);
+
     drawHover('sub',bx,by,sw,subH);
+
     withAnim(a,()=>{
+
       ctx.fillStyle='rgba(255,255,255,0.07)';rr(ctx,bx,by,sw,subH,5*s);ctx.fill();
+
       ctx.font=F.sub.font;ctx.fillStyle='rgba(255,255,255,0.55)';ctx.textAlign='center';
+
       ctx.fillText(sub.toUpperCase(),bx+sw/2,by+subH*0.74);
+
     });
+
   }
+
+
 
   // Характеристики
+
   if(vis('feats')){
+
     const baseDelay=parseFloat(document.getElementById('at_feat')?.value||'4');
+
     const effect=document.getElementById('ae_feat')?.value||'slideLeft';
+
     const fx2=px('feats'), fy2=py('feats');
+
     regBox('feats',fx2,fy2,LEFTWID-PAD,featsTotal||featRowH);
+
     drawHover('feats',fx2,fy2,LEFTWID-PAD,featsTotal||featRowH);
+
     activeFeat.forEach((feat,i)=>{
+
       const delay=baseDelay+i*0.35;
+
       const t=Math.max(0,gt-delay);
+
       const p=Math.min(1,t/animFadeDur);
+
       const ease=p<0.5?2*p*p:-1+(4-2*p)*p;
+
       if(p<=0)return;
+
       let alpha=ease,ox=0,oy=0,sc=1;
+
       switch(effect){
+
         case 'fade':break;
+
         case 'slideLeft':ox=(1-ease)*-60*s;break;
+
         case 'slideUp':oy=(1-ease)*30*s;break;
+
         case 'slideDown':oy=(1-ease)*-30*s;break;
+
         case 'zoom':sc=0.6+ease*0.4;break;
+
       }
+
       ctx.save();ctx.globalAlpha=alpha;ctx.translate(ox,oy);
+
       if(sc!==1){ctx.translate(fx2,fy2+i*(featRowH+featGap)+featRowH/2);ctx.scale(sc,sc);ctx.translate(-fx2,-(fy2+i*(featRowH+featGap)+featRowH/2));}
+
       const fy=fy2+i*(featRowH+featGap);
+
       const dotR=Math.max(3*s,F.feat.px*0.32);
+
       // Ширина плашки = ширина текста + отступы (адаптивно)
+
       ctx.font=F.feat.font;
+
       const textPad = dotR*2 + 20*s;
+
       const displayFeat = effect==='typewriter' ? feat.slice(0,Math.ceil(p*feat.length)) : feat;
+
       const textW = ctx.measureText(displayFeat).width;
+
       const fw = textW + textPad + dotR + 8*s;
+
       ctx.fillStyle=th.feat;rr(ctx,fx2,fy,fw,featRowH,5*s);ctx.fill();
+
       ctx.fillStyle=th.dot;ctx.beginPath();ctx.arc(fx2+dotR+5*s,fy+featRowH/2,dotR,0,Math.PI*2);ctx.fill();
+
       ctx.font=F.feat.font;
+
       if(effect==='typewriter'){
+
         const shown=Math.ceil(p*feat.length);
+
         ctx.fillStyle='rgba(255,255,255,0.9)';ctx.textAlign='left';
+
         ctx.fillText(feat.slice(0,shown),fx2+dotR*2+12*s,fy+featRowH*0.68);
+
       } else {
+
         ctx.fillStyle='rgba(255,255,255,0.9)';ctx.textAlign='left';
+
         ctx.fillText(feat,fx2+dotR*2+12*s,fy+featRowH*0.68);
+
       }
+
       ctx.restore();
+
     });
+
   }
+
+
 
   // ── 8. Custom text blocks ─────────────────────────────────────────────────
+
   customTexts.forEach(t=>{
+
     const key = 'ct_'+t.id;
+
     if(!EP[key]) EP[key]={x:t.x, y:t.y};
+
     const cx2=EP[key].x*cw, cy2=EP[key].y*ch;
+
     const weight=(t.bold?'bold ':'')+(t.italic?'italic ':'');
+
     const px2=Math.max(8, Math.round(t.size*s));
+
     const fontStr=`${weight}${px2}px '${t.font}',sans-serif`;
+
     const lh=px2*1.35;
+
     const opacity=(t.opacity||100)/100;
 
+
+
     ctx.save();
+
     ctx.globalAlpha=opacity;
+
     ctx.font=fontStr;
+
     ctx.fillStyle=t.color;
+
     ctx.textAlign=t.align||'left';
 
+
+
     if(t.shadow){
+
       ctx.shadowColor='rgba(0,0,0,0.75)';
+
       ctx.shadowBlur=px2*0.4;
+
       ctx.shadowOffsetX=px2*0.06;
+
       ctx.shadowOffsetY=px2*0.06;
+
     }
+
+
 
     const lines=t.text.split('\n');
+
     const maxW=lines.reduce((m,l)=>Math.max(m,ctx.measureText(l).width),0);
+
     let bx=cx2;
+
     if(t.align==='center') bx=cx2-maxW/2;
+
     if(t.align==='right')  bx=cx2-maxW;
 
+
+
     // Register bounding box
+
     const ctBx=bx-5*s, ctBy=cy2-lh*0.95;
+
     const ctBw=(maxW||50*s)+10*s, ctBh=lh*lines.length+6*s;
+
     regBox(key, ctBx, ctBy, ctBw, ctBh);
 
+
+
     // Draw hover/selection outline + handles
+
     const ctSel = selectedEl===key;
+
     const ctHov = hovered===key||drag?.key===key;
+
     if(ctHov||ctSel){
+
       ctx.save();
+
       ctx.strokeStyle=ctSel?'rgba(245,197,24,0.9)':'rgba(245,197,24,0.5)';
+
       ctx.lineWidth=1.5*s;ctx.setLineDash([3*s,3*s]);
+
       ctx.strokeRect(ctBx,ctBy,ctBw,ctBh);ctx.setLineDash([]);ctx.restore();
+
     }
+
     if(ctSel){
+
       const hr=HANDLE_R*s;
+
       [[ctBx,ctBy,'nw'],[ctBx+ctBw,ctBy,'ne'],[ctBx+ctBw,ctBy+ctBh,'se'],[ctBx,ctBy+ctBh,'sw']].forEach(([hx,hy,hk])=>{
+
         ctx.save();ctx.fillStyle='#fff';ctx.strokeStyle='#f5c518';ctx.lineWidth=1.5*s;
+
         ctx.beginPath();ctx.arc(hx,hy,hr,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.restore();
+
         BOXES['cth_'+key+'_'+hk]={x:hx-hr*1.5,y:hy-hr*1.5,w:hr*3,h:hr*3,isElHandle:true,ctKey:key,hk,hCur:'se-resize'};
+
       });
+
     }
+
+
 
     lines.forEach((line,i)=>{
+
       const ly=cy2+i*lh;
+
       ctx.fillText(line, cx2, ly);
 
+
+
       // Underline
+
       if(t.underline){
+
         const lw=ctx.measureText(line).width;
+
         const ux=t.align==='center'?cx2-lw/2:t.align==='right'?cx2-lw:cx2;
+
         ctx.save();ctx.shadowBlur=0;ctx.shadowOffsetX=0;ctx.shadowOffsetY=0;
+
         ctx.fillRect(ux, ly+px2*0.15, lw, Math.max(1, px2*0.07));
+
         ctx.restore();
+
       }
+
       // Strikethrough
+
       if(t.strike){
+
         const lw=ctx.measureText(line).width;
+
         const sx2=t.align==='center'?cx2-lw/2:t.align==='right'?cx2-lw:cx2;
+
         ctx.save();ctx.shadowBlur=0;ctx.shadowOffsetX=0;ctx.shadowOffsetY=0;
+
         ctx.fillRect(sx2, ly-px2*0.3, lw, Math.max(1, px2*0.07));
+
         ctx.restore();
+
       }
+
     });
 
+
+
     ctx.restore();
+
   });
+
+
 
   // ── 9. Shape / template elements ─────────────────────────────────────────
+
   shapeElements.forEach(el=>{
+
     const key='sh_'+el.id;
+
     if(!EP[key]) EP[key]={x:el.x,y:el.y};
+
     const ex=EP[key].x*cw, ey=EP[key].y*ch;
+
     const op=(el.opacity||100)/100;
+
     ctx.save(); ctx.globalAlpha=op;
 
+
+
     if(el.shape==='badge'||el.shape==='text'){
+
       const weight=(el.bold?'bold ':'')+Math.round((el.size||24)*s)+'px \''+el.font+'\',sans-serif';
+
       ctx.font=weight;
+
       const tw=ctx.measureText(el.text).width;
+
       const px2=(el.padX||0)*s, py2=(el.padY||0)*s;
+
       const bw=tw+px2*2, bh=(el.size||24)*s+(py2*2);
+
       if(el.bgColor){
+
         ctx.fillStyle=el.bgColor;
+
         const rr2=Math.min((el.radius||0)*s, bh/2);
+
         ctx.beginPath();ctx.moveTo(ex+rr2,ey);ctx.lineTo(ex+bw-rr2,ey);
+
         ctx.arcTo(ex+bw,ey,ex+bw,ey+rr2,rr2);ctx.lineTo(ex+bw,ey+bh-rr2);
+
         ctx.arcTo(ex+bw,ey+bh,ex+bw-rr2,ey+bh,rr2);ctx.lineTo(ex+rr2,ey+bh);
+
         ctx.arcTo(ex,ey+bh,ex,ey+bh-rr2,rr2);ctx.lineTo(ex,ey+rr2);
+
         ctx.arcTo(ex,ey,ex+rr2,ey,rr2);ctx.closePath();ctx.fill();
+
         regBox(key,ex,ey,bw,bh);
+
         drawHover(key,ex,ey,bw,bh);
+
       } else {
+
         regBox(key,ex,ey-el.size*s,tw,el.size*s*1.2);
+
         drawHover(key,ex,ey-el.size*s,tw,el.size*s*1.2);
+
       }
+
       ctx.font=weight;
+
       ctx.fillStyle=el.textColor||'#fff';
+
       ctx.textAlign='left';
+
       ctx.shadowColor='rgba(0,0,0,0.5)';ctx.shadowBlur=3*s;
+
       ctx.fillText(el.text,ex+px2,ey+(el.size||24)*s+py2-py2*0.15);
 
+
+
     } else if(el.shape==='line'){
+
       const lw2=(el.width||0.5)*cw;
+
       regBox(key,ex,ey-4*s,lw2,8*s);
+
       drawHover(key,ex,ey-4*s,lw2,8*s);
+
       ctx.strokeStyle=el.lineColor||'rgba(255,255,255,0.4)';
+
       ctx.lineWidth=(el.lineWidth||2)*s;
+
       ctx.setLineDash([]); ctx.beginPath();
+
       ctx.moveTo(ex,ey); ctx.lineTo(ex+lw2,ey); ctx.stroke();
 
+
+
     } else if(el.shape==='rect'){
+
       const rw=(el.width||0.5)*cw, rh=(el.height||0.08)*ch;
+
       const rr2=Math.min((el.radius||0)*s, rh/2);
+
       regBox(key,ex,ey,rw,rh);
+
       drawHover(key,ex,ey,rw,rh);
+
       ctx.fillStyle=el.fillColor||'rgba(0,0,0,0.5)';
+
       ctx.beginPath();ctx.moveTo(ex+rr2,ey);ctx.lineTo(ex+rw-rr2,ey);
+
       ctx.arcTo(ex+rw,ey,ex+rw,ey+rr2,rr2);ctx.lineTo(ex+rw,ey+rh-rr2);
+
       ctx.arcTo(ex+rw,ey+rh,ex+rw-rr2,ey+rh,rr2);ctx.lineTo(ex+rr2,ey+rh);
+
       ctx.arcTo(ex,ey+rh,ex,ey+rh-rr2,rr2);ctx.lineTo(ex,ey+rr2);
+
       ctx.arcTo(ex,ey,ex+rr2,ey,rr2);ctx.closePath();ctx.fill();
+
       if(el.strokeColor){
+
         ctx.strokeStyle=el.strokeColor;ctx.lineWidth=1.5*s;ctx.stroke();
+
       }
+
     }
+
     ctx.restore();
+
   });
+
+
 
   // ── 10. Canvas shapes (resizable) ────────────────────────────────────────
+
   canvasShapes.forEach(sh=>drawCanvasShape(ctx,sh,cw,ch,s));
 
+
+
   // ── Snap guides ───────────────────────────────────────────────────────────
+
   drawSnapLines(ctx, cw, ch);
 
+
+
   // 9. Bottom bar
+
   ctx.fillStyle = th.line; ctx.fillRect(0, ch-3*s, cw, 3*s);
+
 }
+
+
 
 // ── Preview loop ──────────────────────────────────────────────────────────────
+
 function rp(){cancelAnimationFrame(prevRaf);animT=0;loop();}
+
 function loop(){
+
   animT+=0.018;
+
   drawFrame(document.getElementById('prevCv'),FW,FH,animT,bgVid);
+
   prevRaf=requestAnimationFrame(loop);
+
 }
+
 loop();
+
 initDrag();
+
 sizeCanvas();
+
 renderTmplGrid();
+
 renderShapeGrid();
 
+
+
 // ── Generate ──────────────────────────────────────────────────────────────────
+
 async function startGen(){
+
   const size=v('f_size');
+
   if(!size){setSt('Введите размер шины','err');return;}
+
   const btn=document.getElementById('genBtn');btn.disabled=true;
+
   cancelAnimationFrame(prevRaf);prevRaf=null;
+
   document.getElementById('dlArea').innerHTML='';
+
   document.getElementById('prog').style.display='block';
+
   document.getElementById('pb').style.width='0%';
+
   setSt('<div class="spin"></div> Генерация...','');
+
   try{
+
     const blob=await genVideo();
+
     const url=URL.createObjectURL(blob);
+
     const safe=size.replace(/[^a-zA-Z0-9]/g,'_');
+
     document.getElementById('pb').style.width='100%';
+
     setSt('✅ Готово!','ok');
+
     document.getElementById('dlArea').innerHTML=`<a class="btn-dl" href="${url}" download="${safe}.webm">⬇ Скачать видео</a>`;
+
   }catch(e){setSt('❌ '+e.message,'err');}
+
   btn.disabled=false;loop();
+
 }
+
+
 
 async function genVideo(){
+
   const dur=parseInt(v('f_dur'))||10;
+
   const totF=FPS*dur;
+
   const cv=document.createElement('canvas');cv.width=FW;cv.height=FH;
+
   if(bgVid){bgVid.currentTime=0;await new Promise(r=>{bgVid.onseeked=r;setTimeout(r,500);});bgVid.play().catch(()=>{});}
+
   const mime=MediaRecorder.isTypeSupported('video/webm;codecs=vp9')?'video/webm;codecs=vp9':'video/webm';
+
   const stream=cv.captureStream(FPS);
+
   const rec=new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:10000000});
+
   const chunks=[];
+
   rec.ondataavailable=e=>{if(e.data.size>0)chunks.push(e.data);};
+
   return new Promise((resolve,reject)=>{
+
     rec.start(100);
+
     let f=0,gt=0;
+
     const bar=document.getElementById('pb');
+
     function frame(){
+
       gt+=1/FPS;
+
       drawFrame(cv,FW,FH,gt,bgVid);
+
       f++;bar.style.width=Math.round(f/totF*95)+'%';
+
       if(f<totF) setTimeout(frame,0);
+
       else{if(bgVid)bgVid.pause();rec.stop();}
+
     }
+
     rec.onstop=()=>resolve(new Blob(chunks,{type:mime}));
+
     rec.onerror=e=>reject(e.error||new Error('Ошибка записи'));
+
     frame();
+
   });
+
 }
+
 // ── Custom text blocks ────────────────────────────────────────────────────────
+
 function addCustomText(){
+
   const id = ++ctxtIdSeq;
+
   customTexts.push({
+
     id, text:'Мой текст', font:'Oswald', size:28, color:'#ffffff',
+
     bold:false, italic:false, underline:false, strike:false,
+
     align:'left', opacity:100, lineHeight:1.3,
+
     x: 0.05 + Math.random()*0.3, y: 0.45 + Math.random()*0.2,
+
   });
+
   EP['ct_'+id] = {x: customTexts[customTexts.length-1].x, y: customTexts[customTexts.length-1].y};
+
   renderCustomTextList();
+
   rp();
+
 }
+
+
 
 function removeCustomText(id){
+
   customTexts = customTexts.filter(t=>t.id!==id);
+
   delete EP['ct_'+id];
+
   delete BOXES['ct_'+id];
+
   renderCustomTextList();
+
   rp();
+
 }
+
+
 
 function ctChange(id, field, val){
+
   const t = customTexts.find(t=>t.id===id);
+
   if(!t) return;
+
   t[field] = val;
+
   rp();
+
 }
+
+
 
 // SVG icons for Word toolbar
+
 const ICONS = {
+
   bold:      `<svg viewBox="0 0 24 24"><path d="M15.6 10.8A4 4 0 0012 4H6v16h7a4 4 0 001.6-7.2zM9 7h3a1.5 1.5 0 010 3H9V7zm3.5 10H9v-4h3.5a2 2 0 010 4z"/></svg>`,
+
   italic:    `<svg viewBox="0 0 24 24"><path d="M10 4v3h2.21l-3.42 10H6v3h8v-3h-2.21l3.42-10H18V4h-8z"/></svg>`,
+
   underline: `<svg viewBox="0 0 24 24"><path d="M12 17c3.31 0 6-2.69 6-6V3h-2.5v8c0 1.93-1.57 3.5-3.5 3.5S8.5 12.93 8.5 11V3H6v8c0 3.31 2.69 6 6 6zm-7 2v2h14v-2H5z"/></svg>`,
+
   strike:    `<svg viewBox="0 0 24 24"><path d="M10 19h4v-3h-4v3zM5 4v3h5v3h4V7h5V4H5zM3 14h18v-2H3v2z"/></svg>`,
+
   alignL:    `<svg viewBox="0 0 24 24"><path d="M15 15H3v2h12v-2zm0-8H3v2h12V7zM3 13h18v-2H3v2zm0 8h18v-2H3v2zM3 3v2h18V3H3z"/></svg>`,
+
   alignC:    `<svg viewBox="0 0 24 24"><path d="M7 15v2h10v-2H7zm-4 6h18v-2H3v2zm0-8h18v-2H3v2zm4-6v2h10V7H7zM3 3v2h18V3H3z"/></svg>`,
+
   alignR:    `<svg viewBox="0 0 24 24"><path d="M3 21h18v-2H3v2zm6-4h12v-2H9v2zm-6-4h18v-2H3v2zm6-4h12V7H9v2zM3 3v2h18V3H3z"/></svg>`,
+
   shadow:    `<svg viewBox="0 0 24 24"><path d="M5 5h2V3H5v2zm4-2v2h2V3H9zm4 0v2h2V3h-2zm4 2h2V3h-2v2zM3 7v2h2V7H3zm0 4h2v-2H3v2zm0 4h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2v-2H3v2zm18-4h-2v2h2V7zm0 4h-2v2h2v-2zm0 4h-2v2h2v-2zm0 4h-2v2h2v-2zm-2 2v2h2v-2h-2zM5 21h2v-2H5v2zm4 0h2v-2H9v2zm4 0h2v-2h-2v2z"/></svg>`,
+
 };
 
+
+
 function wb(id, field, icon, title, isOn, toggle){
+
   return `<button type="button" class="wbtn${isOn?' on':''}" title="${title}"
+
     onclick="ctChange(${id},'${field}',!${toggle});renderCustomTextList()">${icon}</button>`;
+
 }
 
+
+
 function renderCustomTextList(){
+
   const el = document.getElementById('customTextList');
+
   el.innerHTML='';
+
   if(customTexts.length===0){
+
     el.innerHTML='<div style="font-size:11px;color:#444;text-align:center;padding:12px">Нажмите «+ Добавить» чтобы создать свой текст</div>';
+
     return;
+
   }
+
   customTexts.forEach(t=>{
+
     const d=document.createElement('div');
+
     d.className='ctext-card';
+
     d.innerHTML=`
+
       <div class="ctext-card-head">
+
         <span>Текст #${t.id} · тащите на превью</span>
+
         <button class="ctext-del" onclick="removeCustomText(${t.id})">×</button>
+
       </div>
+
+
 
       <div class="word-toolbar">
 
+
+
         <!-- Строка 1: шрифт + размер + цвет -->
+
         <div class="word-row">
+
           <select class="wsel font-sel" onchange="ctChange(${t.id},'font',this.value)">
+
             ${FONT_LIST.map(f=>`<option value="${f}"${f===t.font?' selected':''}>${f}</option>`).join('')}
+
           </select>
+
           <div class="word-sep"></div>
+
           <input class="wnuminput" type="number" min="6" max="200" value="${t.size}"
+
                  onchange="ctChange(${t.id},'size',+this.value)" title="Размер шрифта">
+
           <div class="word-sep"></div>
+
           <label class="wlabel" title="Цвет текста">A</label>
+
           <input class="wcolor" type="color" value="${t.color}"
+
                  oninput="ctChange(${t.id},'color',this.value)" title="Цвет текста">
+
         </div>
+
+
 
         <!-- Строка 2: форматирование + выравнивание + прозрачность -->
+
         <div class="word-row">
+
           ${wb(t.id,'bold',   ICONS.bold,      'Жирный (Ctrl+B)',   t.bold,   t.bold)}
+
           ${wb(t.id,'italic', ICONS.italic,    'Курсив (Ctrl+I)',   t.italic, t.italic)}
+
           ${wb(t.id,'underline',ICONS.underline,'Подчёркнутый',     t.underline,t.underline)}
+
           ${wb(t.id,'strike', ICONS.strike,    'Зачёркнутый',      t.strike, t.strike)}
+
           <div class="word-sep"></div>
+
           <button type="button" class="wbtn${t.align==='left'?' on':''}" title="По левому краю"
+
             onclick="ctChange(${t.id},'align','left');renderCustomTextList()">${ICONS.alignL}</button>
+
           <button type="button" class="wbtn${t.align==='center'?' on':''}" title="По центру"
+
             onclick="ctChange(${t.id},'align','center');renderCustomTextList()">${ICONS.alignC}</button>
+
           <button type="button" class="wbtn${t.align==='right'?' on':''}" title="По правому краю"
+
             onclick="ctChange(${t.id},'align','right');renderCustomTextList()">${ICONS.alignR}</button>
+
           <div class="word-sep"></div>
+
           <span class="wlabel">Тень</span>
+
           ${wb(t.id,'shadow', ICONS.shadow,    'Тень текста',       t.shadow, t.shadow)}
+
           <div class="word-sep"></div>
+
           <span class="wlabel">Прозр.</span>
+
           <input class="wopacity" type="range" min="10" max="100" value="${t.opacity||100}"
+
                  oninput="ctChange(${t.id},'opacity',+this.value)"
+
                  title="Прозрачность: ${t.opacity||100}%">
+
         </div>
 
+
+
       </div>
 
+
+
       <div class="ctext-body">
+
         <textarea class="ctext-input" rows="2"
+
           placeholder="Введите текст..."
+
           oninput="ctChange(${t.id},'text',this.value)">${he(t.text)}</textarea>
+
       </div>
+
     `;
+
     el.appendChild(d);
+
   });
+
 }
+
 renderCustomTextList();
 
 
+
+
+
 // ── Shape / template elements ─────────────────────────────────────────────────
+
 function addShapeFromTemplate(tpl){
+
   const id = ++shapeIdSeq;
+
   const el = Object.assign({
+
     id, tplId:tpl.id, shape:tpl.shape,
+
     x:0.08+Math.random()*0.3, y:0.3+Math.random()*0.3, opacity:100,
+
     text:'', textColor:'#fff', bgColor:null, font:'Oswald', size:24,
+
     bold:false, radius:0, padX:0, padY:0,
+
     lineColor:'rgba(255,255,255,0.4)', lineWidth:2,
+
     fillColor:'rgba(0,0,0,0.5)', strokeColor:null, width:0.5, height:0.08,
+
   }, tpl);
+
   el.id = id; // restore id after assign
+
   shapeElements.push(el);
+
   EP['sh_'+id] = {x:el.x, y:el.y};
+
   rp();
+
 }
+
+
 
 function removeShape(id){
+
   shapeElements = shapeElements.filter(e=>e.id!==id);
+
   delete EP['sh_'+id]; delete BOXES['sh_'+id]; rp();
+
 }
+
+
 
 function renderTmplGrid(){
+
   const grid = document.getElementById('tmplGrid');
+
   if(!grid) return;
+
   grid.innerHTML = TEMPLATES.map(t=>`
+
     <div class="tmpl-card" onclick='addShapeFromTemplate(TEMPLATES.find(x=>x.id==="${t.id}"))' title="${t.name}">
+
       <div class="tmpl-preview" style="${t.preview}">
+
         <span style="font-family:'Oswald',sans-serif;letter-spacing:.03em">${t.previewText}</span>
+
       </div>
+
       <span class="tmpl-name">${t.name}</span>
+
     </div>`).join('');
+
 }
+
+
 
 // ── Shapes system ─────────────────────────────────────────────────────────────
+
 // SVG previews for each shape
+
 function shapePreviewSVG(type, color){
+
   const c=color, w=32, h=32;
+
   switch(type){
+
     case 'rect':      return `<rect x="3" y="7" width="26" height="18" fill="${c}"/>`;
+
     case 'rounded':   return `<rect x="3" y="7" width="26" height="18" rx="6" fill="${c}"/>`;
+
     case 'circle':    return `<circle cx="16" cy="16" r="12" fill="${c}"/>`;
+
     case 'ellipse':   return `<ellipse cx="16" cy="16" rx="14" ry="9" fill="${c}"/>`;
+
     case 'triangle':  return `<polygon points="16,3 29,29 3,29" fill="${c}"/>`;
+
     case 'rtriangle': return `<polygon points="3,29 3,3 29,29" fill="${c}"/>`;
+
     case 'star':      return `<polygon points="16,2 20,12 30,12 22,19 25,29 16,23 7,29 10,19 2,12 12,12" fill="${c}"/>`;
+
     case 'diamond':   return `<polygon points="16,2 30,16 16,30 2,16" fill="${c}"/>`;
+
     case 'hexagon':   return `<polygon points="16,2 29,9 29,23 16,30 3,23 3,9" fill="${c}"/>`;
+
     case 'arrow':     return `<polygon points="3,11 21,11 21,5 29,16 21,27 21,21 3,21" fill="${c}"/>`;
+
     case 'line':      return `<line x1="3" y1="16" x2="29" y2="16" stroke="${c}" stroke-width="4" stroke-linecap="round"/>`;
+
     case 'cross':     return `<path d="M11,3h10v8h8v10h-8v8h-10v-8h-8v-10h8z" fill="${c}"/>`;
+
     default:          return `<rect x="3" y="3" width="26" height="26" fill="${c}"/>`;
+
   }
+
 }
+
+
 
 function addCanvasShape(type, color){
+
   const id = ++shapeSeqId;
+
   const sh = {
+
     id, type,
+
     // position (fraction of canvas)
+
     x: 0.15 + Math.random()*0.3,
+
     y: 0.25 + Math.random()*0.3,
+
     // size (fraction of canvas)
+
     w: type==='line' ? 0.4 : 0.25,
+
     h: type==='line' ? 0.01 : (type==='circle'||type==='star'||type==='diamond'?0.15:0.12),
+
     fill: color,
+
     stroke: 'transparent',
+
     strokeW: 0,
+
     opacity: 100,
+
     radius: type==='rounded' ? 12 : 0,
+
   };
+
   canvasShapes.push(sh);
+
   selectShape(id);
+
   rp();
+
 }
+
+
 
 function selectShape(id){
+
   selectedShape = id;
+
   const sh = canvasShapes.find(s=>s.id===id);
+
   if(!sh) return;
+
   document.getElementById('shapeEditor').style.display='';
+
   document.getElementById('shapeEditorTitle').textContent = SHAPE_DEFS.find(d=>d.type===sh.type)?.label||'Фигура';
+
   document.getElementById('sp_fill').value   = sh.fill.startsWith('#')?sh.fill:'#3a7af0';
+
   document.getElementById('sp_stroke').value = sh.stroke.startsWith('#')?sh.stroke:'#ffffff';
+
   document.getElementById('sp_strokeW').value= sh.strokeW||0;
+
   document.getElementById('sp_opacity').value= sh.opacity||100;
+
   document.getElementById('sp_radius').value = sh.radius||0;
+
 }
+
+
 
 function updateShapeProp(prop, val){
+
   const sh = canvasShapes.find(s=>s.id===selectedShape);
+
   if(!sh) return;
+
   if(prop==='fill')    sh.fill    = val;
+
   if(prop==='stroke')  sh.stroke  = val;
+
   if(prop==='strokeW') sh.strokeW = val;
+
   if(prop==='opacity') sh.opacity = val;
+
   if(prop==='radius')  sh.radius  = val;
+
   rp();
+
 }
+
+
 
 function deleteSelectedShape(){
+
   if(!selectedShape) return;
+
   canvasShapes = canvasShapes.filter(s=>s.id!==selectedShape);
+
   delete BOXES['sv_'+selectedShape];
+
   selectedShape = null;
+
   document.getElementById('shapeEditor').style.display='none';
+
   rp();
+
 }
 
+
+
 function renderShapeGrid(){
+
   const g = document.getElementById('shapeGrid');
+
   if(!g) return;
+
   g.innerHTML = SHAPE_DEFS.map(d=>`
+
     <div class="shape-card" onclick="addCanvasShape('${d.type}','${d.color}')" title="${d.label}">
+
       <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">${shapePreviewSVG(d.type,d.color)}</svg>
+
       <span>${d.label}</span>
+
     </div>`).join('');
+
 }
+
+
 
 // ── Draw a single canvas shape ─────────────────────────────────────────────
 
+
+
 function drawCanvasShape(ctx, sh, cw, ch, s){
+
   const x=sh.x*cw, y=sh.y*ch, w=sh.w*cw, h=sh.h*ch;
+
   const op=(sh.opacity||100)/100;
+
   ctx.save();
+
   ctx.globalAlpha=op;
 
+
+
   function applyStroke(){
+
     if(sh.strokeW>0 && sh.stroke!=='transparent'){
+
       ctx.strokeStyle=sh.stroke; ctx.lineWidth=sh.strokeW*s; ctx.stroke();
+
     }
+
   }
 
+
+
   ctx.fillStyle=sh.fill;
+
   switch(sh.type){
+
     case 'rect':
+
       ctx.fillRect(x,y,w,h); applyStroke(); break;
+
     case 'rounded':{
+
       const r=Math.min((sh.radius||10)*s, w/2, h/2);
+
       rr(ctx,x,y,w,h,r); ctx.fill(); applyStroke(); break;}
+
     case 'circle':
+
       ctx.beginPath();ctx.ellipse(x+w/2,y+h/2,w/2,w/2,0,0,Math.PI*2);ctx.fill();applyStroke();break;
+
     case 'ellipse':
+
       ctx.beginPath();ctx.ellipse(x+w/2,y+h/2,w/2,h/2,0,0,Math.PI*2);ctx.fill();applyStroke();break;
+
     case 'triangle':
+
       ctx.beginPath();ctx.moveTo(x+w/2,y);ctx.lineTo(x+w,y+h);ctx.lineTo(x,y+h);ctx.closePath();ctx.fill();applyStroke();break;
+
     case 'rtriangle':
+
       ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+w,y+h);ctx.lineTo(x,y+h);ctx.closePath();ctx.fill();applyStroke();break;
+
     case 'diamond':
+
       ctx.beginPath();ctx.moveTo(x+w/2,y);ctx.lineTo(x+w,y+h/2);ctx.lineTo(x+w/2,y+h);ctx.lineTo(x,y+h/2);ctx.closePath();ctx.fill();applyStroke();break;
+
     case 'star':{
+
       ctx.beginPath();
+
       for(let i=0;i<10;i++){
+
         const a=Math.PI/5*i - Math.PI/2;
+
         const r2=i%2===0?Math.min(w,h)/2:Math.min(w,h)/4;
+
         const px2=x+w/2+Math.cos(a)*r2, py2=y+h/2+Math.sin(a)*r2;
+
         i===0?ctx.moveTo(px2,py2):ctx.lineTo(px2,py2);
+
       }
+
       ctx.closePath();ctx.fill();applyStroke();break;}
+
     case 'hexagon':{
+
       ctx.beginPath();
+
       for(let i=0;i<6;i++){
+
         const a=Math.PI/3*i - Math.PI/6;
+
         const px2=x+w/2+Math.cos(a)*w/2, py2=y+h/2+Math.sin(a)*h/2;
+
         i===0?ctx.moveTo(px2,py2):ctx.lineTo(px2,py2);
+
       }
+
       ctx.closePath();ctx.fill();applyStroke();break;}
+
     case 'arrow':{
+
       const ah=h*0.55, ay=(h-ah)/2;
+
       ctx.beginPath();
+
       ctx.moveTo(x,y+ay);ctx.lineTo(x+w*0.6,y+ay);
+
       ctx.lineTo(x+w*0.6,y);ctx.lineTo(x+w,y+h/2);
+
       ctx.lineTo(x+w*0.6,y+h);ctx.lineTo(x+w*0.6,y+ay+ah);
+
       ctx.lineTo(x,y+ay+ah);ctx.closePath();ctx.fill();applyStroke();break;}
+
     case 'line':
+
       ctx.strokeStyle=sh.fill;ctx.lineWidth=Math.max(3*s,h);ctx.lineCap='round';
+
       ctx.beginPath();ctx.moveTo(x,y+h/2);ctx.lineTo(x+w,y+h/2);ctx.stroke();break;
+
     case 'cross':{
+
       const t=w*0.28;
+
       ctx.beginPath();
+
       ctx.moveTo(x+(w-t)/2,y);ctx.lineTo(x+(w+t)/2,y);ctx.lineTo(x+(w+t)/2,y+(h-t)/2);
+
       ctx.lineTo(x+w,y+(h-t)/2);ctx.lineTo(x+w,y+(h+t)/2);ctx.lineTo(x+(w+t)/2,y+(h+t)/2);
+
       ctx.lineTo(x+(w+t)/2,y+h);ctx.lineTo(x+(w-t)/2,y+h);ctx.lineTo(x+(w-t)/2,y+(h+t)/2);
+
       ctx.lineTo(x,y+(h+t)/2);ctx.lineTo(x,y+(h-t)/2);ctx.lineTo(x+(w-t)/2,y+(h-t)/2);
+
       ctx.closePath();ctx.fill();applyStroke();break;}
+
   }
+
+
 
   ctx.restore();
 
+
+
   // Register box for drag/hit
+
   BOXES['sv_'+sh.id] = {x,y,w,h};
 
+
+
   // Selection handles
+
   if(selectedShape===sh.id){
+
     ctx.save();
+
     ctx.strokeStyle='rgba(245,197,24,0.9)';ctx.lineWidth=1.5*s;ctx.setLineDash([4*s,3*s]);
+
     ctx.strokeRect(x,y,w,h);ctx.setLineDash([]);
 
+
+
     // 8 handles: corners + midpoints
+
     const handles=[
+
       {hx:x,    hy:y,    cur:'nw-resize', hk:'nw'},
+
       {hx:x+w/2,hy:y,    cur:'n-resize',  hk:'n'},
+
       {hx:x+w,  hy:y,    cur:'ne-resize', hk:'ne'},
+
       {hx:x+w,  hy:y+h/2,cur:'e-resize',  hk:'e'},
+
       {hx:x+w,  hy:y+h,  cur:'se-resize', hk:'se'},
+
       {hx:x+w/2,hy:y+h,  cur:'s-resize',  hk:'s'},
+
       {hx:x,    hy:y+h,  cur:'sw-resize', hk:'sw'},
+
       {hx:x,    hy:y+h/2,cur:'w-resize',  hk:'w'},
+
     ];
+
     handles.forEach(hd=>{
+
       ctx.fillStyle='#fff';ctx.strokeStyle='#f5c518';ctx.lineWidth=1.5*s;
+
       ctx.beginPath();ctx.arc(hd.hx,hd.hy,HANDLE_R*s,0,Math.PI*2);
+
       ctx.fill();ctx.stroke();
+
       // Store handle boxes for resize hit-test
+
       BOXES['svh_'+sh.id+'_'+hd.hk]={x:hd.hx-HANDLE_R*s*1.5,y:hd.hy-HANDLE_R*s*1.5,w:HANDLE_R*s*3,h:HANDLE_R*s*3,isHandle:true,shId:sh.id,hk:hd.hk,hCur:hd.cur};
+
     });
+
     ctx.restore();
+
   }
+
 }
+
+
+
+// ── Accordion & inner tabs ────────────────────────────────────────────────────
+
+function togglePanel(id){
+
+  document.getElementById(id).classList.toggle('open');
+
+}
+
+function switchInner(tab){
+
+  ['txt','tmpl','shape'].forEach(t=>{
+
+    document.getElementById('ip_'+t).style.display=t===tab?'':'none';
+
+    document.getElementById('it_'+t).classList.toggle('active',t===tab);
+
+  });
+
+}
+
+
 
 function switchTab(tab){
+
   document.getElementById('panel_manual').style.display = tab==='manual' ? '' : 'none';
+
   document.getElementById('panel_ai').style.display     = tab==='ai'     ? '' : 'none';
+
   document.getElementById('tab_manual').classList.toggle('active', tab==='manual');
+
   document.getElementById('tab_ai').classList.toggle('active',     tab==='ai');
+
 }
 
+
+
 // ── AI Section ────────────────────────────────────────────────────────────────
+
 const AI_PROMPTS = {
+
   dynamic:   'Динамичный монтаж крупных планов шины, быстрая смена ракурсов, тёплый золотой свет, пыль в воздухе, кинематографичный стиль, без людей, без текста',
+
   cinematic: 'Кинематографичная сцена: плавное движение камеры вокруг шины, боке на фоне, мягкий студийный свет, профессиональная съёмка, без людей, без текста',
+
   offroad:   'Сцена на бездорожье: каменистый грунт, пыль, яркое солнце, драматические тени, низкий угол камеры, суровая природа, без людей, без текста',
+
   summer:    'Летняя трасса: горячий асфальт, далёкий горизонт, яркое небо, солнечные блики, плавное движение вперёд, без людей, без текста',
+
   winter:    'Зимняя сцена: снег, лёд, холодный синий свет, заснеженные деревья, медленное движение камеры, атмосферный туман, без людей, без текста',
+
 };
 
+
+
 const AI_KEY_HINTS = {
+
   runway:    'Ключ: <a href="https://app.runwayml.com/account/api-keys" target="_blank" style="color:#f5c518">app.runwayml.com → API Keys</a>',
+
   kling:     'Ключ: <a href="https://platform.klingai.com" target="_blank" style="color:#f5c518">platform.klingai.com → API</a>',
+
   pika:      'Ключ: <a href="https://pika.art/account" target="_blank" style="color:#f5c518">pika.art → Account → API</a>',
+
   luma:      'Ключ: <a href="https://lumalabs.ai/dream-machine/api" target="_blank" style="color:#f5c518">lumalabs.ai → API</a>',
+
   replicate: 'Ключ: <a href="https://replicate.com/account/api-tokens" target="_blank" style="color:#f5c518">replicate.com → API Tokens</a>',
+
 };
+
+
 
 let aiPhotos = [];
 
+
+
 function setPrompt(key){
+
   const el = document.getElementById('ai_prompt');
+
   if(el) el.value = AI_PROMPTS[key] || '';
+
 }
+
+
 
 function onAiVideoLoad(f){
+
   if(!f) return;
+
   const box = document.getElementById('ai_video_box');
+
   box.classList.add('filled');
+
   box.querySelector('.ic').textContent  = '✅';
+
   box.querySelector('.tt').textContent  = f.name;
+
   box.querySelector('.sb').textContent  = (f.size/1024/1024).toFixed(1)+' MB';
+
   checkAiReady();
+
 }
+
+
 
 function onAiPhotosLoad(files){
+
   for(const f of files){
+
     if(aiPhotos.length >= 5) break;
+
     if(!f.type.startsWith('image/')) continue;
+
     const url = URL.createObjectURL(f);
+
     aiPhotos.push({file:f, url});
+
   }
+
   renderAiThumbs();
+
   checkAiReady();
+
 }
+
+
 
 function renderAiThumbs(){
+
   const row = document.getElementById('ai_thumb_row');
+
   row.innerHTML = '';
+
   aiPhotos.forEach((p,i)=>{
+
     const d = document.createElement('div'); d.className='ai-thumb';
+
     d.innerHTML = `<img src="${p.url}">
+
       <button class="ai-tdel" onclick="removeAiPhoto(${i})">✕</button>`;
+
     row.appendChild(d);
+
   });
+
   const box = document.getElementById('ai_photos_box');
+
   if(aiPhotos.length > 0){
+
     box.classList.add('filled');
+
     box.querySelector('.ic').textContent = '✅';
+
     box.querySelector('.tt').textContent = `${aiPhotos.length} фото`;
+
   } else {
+
     box.classList.remove('filled');
+
     box.querySelector('.ic').textContent = '📸';
+
     box.querySelector('.tt').textContent = 'Фото для ИИ';
+
   }
+
 }
+
+
 
 function removeAiPhoto(i){
+
   URL.revokeObjectURL(aiPhotos[i].url);
+
   aiPhotos.splice(i,1);
+
   renderAiThumbs();
+
   checkAiReady();
+
 }
 
+
+
 function onAiServiceChange(){
+
   const svc = document.getElementById('ai_service').value;
+
   const hint = document.getElementById('ai_key_hint');
+
   hint.innerHTML = svc ? (AI_KEY_HINTS[svc]||'') : 'Выберите сервис — появится подсказка где взять ключ';
+
   checkAiReady();
+
 }
+
+
 
 function onApiKeyInput(){ checkAiReady(); }
 
+
+
 function checkAiReady(){
+
   const svc    = document.getElementById('ai_service').value;
+
   const key    = document.getElementById('ai_key').value.trim();
+
   const hasVid = document.getElementById('ai_video_box').classList.contains('loaded');
+
   const ready  = svc && key && (hasVid || aiPhotos.length > 0);
+
   document.getElementById('ai_gen_btn').disabled = !ready;
+
 }
+
+
 
 function toggleKey(){
+
   const inp = document.getElementById('ai_key');
+
   inp.type = inp.type === 'password' ? 'text' : 'password';
+
 }
 
+
+
 async function generateAiVideo(){
+
   const svc    = document.getElementById('ai_service').value;
+
   const key    = document.getElementById('ai_key').value.trim();
+
   const prompt = document.getElementById('ai_prompt').value.trim();
+
   const btn    = document.getElementById('ai_gen_btn');
+
   const status = document.getElementById('ai_status');
 
+
+
   btn.disabled = true;
+
   status.className = 'ai-status';
+
   status.innerHTML = '<div class="spin"></div> Отправка материалов в ИИ...';
+
+
 
   await new Promise(r => setTimeout(r, 1500));
 
+
+
   // Placeholder — реальный API подключим после выбора сервиса
+
   // Когда API будет подключён — здесь будет URL результата:
+
   // const resultUrl = await callAiApi(svc, key, prompt, ...);
+
   // autoLoadAiBg(resultUrl);
 
+
+
   status.className = 'ai-status err';
+
   status.innerHTML = `⚠️ API <b>${svc}</b> ещё не подключён.<br>
+
     <span style="font-size:10px;color:#555;display:block;margin-top:3px">
+
     Выберите конкретный сервис — подключим на следующем шаге</span>`;
+
   btn.disabled = false;
+
 }
+
+
 
 // Когда ИИ вернёт результат — вызываем эту функцию
+
 // Она автоматически загружает видео в предпросмотр и переключает на него
+
 function autoLoadAiBg(videoUrl){
+
   const vid = document.createElement('video');
+
   vid.src = videoUrl; vid.loop=true; vid.muted=true; vid.playsInline=true;
+
   vid.onloadeddata = ()=>{
+
     bgVid = vid; vid.play().catch(()=>{});
+
     // Показать результат
+
     const res = document.getElementById('ai_result');
+
     const rv  = document.getElementById('ai_result_video');
+
     rv.src = videoUrl; res.style.display='';
+
     // Статус
+
     document.getElementById('ai_status').className='ai-status ok';
+
     document.getElementById('ai_status').innerHTML='✅ Фон готов — загружен в предпросмотр';
+
     // Обновить предпросмотр
+
     rp();
+
   };
+
   vid.load();
+
 }
 
+
+
 function setSt(h,c){const el=document.getElementById('st');el.className='st '+c;el.innerHTML=h;}
+
 </script>
+
 </body>
+
 </html>
