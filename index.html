@@ -113,6 +113,22 @@ select option{background:#1a1b26}
 .btog:hover{background:rgba(255,255,255,0.07);color:#aaa}
 .btog input{width:auto;accent-color:#f5c518;cursor:pointer;margin:0}
 .btog input:checked+span{color:#f5c518}
+.shape-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px}
+.shape-card{background:#1a1b26;border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:8px 4px;cursor:pointer;transition:all .15s;display:flex;flex-direction:column;align-items:center;gap:4px}
+.shape-card:hover{border-color:rgba(245,197,24,0.4);background:rgba(245,197,24,0.06);transform:translateY(-1px)}
+.shape-card svg{width:32px;height:32px;display:block}
+.shape-card span{font-size:9px;color:#555;text-transform:uppercase;letter-spacing:.05em}
+.shape-card:hover span{color:#888}
+.shape-editor-head{display:flex;align-items:center;justify-content:space-between;background:#14161f;border-radius:7px 7px 0 0;padding:7px 10px;border:1px solid rgba(255,255,255,0.07);border-bottom:none}
+.shape-editor-head span{font-size:11px;color:#888;font-weight:500}
+.shape-props{background:#1a1b26;border:1px solid rgba(255,255,255,0.07);border-radius:0 0 7px 7px;padding:10px}
+.tmpl-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:8px}
+.tmpl-card{background:#1a1b26;border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:8px 6px;cursor:pointer;transition:all .15s;display:flex;flex-direction:column;align-items:center;gap:5px;text-align:center;position:relative;overflow:hidden}
+.tmpl-card:hover{border-color:rgba(245,197,24,0.4);background:rgba(245,197,24,0.06);transform:translateY(-1px)}
+.tmpl-card:active{transform:translateY(0)}
+.tmpl-preview{width:100%;height:36px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;letter-spacing:.04em;overflow:hidden;flex-shrink:0}
+.tmpl-name{font-size:9px;color:#555;text-transform:uppercase;letter-spacing:.06em;white-space:nowrap}
+.tmpl-card:hover .tmpl-name{color:#888}
 .add-ctext-btn{background:rgba(245,197,24,0.12);border:1px solid rgba(245,197,24,0.3);border-radius:6px;color:#f5c518;font-size:11px;font-weight:600;padding:3px 10px;cursor:pointer;transition:background .15s}
 .add-ctext-btn:hover{background:rgba(245,197,24,0.2)}
 /* Word-style card */
@@ -359,6 +375,52 @@ select option{background:#1a1b26}
     </div>
   </div>
 
+  <!-- Шаблоны элементов -->
+  <div>
+    <div class="sec">03в — Готовые элементы</div>
+    <div class="tmpl-grid" id="tmplGrid"></div>
+    <div style="font-size:10px;color:#444;margin-top:8px">
+      💡 Нажмите на элемент — он появится на холсте. Затем перетащите куда нужно.
+    </div>
+  </div>
+
+  <!-- Фигуры -->
+  <div>
+    <div class="sec">03г — Фигуры</div>
+    <div class="shape-grid" id="shapeGrid"></div>
+
+    <!-- Редактор выбранной фигуры -->
+    <div id="shapeEditor" style="display:none;margin-top:10px">
+      <div class="shape-editor-head">
+        <span id="shapeEditorTitle">Фигура</span>
+        <button type="button" onclick="deleteSelectedShape()" style="background:none;border:none;color:#ff6b6b;cursor:pointer;font-size:12px;padding:0">🗑 Удалить</button>
+      </div>
+      <div class="shape-props">
+        <div class="row2">
+          <div><label class="f">Заливка</label>
+            <input type="color" id="sp_fill" style="width:100%;height:28px;padding:2px;border-radius:5px;background:#1a1b26;border:1px solid rgba(255,255,255,0.1);cursor:pointer" oninput="updateShapeProp('fill',this.value)"></div>
+          <div><label class="f">Обводка</label>
+            <input type="color" id="sp_stroke" style="width:100%;height:28px;padding:2px;border-radius:5px;background:#1a1b26;border:1px solid rgba(255,255,255,0.1);cursor:pointer" oninput="updateShapeProp('stroke',this.value)"></div>
+        </div>
+        <label class="f">Толщина обводки</label>
+        <input type="range" id="sp_strokeW" min="0" max="20" value="0"
+               style="-webkit-appearance:none;width:100%;height:3px;background:rgba(255,255,255,0.1);border-radius:2px;outline:none;border:none"
+               oninput="updateShapeProp('strokeW',+this.value)">
+        <label class="f">Прозрачность</label>
+        <input type="range" id="sp_opacity" min="10" max="100" value="100"
+               style="-webkit-appearance:none;width:100%;height:3px;background:rgba(255,255,255,0.1);border-radius:2px;outline:none;border:none"
+               oninput="updateShapeProp('opacity',+this.value)">
+        <label class="f">Скругление углов</label>
+        <input type="range" id="sp_radius" min="0" max="50" value="0"
+               style="-webkit-appearance:none;width:100%;height:3px;background:rgba(255,255,255,0.1);border-radius:2px;outline:none;border:none"
+               oninput="updateShapeProp('radius',+this.value)">
+      </div>
+    </div>
+    <div style="font-size:10px;color:#444;margin-top:8px">
+      💡 Перетаскивайте фигуру · тяните за уголки чтобы изменить размер
+    </div>
+  </div>
+
   <!-- Оформление -->
   <div>
     <div class="sec">04 — Оформление</div>
@@ -530,6 +592,57 @@ select option{background:#1a1b26}
 const W=540,H=960,FPS=24;
 let bgVid=null,tireImg=null,tireMask=null,prevRaf=null,animT=0;
 
+// ── All state & constants declared at top ─────────────────────────────────────
+let shapeElements  = [];
+let shapeIdSeq     = 0;
+let canvasShapes   = [];
+let shapeSeqId     = 0;
+let selectedShape  = null;
+let selectedEl     = null; // key of selected standard element
+const HANDLE_R     = 6;
+
+const TEMPLATES = [
+  { id:'badge_new',  name:'Новинка',   preview:'background:#1e6e28;color:#7fff7f', previewText:'НОВИНКА',
+    shape:'badge', text:'НОВИНКА', bgColor:'#1e6e28', textColor:'#7fff7f', font:'Oswald', size:22, radius:8, padX:20, padY:10 },
+  { id:'badge_hit',  name:'Хит',       preview:'background:#aa1818;color:#fff', previewText:'🔥 ХИТ',
+    shape:'badge', text:'🔥 ХИТ ПРОДАЖ', bgColor:'#aa1818', textColor:'#fff', font:'Oswald', size:20, radius:8, padX:18, padY:10 },
+  { id:'badge_sale', name:'Акция',     preview:'background:#c49a00;color:#fff', previewText:'⚡ АКЦИЯ',
+    shape:'badge', text:'⚡ АКЦИЯ', bgColor:'#c49a00', textColor:'#fff', font:'Oswald', size:20, radius:8, padX:18, padY:10 },
+  { id:'badge_pct',  name:'Скидка %',  preview:'background:#cc1111;color:#fff;border-radius:40px', previewText:'-30%',
+    shape:'badge', text:'-30%', bgColor:'#cc1111', textColor:'#ffffff', font:'Oswald', size:30, radius:40, padX:22, padY:10 },
+  { id:'badge_free', name:'Доставка',  preview:'background:#1a3399;color:#88aaff', previewText:'🚚 Доставка',
+    shape:'badge', text:'🚚 Бесплатная доставка', bgColor:'#1a3399', textColor:'#88aaff', font:'Roboto', size:16, radius:6, padX:16, padY:9 },
+  { id:'badge_ok',   name:'В наличии', preview:'background:#1e5c1e;color:#6dff6d', previewText:'✓ В наличии',
+    shape:'badge', text:'✓ В наличии', bgColor:'#1e5c1e', textColor:'#6dff6d', font:'Roboto', size:16, radius:6, padX:16, padY:9 },
+  { id:'price',      name:'Цена',      preview:'background:none;color:#fff;font-size:15px;font-weight:900', previewText:'от 990 ₽',
+    shape:'text', text:'от 990 ₽', textColor:'#ffffff', font:'Oswald', size:36, bold:true },
+  { id:'stars',      name:'Рейтинг',   preview:'background:none;color:#f5c518;font-size:18px', previewText:'★★★★★',
+    shape:'text', text:'★★★★★', textColor:'#f5c518', font:'Arial', size:32 },
+  { id:'arrow',      name:'Стрелка',   preview:'background:none;color:#fff;font-size:22px', previewText:'→',
+    shape:'text', text:'→', textColor:'#ffffff', font:'Arial', size:60 },
+  { id:'check',      name:'Галочка',   preview:'background:none;color:#6dff6d;font-size:12px', previewText:'✓ Гарантия',
+    shape:'text', text:'✓ Гарантия 1 год', textColor:'#6dff6d', font:'Roboto', size:20 },
+  { id:'divider',    name:'Линия',     preview:'background:rgba(255,255,255,0.18);height:3px;border-radius:2px;width:80%', previewText:'',
+    shape:'line', lineColor:'rgba(255,255,255,0.4)', lineWidth:3 },
+  { id:'box_dark',   name:'Плашка',    preview:'background:rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.15)', previewText:'',
+    shape:'rect', fillColor:'rgba(0,0,0,0.55)', strokeColor:'rgba(255,255,255,0.18)', width:0.5, height:0.08, radius:10 },
+];
+
+const SHAPE_DEFS = [
+  {type:'rect',      label:'Прямоугольник', color:'#2a6aaa'},
+  {type:'rounded',   label:'Скруглённый',   color:'#1e7a3e'},
+  {type:'circle',    label:'Круг',          color:'#aa2a2a'},
+  {type:'ellipse',   label:'Эллипс',        color:'#7a2aaa'},
+  {type:'triangle',  label:'Треугольник',   color:'#c49a00'},
+  {type:'rtriangle', label:'Прав. треуг.',  color:'#1a6a6a'},
+  {type:'star',      label:'Звезда',        color:'#aa6600'},
+  {type:'diamond',   label:'Ромб',          color:'#2a2aaa'},
+  {type:'hexagon',   label:'Шестиугольник', color:'#3a7a1a'},
+  {type:'arrow',     label:'Стрелка →',     color:'#888'},
+  {type:'line',      label:'Линия',         color:'#aaa'},
+  {type:'cross',     label:'Крест ✕',       color:'#aa3333'},
+];
+
 // ── Video format system ───────────────────────────────────────────────────────
 const FORMATS = {
   '9:16': {w:540,  h:960,  label:'9:16'},
@@ -692,12 +805,12 @@ function initDrag(){
   }
 
   function hitTest(fx,fy){
-    const cx = fx * cv.width, cy = fy * cv.height;
+    const cx2 = fx * cv.width, cy2 = fy * cv.height;
     const keys = Object.keys(BOXES).reverse();
     for(const k of keys){
       const b = BOXES[k];
       if(!b) continue;
-      if(cx>=b.x && cx<=b.x+b.w && cy>=b.y && cy<=b.y+b.h) return k;
+      if(cx2>=b.x && cx2<=b.x+b.w && cy2>=b.y && cy2<=b.y+b.h) return k;
     }
     return null;
   }
@@ -706,8 +819,77 @@ function initDrag(){
     e.preventDefault();
     const {fx,fy} = canvasXY(e);
     const key = hitTest(fx,fy);
-    if(!key) return;
-    drag = {key, startFX:fx, startFY:fy, startEX:EP[key].x, startEY:EP[key].y};
+
+    // Nothing hit — deselect all
+    if(!key){
+      selectedEl=null; selectedShape=null;
+      document.getElementById('shapeEditor').style.display='none';
+      rp(); return;
+    }
+
+    // Shape resize handle
+    if(key.startsWith('svh_')){
+      const b=BOXES[key];
+      const sh=canvasShapes.find(s=>s.id===b.shId);
+      if(sh){
+        drag={mode:'resize',key,shId:b.shId,hk:b.hk,
+          startFX:fx,startFY:fy,startX:sh.x,startY:sh.y,startW:sh.w,startH:sh.h};
+        cv.style.cursor=b.hCur||'se-resize';
+      }
+      return;
+    }
+
+    // Element resize handle (standard blocks)
+    if(key.startsWith('elh_')){
+      const b=BOXES[key];
+      const elKey=b.elKey;
+      const box=BOXES[elKey];
+      if(box){
+        // Get current raw font size
+        const EL_SIZE_SLIDER={brand:'fs_brand',type:'fs_type',badge:'fs_size',sub:'fs_sub',feats:'fs_feat'};
+        const sliderId=EL_SIZE_SLIDER[elKey];
+        const curSize=sliderId?parseInt(document.getElementById(sliderId)?.value||'20'):20;
+        drag={mode:'elResize',key,elKey,hk:b.hk,
+          startFX:fx,startFY:fy,
+          startW:box.w,startH:box.h,
+          startSize:curSize,sliderId};
+        cv.style.cursor=b.hCur||'se-resize';
+      }
+      return;
+    }
+
+    // Custom text resize handle
+    if(key.startsWith('cth_')){
+      const b=BOXES[key];
+      const ctKey=b.ctKey;
+      const box=BOXES[ctKey];
+      if(box){
+        const ctId=parseInt(ctKey.replace('ct_',''));
+        const ct=customTexts.find(t=>t.id===ctId);
+        if(ct) drag={mode:'ctResize',key,ctKey,hk:b.hk,startFX:fx,startFY:fy,startSize:ct.size,ct};
+        cv.style.cursor=b.hCur||'se-resize';
+      }
+      return;
+    }
+
+    // Shape move
+    if(key.startsWith('sv_')){
+      const shId=parseInt(key.replace('sv_',''));
+      selectShape(shId);
+      selectedEl=null;
+      const sh=canvasShapes.find(s=>s.id===shId);
+      if(sh) drag={mode:'shMove',key,startFX:fx,startFY:fy,startX:sh.x,startY:sh.y};
+      cv.style.cursor='grabbing';
+      return;
+    }
+
+    // Standard element or custom text — select + move
+    selectedShape=null; document.getElementById('shapeEditor').style.display='none';
+    // Set selectedEl for standard elements and custom texts
+    if(!key.startsWith('sh_')) selectedEl=key;
+    else selectedEl=null;
+    if(!EP[key]) EP[key]={x:fx,y:fy};
+    drag={mode:'move',key,startFX:fx,startFY:fy,startEX:EP[key].x,startEY:EP[key].y};
     cv.style.cursor='grabbing';
     document.getElementById('dragHint').textContent='🔵 '+keyLabel(key)+' — жёлтая = центр X, синяя = центр Y';
   }
@@ -716,18 +898,68 @@ function initDrag(){
     e.preventDefault();
     const {fx,fy} = canvasXY(e);
     if(drag){
-      const dx = fx - drag.startFX;
-      const dy = fy - drag.startFY;
-      const rawX = drag.startEX + dx;
-      const rawY = drag.startEY + dy;
-      const snapped = calcSnap(drag.key, rawX, rawY);
-      EP[drag.key].x = snapped.x;
-      EP[drag.key].y = snapped.y;
+      const dx=fx-drag.startFX, dy=fy-drag.startFY;
+
+      if(drag.mode==='resize'){
+        // Shape resize
+        const sh=canvasShapes.find(s=>s.id===drag.shId);
+        if(!sh) return;
+        const hk=drag.hk;
+        let nx=drag.startX,ny=drag.startY,nw=drag.startW,nh=drag.startH;
+        if(hk.includes('e'))  nw=Math.max(0.02,drag.startW+dx);
+        if(hk.includes('s'))  nh=Math.max(0.02,drag.startH+dy);
+        if(hk.includes('w')){ nw=Math.max(0.02,drag.startW-dx); nx=drag.startX+drag.startW-nw; }
+        if(hk.includes('n')){ nh=Math.max(0.02,drag.startH-dy); ny=drag.startY+drag.startH-nh; }
+        sh.x=nx; sh.y=ny; sh.w=nw; sh.h=nh;
+
+      } else if(drag.mode==='elResize'){
+        // Standard element font resize — use diagonal delta
+        const delta = (dx+dy)/2;
+        const scaleFactor = (drag.startW + delta*FW) / Math.max(drag.startW, 1);
+        let newSize = Math.round(drag.startSize * scaleFactor);
+        newSize = Math.max(6, Math.min(200, newSize));
+        if(drag.sliderId){
+          const sl=document.getElementById(drag.sliderId);
+          if(sl){
+            sl.value=newSize;
+            const valEl=document.getElementById(drag.sliderId.replace('fs_','fv_'));
+            if(valEl) valEl.textContent=newSize+'px';
+          }
+        }
+
+      } else if(drag.mode==='ctResize'){
+        // Custom text font resize
+        const delta=(dx+dy)/2;
+        const box=BOXES[drag.ctKey];
+        const scaleFactor=(box?(box.w+delta*FW)/Math.max(box.w,1):1+delta);
+        let newSize=Math.round(drag.startSize*scaleFactor);
+        newSize=Math.max(6,Math.min(200,newSize));
+        drag.ct.size=newSize;
+        renderCustomTextList();
+
+      } else if(drag.mode==='shMove'){
+        // Shape move
+        const sh=canvasShapes.find(s=>s.id===parseInt(drag.key.replace('sv_','')));
+        if(sh){ sh.x=Math.max(0,Math.min(1,drag.startX+dx)); sh.y=Math.max(0,Math.min(1,drag.startY+dy)); }
+
+      } else {
+        // Standard move with snap
+        const rawX=drag.startEX+dx, rawY=drag.startEY+dy;
+        if(drag.key.startsWith('sv_')){
+          const sh=canvasShapes.find(s=>s.id===parseInt(drag.key.replace('sv_','')));
+          if(sh){ sh.x=Math.max(0,Math.min(1,rawX)); sh.y=Math.max(0,Math.min(1,rawY)); }
+          EP[drag.key]={x:sh?.x||rawX,y:sh?.y||rawY};
+        } else {
+          const snapped=calcSnap(drag.key,rawX,rawY);
+          if(EP[drag.key]){EP[drag.key].x=snapped.x;EP[drag.key].y=snapped.y;}
+        }
+      }
     } else {
-      const h = hitTest(fx,fy);
-      if(h !== hovered){
-        hovered = h;
-        cv.style.cursor = h ? 'grab' : 'default';
+      const h=hitTest(fx,fy);
+      if(h!==hovered){
+        hovered=h;
+        if(h&&(BOXES[h]?.isHandle||BOXES[h]?.isElHandle)) cv.style.cursor=BOXES[h].hCur||'se-resize';
+        else cv.style.cursor=h?'grab':'default';
       }
     }
   }
@@ -735,7 +967,7 @@ function initDrag(){
   function onUp(e){
     if(drag){
       snapLines = [];
-      cv.style.cursor = 'grab';
+      cv.style.cursor = 'default';
       document.getElementById('dragHint').textContent='☝️ Перетаскивайте элементы прямо на превью';
       drag = null;
     }
@@ -984,10 +1216,41 @@ function drawFrame(cv,cw,ch,gt,vidSrc){
   }
 
   // ── 5. TEXT — each element uses EP position ────────────────────────────────
+  // Font size slider IDs per element key
+  const EL_SIZE_SLIDER = {
+    brand:'fs_brand', type:'fs_type', badge:'fs_size',
+    sub:'fs_sub', feats:'fs_feat',
+  };
+
   function drawHover(key,x,y,w,h){
-    if(hovered===key||drag?.key===key){
-      ctx.save();ctx.strokeStyle='rgba(245,197,24,0.55)';ctx.lineWidth=1.5*s;
-      ctx.setLineDash([3*s,3*s]);ctx.strokeRect(x-3*s,y-3*s,w+6*s,h+6*s);ctx.restore();
+    const isHov  = hovered===key || drag?.key===key;
+    const isSel  = selectedEl===key;
+    if(!isHov && !isSel) return;
+    ctx.save();
+    ctx.strokeStyle = isSel ? 'rgba(245,197,24,0.9)' : 'rgba(245,197,24,0.45)';
+    ctx.lineWidth   = 1.5*s;
+    ctx.setLineDash([3*s,3*s]);
+    ctx.strokeRect(x-2*s, y-2*s, w+4*s, h+4*s);
+    ctx.setLineDash([]);
+    ctx.restore();
+
+    if(isSel){
+      // Draw 4 corner handles + 4 edge handles
+      const hr = HANDLE_R*s;
+      const handles=[
+        {hx:x,   hy:y,   hk:'nw'},{hx:x+w/2,hy:y,   hk:'n'},{hx:x+w,hy:y,   hk:'ne'},
+        {hx:x+w, hy:y+h/2,hk:'e'},{hx:x+w,hy:y+h,  hk:'se'},{hx:x+w/2,hy:y+h,hk:'s'},
+        {hx:x,   hy:y+h, hk:'sw'},{hx:x,  hy:y+h/2,hk:'w'},
+      ];
+      const CURSOR={nw:'nw-resize',n:'n-resize',ne:'ne-resize',e:'e-resize',se:'se-resize',s:'s-resize',sw:'sw-resize',w:'w-resize'};
+      handles.forEach(hd=>{
+        ctx.save();
+        ctx.fillStyle='#fff'; ctx.strokeStyle='#f5c518'; ctx.lineWidth=1.5*s;
+        ctx.beginPath(); ctx.arc(hd.hx,hd.hy,hr,0,Math.PI*2); ctx.fill(); ctx.stroke();
+        ctx.restore();
+        BOXES['elh_'+key+'_'+hd.hk]={x:hd.hx-hr*1.5,y:hd.hy-hr*1.5,w:hr*3,h:hr*3,
+          isElHandle:true, elKey:key, hk:hd.hk, hCur:CURSOR[hd.hk]};
+      });
     }
   }
 
@@ -1151,15 +1414,26 @@ function drawFrame(cv,cw,ch,gt,vidSrc){
     if(t.align==='right')  bx=cx2-maxW;
 
     // Register bounding box
-    regBox(key, bx, cy2-lh*0.85, maxW||50*s, lh*lines.length);
+    const ctBx=bx-5*s, ctBy=cy2-lh*0.95;
+    const ctBw=(maxW||50*s)+10*s, ctBh=lh*lines.length+6*s;
+    regBox(key, ctBx, ctBy, ctBw, ctBh);
 
-    // Draw hover outline
-    if(hovered===key||drag?.key===key){
+    // Draw hover/selection outline + handles
+    const ctSel = selectedEl===key;
+    const ctHov = hovered===key||drag?.key===key;
+    if(ctHov||ctSel){
       ctx.save();
-      ctx.strokeStyle='rgba(245,197,24,0.7)';ctx.lineWidth=1.5*s;
-      ctx.setLineDash([3*s,3*s]);
-      ctx.strokeRect(bx-5*s, cy2-lh*0.95, (maxW||50*s)+10*s, lh*lines.length+6*s);
-      ctx.restore();
+      ctx.strokeStyle=ctSel?'rgba(245,197,24,0.9)':'rgba(245,197,24,0.5)';
+      ctx.lineWidth=1.5*s;ctx.setLineDash([3*s,3*s]);
+      ctx.strokeRect(ctBx,ctBy,ctBw,ctBh);ctx.setLineDash([]);ctx.restore();
+    }
+    if(ctSel){
+      const hr=HANDLE_R*s;
+      [[ctBx,ctBy,'nw'],[ctBx+ctBw,ctBy,'ne'],[ctBx+ctBw,ctBy+ctBh,'se'],[ctBx,ctBy+ctBh,'sw']].forEach(([hx,hy,hk])=>{
+        ctx.save();ctx.fillStyle='#fff';ctx.strokeStyle='#f5c518';ctx.lineWidth=1.5*s;
+        ctx.beginPath();ctx.arc(hx,hy,hr,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.restore();
+        BOXES['cth_'+key+'_'+hk]={x:hx-hr*1.5,y:hy-hr*1.5,w:hr*3,h:hr*3,isElHandle:true,ctKey:key,hk,hCur:'se-resize'};
+      });
     }
 
     lines.forEach((line,i)=>{
@@ -1187,6 +1461,70 @@ function drawFrame(cv,cw,ch,gt,vidSrc){
     ctx.restore();
   });
 
+  // ── 9. Shape / template elements ─────────────────────────────────────────
+  shapeElements.forEach(el=>{
+    const key='sh_'+el.id;
+    if(!EP[key]) EP[key]={x:el.x,y:el.y};
+    const ex=EP[key].x*cw, ey=EP[key].y*ch;
+    const op=(el.opacity||100)/100;
+    ctx.save(); ctx.globalAlpha=op;
+
+    if(el.shape==='badge'||el.shape==='text'){
+      const weight=(el.bold?'bold ':'')+Math.round((el.size||24)*s)+'px \''+el.font+'\',sans-serif';
+      ctx.font=weight;
+      const tw=ctx.measureText(el.text).width;
+      const px2=(el.padX||0)*s, py2=(el.padY||0)*s;
+      const bw=tw+px2*2, bh=(el.size||24)*s+(py2*2);
+      if(el.bgColor){
+        ctx.fillStyle=el.bgColor;
+        const rr2=Math.min((el.radius||0)*s, bh/2);
+        ctx.beginPath();ctx.moveTo(ex+rr2,ey);ctx.lineTo(ex+bw-rr2,ey);
+        ctx.arcTo(ex+bw,ey,ex+bw,ey+rr2,rr2);ctx.lineTo(ex+bw,ey+bh-rr2);
+        ctx.arcTo(ex+bw,ey+bh,ex+bw-rr2,ey+bh,rr2);ctx.lineTo(ex+rr2,ey+bh);
+        ctx.arcTo(ex,ey+bh,ex,ey+bh-rr2,rr2);ctx.lineTo(ex,ey+rr2);
+        ctx.arcTo(ex,ey,ex+rr2,ey,rr2);ctx.closePath();ctx.fill();
+        regBox(key,ex,ey,bw,bh);
+        drawHover(key,ex,ey,bw,bh);
+      } else {
+        regBox(key,ex,ey-el.size*s,tw,el.size*s*1.2);
+        drawHover(key,ex,ey-el.size*s,tw,el.size*s*1.2);
+      }
+      ctx.font=weight;
+      ctx.fillStyle=el.textColor||'#fff';
+      ctx.textAlign='left';
+      ctx.shadowColor='rgba(0,0,0,0.5)';ctx.shadowBlur=3*s;
+      ctx.fillText(el.text,ex+px2,ey+(el.size||24)*s+py2-py2*0.15);
+
+    } else if(el.shape==='line'){
+      const lw2=(el.width||0.5)*cw;
+      regBox(key,ex,ey-4*s,lw2,8*s);
+      drawHover(key,ex,ey-4*s,lw2,8*s);
+      ctx.strokeStyle=el.lineColor||'rgba(255,255,255,0.4)';
+      ctx.lineWidth=(el.lineWidth||2)*s;
+      ctx.setLineDash([]); ctx.beginPath();
+      ctx.moveTo(ex,ey); ctx.lineTo(ex+lw2,ey); ctx.stroke();
+
+    } else if(el.shape==='rect'){
+      const rw=(el.width||0.5)*cw, rh=(el.height||0.08)*ch;
+      const rr2=Math.min((el.radius||0)*s, rh/2);
+      regBox(key,ex,ey,rw,rh);
+      drawHover(key,ex,ey,rw,rh);
+      ctx.fillStyle=el.fillColor||'rgba(0,0,0,0.5)';
+      ctx.beginPath();ctx.moveTo(ex+rr2,ey);ctx.lineTo(ex+rw-rr2,ey);
+      ctx.arcTo(ex+rw,ey,ex+rw,ey+rr2,rr2);ctx.lineTo(ex+rw,ey+rh-rr2);
+      ctx.arcTo(ex+rw,ey+rh,ex+rw-rr2,ey+rh,rr2);ctx.lineTo(ex+rr2,ey+rh);
+      ctx.arcTo(ex,ey+rh,ex,ey+rh-rr2,rr2);ctx.lineTo(ex,ey+rr2);
+      ctx.arcTo(ex,ey,ex+rr2,ey,rr2);ctx.closePath();ctx.fill();
+      if(el.strokeColor){
+        ctx.strokeStyle=el.strokeColor;ctx.lineWidth=1.5*s;ctx.stroke();
+      }
+    }
+    ctx.restore();
+  });
+
+  // ── 10. Canvas shapes (resizable) ────────────────────────────────────────
+  canvasShapes.forEach(sh=>drawCanvasShape(ctx,sh,cw,ch,s));
+
   // ── Snap guides ───────────────────────────────────────────────────────────
   drawSnapLines(ctx, cw, ch);
 
@@ -1204,6 +1542,8 @@ function loop(){
 loop();
 initDrag();
 sizeCanvas();
+renderTmplGrid();
+renderShapeGrid();
 
 // ── Generate ──────────────────────────────────────────────────────────────────
 async function startGen(){
@@ -1366,6 +1706,226 @@ function renderCustomTextList(){
 }
 renderCustomTextList();
 
+
+// ── Shape / template elements ─────────────────────────────────────────────────
+function addShapeFromTemplate(tpl){
+  const id = ++shapeIdSeq;
+  const el = Object.assign({
+    id, tplId:tpl.id, shape:tpl.shape,
+    x:0.08+Math.random()*0.3, y:0.3+Math.random()*0.3, opacity:100,
+    text:'', textColor:'#fff', bgColor:null, font:'Oswald', size:24,
+    bold:false, radius:0, padX:0, padY:0,
+    lineColor:'rgba(255,255,255,0.4)', lineWidth:2,
+    fillColor:'rgba(0,0,0,0.5)', strokeColor:null, width:0.5, height:0.08,
+  }, tpl);
+  el.id = id; // restore id after assign
+  shapeElements.push(el);
+  EP['sh_'+id] = {x:el.x, y:el.y};
+  rp();
+}
+
+function removeShape(id){
+  shapeElements = shapeElements.filter(e=>e.id!==id);
+  delete EP['sh_'+id]; delete BOXES['sh_'+id]; rp();
+}
+
+function renderTmplGrid(){
+  const grid = document.getElementById('tmplGrid');
+  if(!grid) return;
+  grid.innerHTML = TEMPLATES.map(t=>`
+    <div class="tmpl-card" onclick='addShapeFromTemplate(TEMPLATES.find(x=>x.id==="${t.id}"))' title="${t.name}">
+      <div class="tmpl-preview" style="${t.preview}">
+        <span style="font-family:'Oswald',sans-serif;letter-spacing:.03em">${t.previewText}</span>
+      </div>
+      <span class="tmpl-name">${t.name}</span>
+    </div>`).join('');
+}
+
+// ── Shapes system ─────────────────────────────────────────────────────────────
+// SVG previews for each shape
+function shapePreviewSVG(type, color){
+  const c=color, w=32, h=32;
+  switch(type){
+    case 'rect':      return `<rect x="3" y="7" width="26" height="18" fill="${c}"/>`;
+    case 'rounded':   return `<rect x="3" y="7" width="26" height="18" rx="6" fill="${c}"/>`;
+    case 'circle':    return `<circle cx="16" cy="16" r="12" fill="${c}"/>`;
+    case 'ellipse':   return `<ellipse cx="16" cy="16" rx="14" ry="9" fill="${c}"/>`;
+    case 'triangle':  return `<polygon points="16,3 29,29 3,29" fill="${c}"/>`;
+    case 'rtriangle': return `<polygon points="3,29 3,3 29,29" fill="${c}"/>`;
+    case 'star':      return `<polygon points="16,2 20,12 30,12 22,19 25,29 16,23 7,29 10,19 2,12 12,12" fill="${c}"/>`;
+    case 'diamond':   return `<polygon points="16,2 30,16 16,30 2,16" fill="${c}"/>`;
+    case 'hexagon':   return `<polygon points="16,2 29,9 29,23 16,30 3,23 3,9" fill="${c}"/>`;
+    case 'arrow':     return `<polygon points="3,11 21,11 21,5 29,16 21,27 21,21 3,21" fill="${c}"/>`;
+    case 'line':      return `<line x1="3" y1="16" x2="29" y2="16" stroke="${c}" stroke-width="4" stroke-linecap="round"/>`;
+    case 'cross':     return `<path d="M11,3h10v8h8v10h-8v8h-10v-8h-8v-10h8z" fill="${c}"/>`;
+    default:          return `<rect x="3" y="3" width="26" height="26" fill="${c}"/>`;
+  }
+}
+
+function addCanvasShape(type, color){
+  const id = ++shapeSeqId;
+  const sh = {
+    id, type,
+    // position (fraction of canvas)
+    x: 0.15 + Math.random()*0.3,
+    y: 0.25 + Math.random()*0.3,
+    // size (fraction of canvas)
+    w: type==='line' ? 0.4 : 0.25,
+    h: type==='line' ? 0.01 : (type==='circle'||type==='star'||type==='diamond'?0.15:0.12),
+    fill: color,
+    stroke: 'transparent',
+    strokeW: 0,
+    opacity: 100,
+    radius: type==='rounded' ? 12 : 0,
+  };
+  canvasShapes.push(sh);
+  selectShape(id);
+  rp();
+}
+
+function selectShape(id){
+  selectedShape = id;
+  const sh = canvasShapes.find(s=>s.id===id);
+  if(!sh) return;
+  document.getElementById('shapeEditor').style.display='';
+  document.getElementById('shapeEditorTitle').textContent = SHAPE_DEFS.find(d=>d.type===sh.type)?.label||'Фигура';
+  document.getElementById('sp_fill').value   = sh.fill.startsWith('#')?sh.fill:'#3a7af0';
+  document.getElementById('sp_stroke').value = sh.stroke.startsWith('#')?sh.stroke:'#ffffff';
+  document.getElementById('sp_strokeW').value= sh.strokeW||0;
+  document.getElementById('sp_opacity').value= sh.opacity||100;
+  document.getElementById('sp_radius').value = sh.radius||0;
+}
+
+function updateShapeProp(prop, val){
+  const sh = canvasShapes.find(s=>s.id===selectedShape);
+  if(!sh) return;
+  if(prop==='fill')    sh.fill    = val;
+  if(prop==='stroke')  sh.stroke  = val;
+  if(prop==='strokeW') sh.strokeW = val;
+  if(prop==='opacity') sh.opacity = val;
+  if(prop==='radius')  sh.radius  = val;
+  rp();
+}
+
+function deleteSelectedShape(){
+  if(!selectedShape) return;
+  canvasShapes = canvasShapes.filter(s=>s.id!==selectedShape);
+  delete BOXES['sv_'+selectedShape];
+  selectedShape = null;
+  document.getElementById('shapeEditor').style.display='none';
+  rp();
+}
+
+function renderShapeGrid(){
+  const g = document.getElementById('shapeGrid');
+  if(!g) return;
+  g.innerHTML = SHAPE_DEFS.map(d=>`
+    <div class="shape-card" onclick="addCanvasShape('${d.type}','${d.color}')" title="${d.label}">
+      <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">${shapePreviewSVG(d.type,d.color)}</svg>
+      <span>${d.label}</span>
+    </div>`).join('');
+}
+
+// ── Draw a single canvas shape ─────────────────────────────────────────────
+
+function drawCanvasShape(ctx, sh, cw, ch, s){
+  const x=sh.x*cw, y=sh.y*ch, w=sh.w*cw, h=sh.h*ch;
+  const op=(sh.opacity||100)/100;
+  ctx.save();
+  ctx.globalAlpha=op;
+
+  function applyStroke(){
+    if(sh.strokeW>0 && sh.stroke!=='transparent'){
+      ctx.strokeStyle=sh.stroke; ctx.lineWidth=sh.strokeW*s; ctx.stroke();
+    }
+  }
+
+  ctx.fillStyle=sh.fill;
+  switch(sh.type){
+    case 'rect':
+      ctx.fillRect(x,y,w,h); applyStroke(); break;
+    case 'rounded':{
+      const r=Math.min((sh.radius||10)*s, w/2, h/2);
+      rr(ctx,x,y,w,h,r); ctx.fill(); applyStroke(); break;}
+    case 'circle':
+      ctx.beginPath();ctx.ellipse(x+w/2,y+h/2,w/2,w/2,0,0,Math.PI*2);ctx.fill();applyStroke();break;
+    case 'ellipse':
+      ctx.beginPath();ctx.ellipse(x+w/2,y+h/2,w/2,h/2,0,0,Math.PI*2);ctx.fill();applyStroke();break;
+    case 'triangle':
+      ctx.beginPath();ctx.moveTo(x+w/2,y);ctx.lineTo(x+w,y+h);ctx.lineTo(x,y+h);ctx.closePath();ctx.fill();applyStroke();break;
+    case 'rtriangle':
+      ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+w,y+h);ctx.lineTo(x,y+h);ctx.closePath();ctx.fill();applyStroke();break;
+    case 'diamond':
+      ctx.beginPath();ctx.moveTo(x+w/2,y);ctx.lineTo(x+w,y+h/2);ctx.lineTo(x+w/2,y+h);ctx.lineTo(x,y+h/2);ctx.closePath();ctx.fill();applyStroke();break;
+    case 'star':{
+      ctx.beginPath();
+      for(let i=0;i<10;i++){
+        const a=Math.PI/5*i - Math.PI/2;
+        const r2=i%2===0?Math.min(w,h)/2:Math.min(w,h)/4;
+        const px2=x+w/2+Math.cos(a)*r2, py2=y+h/2+Math.sin(a)*r2;
+        i===0?ctx.moveTo(px2,py2):ctx.lineTo(px2,py2);
+      }
+      ctx.closePath();ctx.fill();applyStroke();break;}
+    case 'hexagon':{
+      ctx.beginPath();
+      for(let i=0;i<6;i++){
+        const a=Math.PI/3*i - Math.PI/6;
+        const px2=x+w/2+Math.cos(a)*w/2, py2=y+h/2+Math.sin(a)*h/2;
+        i===0?ctx.moveTo(px2,py2):ctx.lineTo(px2,py2);
+      }
+      ctx.closePath();ctx.fill();applyStroke();break;}
+    case 'arrow':{
+      const ah=h*0.55, ay=(h-ah)/2;
+      ctx.beginPath();
+      ctx.moveTo(x,y+ay);ctx.lineTo(x+w*0.6,y+ay);
+      ctx.lineTo(x+w*0.6,y);ctx.lineTo(x+w,y+h/2);
+      ctx.lineTo(x+w*0.6,y+h);ctx.lineTo(x+w*0.6,y+ay+ah);
+      ctx.lineTo(x,y+ay+ah);ctx.closePath();ctx.fill();applyStroke();break;}
+    case 'line':
+      ctx.strokeStyle=sh.fill;ctx.lineWidth=Math.max(3*s,h);ctx.lineCap='round';
+      ctx.beginPath();ctx.moveTo(x,y+h/2);ctx.lineTo(x+w,y+h/2);ctx.stroke();break;
+    case 'cross':{
+      const t=w*0.28;
+      ctx.beginPath();
+      ctx.moveTo(x+(w-t)/2,y);ctx.lineTo(x+(w+t)/2,y);ctx.lineTo(x+(w+t)/2,y+(h-t)/2);
+      ctx.lineTo(x+w,y+(h-t)/2);ctx.lineTo(x+w,y+(h+t)/2);ctx.lineTo(x+(w+t)/2,y+(h+t)/2);
+      ctx.lineTo(x+(w+t)/2,y+h);ctx.lineTo(x+(w-t)/2,y+h);ctx.lineTo(x+(w-t)/2,y+(h+t)/2);
+      ctx.lineTo(x,y+(h+t)/2);ctx.lineTo(x,y+(h-t)/2);ctx.lineTo(x+(w-t)/2,y+(h-t)/2);
+      ctx.closePath();ctx.fill();applyStroke();break;}
+  }
+
+  ctx.restore();
+
+  // Register box for drag/hit
+  BOXES['sv_'+sh.id] = {x,y,w,h};
+
+  // Selection handles
+  if(selectedShape===sh.id){
+    ctx.save();
+    ctx.strokeStyle='rgba(245,197,24,0.9)';ctx.lineWidth=1.5*s;ctx.setLineDash([4*s,3*s]);
+    ctx.strokeRect(x,y,w,h);ctx.setLineDash([]);
+
+    // 8 handles: corners + midpoints
+    const handles=[
+      {hx:x,    hy:y,    cur:'nw-resize', hk:'nw'},
+      {hx:x+w/2,hy:y,    cur:'n-resize',  hk:'n'},
+      {hx:x+w,  hy:y,    cur:'ne-resize', hk:'ne'},
+      {hx:x+w,  hy:y+h/2,cur:'e-resize',  hk:'e'},
+      {hx:x+w,  hy:y+h,  cur:'se-resize', hk:'se'},
+      {hx:x+w/2,hy:y+h,  cur:'s-resize',  hk:'s'},
+      {hx:x,    hy:y+h,  cur:'sw-resize', hk:'sw'},
+      {hx:x,    hy:y+h/2,cur:'w-resize',  hk:'w'},
+    ];
+    handles.forEach(hd=>{
+      ctx.fillStyle='#fff';ctx.strokeStyle='#f5c518';ctx.lineWidth=1.5*s;
+      ctx.beginPath();ctx.arc(hd.hx,hd.hy,HANDLE_R*s,0,Math.PI*2);
+      ctx.fill();ctx.stroke();
+      // Store handle boxes for resize hit-test
+      BOXES['svh_'+sh.id+'_'+hd.hk]={x:hd.hx-HANDLE_R*s*1.5,y:hd.hy-HANDLE_R*s*1.5,w:HANDLE_R*s*3,h:HANDLE_R*s*3,isHandle:true,shId:sh.id,hk:hd.hk,hCur:hd.cur};
+    });
+    ctx.restore();
+  }
+}
 
 function switchTab(tab){
   document.getElementById('panel_manual').style.display = tab==='manual' ? '' : 'none';
