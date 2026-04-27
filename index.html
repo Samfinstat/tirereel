@@ -2193,47 +2193,150 @@ function drawFrame(cv,cw,ch,gt,vidSrc){
 
 
 
-  // 4. Tire image
+  // ── Standard block draw functions (closures capture local vars) ────────────
 
-  if(tireMask && vis('tire')){
-
-    const tr  = Math.min(tireW/tireMask.width, tireH2/tireMask.height) * tireS;
-
-    const tw  = tireMask.width  * tr;
-
-    const tha = tireMask.height * tr;
-
-    const tx  = tireX + (tireW-tw)/2;
-
-    const ty  = tireY;
-
-    regBox('tire', tx, ty, tw, tha);
-
+  function drawStdTire(){
+    if(!tireMask||!vis('tire')) return;
+    const tr=Math.min(tireW/tireMask.width,tireH2/tireMask.height)*tireS;
+    const tw=tireMask.width*tr, tha=tireMask.height*tr;
+    const tx=tireX+(tireW-tw)/2, ty=tireY;
+    regBox('tire',tx,ty,tw,tha);
+    drawHover('tire',tx,ty,tw,tha);
     ctx.save();
-
     ctx.shadowColor='rgba(0,0,0,0.85)';ctx.shadowBlur=22*s;
-
     ctx.shadowOffsetX=-4*s;ctx.shadowOffsetY=12*s;
-
-    ctx.drawImage(tireMask, tx, ty, tw, tha);
-
+    ctx.drawImage(tireMask,tx,ty,tw,tha);
     ctx.restore();
-
-    // Drag highlight
-
-    if(hovered==='tire'||drag?.key==='tire'){
-
-      ctx.save();ctx.strokeStyle='rgba(245,197,24,0.7)';ctx.lineWidth=2*s;
-
-      ctx.setLineDash([4*s,4*s]);ctx.strokeRect(tx,ty,tw,tha);ctx.restore();
-
-    }
-
   }
 
+  function drawStdBrand(){
+    if(!brand||!vis('brand')) return;
+    const a=elemAnim('ae_brand','at_brand','ao_brand');
+    const bx=px('brand'),by=py('brand');
+    ctx.font=F.brand.font;
+    const bw=ctx.measureText(brand.toUpperCase()).width+6*s;
+    const bh=brandH||F.brand.px*1.6;
+    regBox('brand',bx,by,bw,bh);
+    drawHover('brand',bx,by,bw,bh);
+    withAnim(a,()=>{
+      ctx.font=F.brand.font;ctx.fillStyle='rgba(255,255,255,0.5)';
+      ctx.textAlign='left';ctx.fillText(brand.toUpperCase(),bx,by+F.brand.px);
+    });
+  }
 
+  function drawStdDisc(){
+    if(!disc||!vis('disc')) return;
+    const a=elemAnim('ae_brand','at_brand','ao_brand');
+    withAnim(a,()=>{
+      ctx.font=F.brand.font;
+      const mw=ctx.measureText(disc).width;
+      const dbw=mw+16*s,dbh=F.brand.px*1.8;
+      const dbx=px('disc'),dby=py('disc');
+      regBox('disc',dbx,dby,dbw,dbh);
+      drawHover('disc',dbx,dby,dbw,dbh);
+      ctx.fillStyle='#cc1111';rr(ctx,dbx,dby,dbw,dbh,5*s);ctx.fill();
+      ctx.fillStyle='#fff';ctx.textAlign='center';
+      ctx.fillText(disc,dbx+dbw/2,dby+dbh*0.73);
+    });
+  }
 
-  // ── 5. TEXT — each element uses EP position ────────────────────────────────
+  function drawStdType(){
+    if(!vis('type')) return;
+    const a=elemAnim('ae_type','at_type','ao_type');
+    const tx2=px('type'),ty2=py('type');
+    ctx.font=F.type.font;
+    const tw2=ctx.measureText(typeText).width;
+    regBox('type',tx2,ty2,tw2,typeH);
+    drawHover('type',tx2,ty2,tw2,typeH);
+    withAnim(a,(an)=>{
+      ctx.font=F.type.font;ctx.fillStyle='#fff';ctx.textAlign='left';
+      if(an.effect==='typewriter'){
+        ctx.fillText(typeText.slice(0,Math.ceil(an.p*typeText.length)),tx2,ty2+F.type.px);
+      } else {
+        ctx.fillText(typeText,tx2,ty2+F.type.px);
+      }
+    });
+  }
+
+  function drawStdBadge(){
+    if(!vis('badge')) return;
+    const a=elemAnim('ae_size','at_size','ao_size');
+    const bx=px('badge'),by=py('badge');
+    ctx.font=F.size.font;
+    const sbw=Math.max(ctx.measureText(sizeText).width+30*s,120*s);
+    regBox('badge',bx,by,sbw,badgeH);
+    drawHover('badge',bx,by,sbw,badgeH);
+    withAnim(a,()=>{
+      const sbg=ctx.createLinearGradient(bx,by,bx+sbw,by);
+      sbg.addColorStop(0,th.badge);sbg.addColorStop(1,th.badgeL);
+      ctx.fillStyle=sbg;rr(ctx,bx,by,sbw,badgeH,8*s);ctx.fill();
+      ctx.fillStyle='rgba(255,255,255,0.07)';rr(ctx,bx,by,sbw,badgeH*0.48,8*s);ctx.fill();
+      ctx.font=F.size.font;ctx.fillStyle=th.txt;ctx.textAlign='center';
+      ctx.fillText(sizeText,bx+sbw/2,by+badgeH*0.70);
+    });
+  }
+
+  function drawStdSub(){
+    if(!sub||!subH||!vis('sub')) return;
+    const a=elemAnim('ae_sub','at_sub','ao_sub');
+    const bx=px('sub'),by=py('sub');
+    ctx.font=F.sub.font;
+    const sw=Math.max(ctx.measureText(sub.toUpperCase()).width+24*s,60*s);
+    regBox('sub',bx,by,sw,subH);
+    drawHover('sub',bx,by,sw,subH);
+    withAnim(a,()=>{
+      ctx.fillStyle='rgba(255,255,255,0.07)';rr(ctx,bx,by,sw,subH,5*s);ctx.fill();
+      ctx.font=F.sub.font;ctx.fillStyle='rgba(255,255,255,0.55)';ctx.textAlign='center';
+      ctx.fillText(sub.toUpperCase(),bx+sw/2,by+subH*0.74);
+    });
+  }
+
+  function drawStdFeats(){
+    if(!vis('feats')) return;
+    const baseDelay=parseFloat(document.getElementById('at_feat')?.value||'4');
+    const featOut=parseFloat(document.getElementById('ao_feat')?.value||'0');
+    const effect=document.getElementById('ae_feat')?.value||'slideLeft';
+    const fx2=px('feats'),fy2=py('feats');
+    regBox('feats',fx2,fy2,LEFTWID-PAD,featsTotal||featRowH);
+    drawHover('feats',fx2,fy2,LEFTWID-PAD,featsTotal||featRowH);
+    activeFeat.forEach((feat,i)=>{
+      const delay=baseDelay+i*0.35;
+      let featAlpha=1,featP=1;
+      if(gt>0.01){
+        if(featOut>0&&gt>=featOut){
+          const t2=gt-featOut;const p2=Math.min(1,t2/animFadeDur);
+          featAlpha=1-(p2<0.5?2*p2*p2:-1+(4-2*p2)*p2);
+          if(featAlpha<=0)return;
+        } else {
+          const t=Math.max(0,gt-delay);
+          featP=Math.min(1,t/animFadeDur);
+          featAlpha=featP<0.5?2*featP*featP:-1+(4-2*featP)*featP;
+          if(featP<=0)return;
+        }
+      }
+      let alpha=featAlpha,ox=0,oy=0,sc=1;
+      switch(effect){
+        case 'fade':break;
+        case 'slideLeft':ox=(1-featAlpha)*-60*s;break;
+        case 'slideUp':oy=(1-featAlpha)*30*s;break;
+        case 'slideDown':oy=(1-featAlpha)*-30*s;break;
+        case 'zoom':sc=0.6+featAlpha*0.4;break;
+      }
+      ctx.save();ctx.globalAlpha=alpha;ctx.translate(ox,oy);
+      if(sc!==1){ctx.translate(fx2,fy2+i*(featRowH+featGap)+featRowH/2);ctx.scale(sc,sc);ctx.translate(-fx2,-(fy2+i*(featRowH+featGap)+featRowH/2));}
+      const fy=fy2+i*(featRowH+featGap);
+      const dotR=Math.max(3*s,F.feat.px*0.32);
+      ctx.font=F.feat.font;
+      const displayFeat=effect==='typewriter'?feat.slice(0,Math.ceil(featP*feat.length)):feat;
+      const textW=ctx.measureText(displayFeat).width;
+      const fw=textW+dotR*2+20*s+8*s;
+      ctx.fillStyle=th.feat;rr(ctx,fx2,fy,fw,featRowH,5*s);ctx.fill();
+      ctx.fillStyle=th.dot;ctx.beginPath();ctx.arc(fx2+dotR+5*s,fy+featRowH/2,dotR,0,Math.PI*2);ctx.fill();
+      ctx.font=F.feat.font;ctx.fillStyle='rgba(255,255,255,0.9)';ctx.textAlign='left';
+      ctx.fillText(displayFeat,fx2+dotR*2+12*s,fy+featRowH*0.68);
+      ctx.restore();
+    });
+  }
 
   // Font size slider IDs per element key
 
@@ -2310,284 +2413,30 @@ function drawFrame(cv,cw,ch,gt,vidSrc){
   }
 
 
+  // ── 8-10. Unified layer draw — ALL elements via layerOrder ──────────────────
 
-  // Бренд
-
-  if(brand && vis('brand')){
-
-    const a = elemAnim('ae_brand','at_brand','ao_brand');
-
-    const bx=px('brand'), by=py('brand');
-
-    ctx.font=F.brand.font; // установить шрифт ДО измерения
-
-    const brandW = ctx.measureText(brand.toUpperCase()).width + 6*s;
-
-    const brandH2 = brandH||F.brand.px*1.6;
-
-    regBox('brand', bx, by, brandW, brandH2);
-
-    drawHover('brand', bx, by, brandW, brandH2);
-
-    withAnim(a,()=>{
-
-      ctx.font=F.brand.font;ctx.fillStyle='rgba(255,255,255,0.5)';
-
-      ctx.textAlign='left';ctx.fillText(brand.toUpperCase(),bx,by+F.brand.px);
-
-    });
-
-  }
-
-
-
-  // Скидка
-
-  if(disc && vis('disc')){
-
-    const a = elemAnim('ae_brand','at_brand','ao_brand');
-
-    withAnim(a,()=>{
-
-      ctx.font=F.brand.font;
-
-      const mw=ctx.measureText(disc).width;
-
-      const dbw=mw+16*s, dbh=F.brand.px*1.8;
-
-      const dbx=px('disc'), dby=py('disc');
-
-      regBox('disc',dbx,dby,dbw,dbh);
-
-      drawHover('disc',dbx,dby,dbw,dbh);
-
-      ctx.fillStyle='#cc1111';rr(ctx,dbx,dby,dbw,dbh,5*s);ctx.fill();
-
-      ctx.fillStyle='#fff';ctx.textAlign='center';
-
-      ctx.fillText(disc,dbx+dbw/2,dby+dbh*0.73);
-
-    });
-
-  }
-
-
-
-  // Заголовок
-
-  if(vis('type')){
-
-    const a=elemAnim('ae_type','at_type','ao_type');
-
-    const tx=px('type'), ty2=py('type');
-
-    ctx.font=F.type.font;
-
-    const tw2=ctx.measureText(typeText).width;
-
-    regBox('type',tx,ty2,tw2,typeH);
-
-    drawHover('type',tx,ty2,tw2,typeH);
-
-    withAnim(a,(an)=>{
-
-      ctx.font=F.type.font;ctx.fillStyle='#fff';ctx.textAlign='left';
-
-      if(an.effect==='typewriter'){
-
-        const shown=Math.ceil(an.p*typeText.length);
-
-        ctx.fillText(typeText.slice(0,shown),tx,ty2+F.type.px);
-
-      } else {
-
-        ctx.fillText(typeText,tx,ty2+F.type.px);
-
-      }
-
-    });
-
-  }
-
-
-
-  // Плашка размера
-
-  if(vis('badge')){
-
-    const a=elemAnim('ae_size','at_size','ao_size');
-
-    const bx=px('badge'), by=py('badge');
-
-    ctx.font=F.size.font;
-
-    const sbw=Math.max(ctx.measureText(sizeText).width+30*s, 120*s);
-
-    regBox('badge',bx,by,sbw,badgeH);
-
-    drawHover('badge',bx,by,sbw,badgeH);
-
-    withAnim(a,()=>{
-
-      const sbg=ctx.createLinearGradient(bx,by,bx+sbw,by);
-
-      sbg.addColorStop(0,th.badge);sbg.addColorStop(1,th.badgeL);
-
-      ctx.fillStyle=sbg;rr(ctx,bx,by,sbw,badgeH,8*s);ctx.fill();
-
-      ctx.fillStyle='rgba(255,255,255,0.07)';rr(ctx,bx,by,sbw,badgeH*0.48,8*s);ctx.fill();
-
-      ctx.font=F.size.font;ctx.fillStyle=th.txt;ctx.textAlign='center';
-
-      ctx.fillText(sizeText,bx+sbw/2,by+badgeH*0.70);
-
-    });
-
-  }
-
-
-
-  // Подзаголовок
-
-  if(sub && subH>0 && vis('sub')){
-
-    const a=elemAnim('ae_sub','at_sub','ao_sub');
-
-    const bx=px('sub'), by=py('sub');
-
-    ctx.font=F.sub.font;
-
-    const sw=Math.max(ctx.measureText(sub.toUpperCase()).width+24*s, 60*s);
-
-    regBox('sub',bx,by,sw,subH);
-
-    drawHover('sub',bx,by,sw,subH);
-
-    withAnim(a,()=>{
-
-      ctx.fillStyle='rgba(255,255,255,0.07)';rr(ctx,bx,by,sw,subH,5*s);ctx.fill();
-
-      ctx.font=F.sub.font;ctx.fillStyle='rgba(255,255,255,0.55)';ctx.textAlign='center';
-
-      ctx.fillText(sub.toUpperCase(),bx+sw/2,by+subH*0.74);
-
-    });
-
-  }
-
-
-
-  // Характеристики
-
-  if(vis('feats')){
-
-    const baseDelay=parseFloat(document.getElementById('at_feat')?.value||'4');
-    const featOut=parseFloat(document.getElementById('ao_feat')?.value||'0');
-    const effect=document.getElementById('ae_feat')?.value||'slideLeft';
-
-    const fx2=px('feats'), fy2=py('feats');
-
-    regBox('feats',fx2,fy2,LEFTWID-PAD,featsTotal||featRowH);
-
-    drawHover('feats',fx2,fy2,LEFTWID-PAD,featsTotal||featRowH);
-
-    activeFeat.forEach((feat,i)=>{
-
-      const delay=baseDelay+i*0.35;
-      // Timeline alpha for features (design mode = always visible)
-      let featAlpha=1, featP=1;
-      if(gt > 0.01){
-        if(featOut>0 && gt>=featOut){
-          const t2=gt-featOut; const p2=Math.min(1,t2/animFadeDur);
-          featAlpha=1-(p2<0.5?2*p2*p2:-1+(4-2*p2)*p2);
-          if(featAlpha<=0) return;
-        } else {
-          const t=Math.max(0,gt-delay);
-          featP=Math.min(1,t/animFadeDur);
-          featAlpha=featP<0.5?2*featP*featP:-1+(4-2*featP)*featP;
-          if(featP<=0) return;
-        }
-      }
-
-      let alpha=featAlpha, ox=0, oy=0, sc=1;
-
-      switch(effect){
-        case 'fade':break;
-        case 'slideLeft':ox=(1-featAlpha)*-60*s;break;
-        case 'slideUp':oy=(1-featAlpha)*30*s;break;
-        case 'slideDown':oy=(1-featAlpha)*-30*s;break;
-        case 'zoom':sc=0.6+featAlpha*0.4;break;
-      }
-
-      ctx.save();ctx.globalAlpha=alpha;ctx.translate(ox,oy);
-
-      if(sc!==1){ctx.translate(fx2,fy2+i*(featRowH+featGap)+featRowH/2);ctx.scale(sc,sc);ctx.translate(-fx2,-(fy2+i*(featRowH+featGap)+featRowH/2));}
-
-      const fy=fy2+i*(featRowH+featGap);
-
-      const dotR=Math.max(3*s,F.feat.px*0.32);
-
-      // Ширина плашки = ширина текста + отступы (адаптивно)
-
-      ctx.font=F.feat.font;
-
-      const textPad = dotR*2 + 20*s;
-
-      const displayFeat = effect==='typewriter' ? feat.slice(0,Math.ceil(featP*feat.length)) : feat;
-
-      const textW = ctx.measureText(displayFeat).width;
-
-      const fw = textW + textPad + dotR + 8*s;
-
-      ctx.fillStyle=th.feat;rr(ctx,fx2,fy,fw,featRowH,5*s);ctx.fill();
-
-      ctx.fillStyle=th.dot;ctx.beginPath();ctx.arc(fx2+dotR+5*s,fy+featRowH/2,dotR,0,Math.PI*2);ctx.fill();
-
-      ctx.font=F.feat.font;
-
-      if(effect==='typewriter'){
-
-        const shown=Math.ceil(p*feat.length);
-
-        ctx.fillStyle='rgba(255,255,255,0.9)';ctx.textAlign='left';
-
-        ctx.fillText(feat.slice(0,shown),fx2+dotR*2+12*s,fy+featRowH*0.68);
-
-      } else {
-
-        ctx.fillStyle='rgba(255,255,255,0.9)';ctx.textAlign='left';
-
-        ctx.fillText(feat,fx2+dotR*2+12*s,fy+featRowH*0.68);
-
-      }
-
-      ctx.restore();
-
-    });
-
-  }
-
-
-
-  // ── 8-10. Unified layer draw (layerOrder controls z-order) ─────────────────
-
-  // Ensure all user elements are registered in layerOrder
+  // Register any new user elements not yet in layerOrder
   customTexts.forEach(t=>{ const k='ct_'+t.id; if(!layerOrder.includes(k)) layerOrder.push(k); });
   shapeElements.forEach(e=>{ const k='sh_'+e.id; if(!layerOrder.includes(k)) layerOrder.push(k); });
   canvasShapes.forEach(s=>{ const k='sv_'+s.id; if(!layerOrder.includes(k)) layerOrder.push(k); });
 
-  // Draw standard blocks first (they are always "below" user elements unless reordered)
-  // (Standard blocks: brand, disc, type, badge, sub, feats, tire — drawn in sections 3-7 above)
+  // Register standard blocks that aren't yet in layerOrder
+  const STD_KEYS_ORDER=['tire','feats','sub','badge','disc','type','brand'];
+  STD_KEYS_ORDER.forEach(k=>{ if(!layerOrder.includes(k)) layerOrder.unshift(k); });
 
-  // Draw user elements in layerOrder (bottom → top)
+  // Draw EVERYTHING in layerOrder (bottom → top)
   layerOrder.forEach(key=>{
-    if(key.startsWith('ct_')){
-      const t=customTexts.find(t=>'ct_'+t.id===key); if(t) drawCustomText(t,ctx,cw,ch,s);
-    } else if(key.startsWith('sh_')){
-      const e=shapeElements.find(e=>'sh_'+e.id===key); if(e) drawShapeElement(e,ctx,cw,ch,s,key);
-    } else if(key.startsWith('sv_')){
-      const sh=canvasShapes.find(s=>'sv_'+s.id===key); if(sh) drawCanvasShape(ctx,sh,cw,ch,s);
-    }
+    if(!key) return;
+    if(key==='tire')  { drawStdTire(); }
+    else if(key==='brand') { drawStdBrand(); }
+    else if(key==='disc')  { drawStdDisc(); }
+    else if(key==='type')  { drawStdType(); }
+    else if(key==='badge') { drawStdBadge(); }
+    else if(key==='sub')   { drawStdSub(); }
+    else if(key==='feats') { drawStdFeats(); }
+    else if(key.startsWith('ct_')){ const t=customTexts.find(t=>'ct_'+t.id===key); if(t) drawCustomText(t,ctx,cw,ch,s); }
+    else if(key.startsWith('sh_')){ const e=shapeElements.find(e=>'sh_'+e.id===key); if(e) drawShapeElement(e,ctx,cw,ch,s,key); }
+    else if(key.startsWith('sv_')){ const sh=canvasShapes.find(s2=>'sv_'+s2.id===key); if(sh) drawCanvasShape(ctx,sh,cw,ch,s); }
   });
 
   // ── Snap guides ───────────────────────────────────────────────────────────
@@ -2835,15 +2684,11 @@ function addCustomText(){
 
 
 function removeCustomText(id){
-
   customTexts = customTexts.filter(t=>t.id!==id);
-
+  layerOrder = layerOrder.filter(k=>k!=='ct_'+id);
   delete EP['ct_'+id];
-
   delete BOXES['ct_'+id];
-
   renderCustomTextList();
-
   rp();
 
 }
@@ -3083,6 +2928,7 @@ function removeShape(id){
 
   shapeElements = shapeElements.filter(e=>e.id!==id);
 
+  layerOrder = layerOrder.filter(k=>k!=='sh_'+id);
   delete EP['sh_'+id]; delete BOXES['sh_'+id]; rp();
 
 }
@@ -3921,6 +3767,7 @@ function deleteSelected(){
   if(selectedEl.startsWith('sv_')){
     const id=parseInt(selectedEl.replace('sv_',''));
     canvasShapes=canvasShapes.filter(s=>s.id!==id);
+    layerOrder=layerOrder.filter(k=>k!=='sv_'+id);
     delete BOXES['sv_'+id]; selectedShape=null;
     document.getElementById('shapeEditor').style.display='none';
     selectedEl=null; setTimeout(updateElProps,0); rp(); return;
@@ -4000,7 +3847,7 @@ function renderLayerPanel(){
   canvasShapes.forEach(s=>{const k='sv_'+s.id;if(!layerOrder.includes(k))layerOrder.push(k);});
   const stdKeys=['tire','feats','sub','badge','type','brand','disc'];
   const stdVisible=stdKeys.filter(k=>{const cb=document.getElementById('vis_'+k);return cb&&cb.checked;});
-  const allKeys=[...layerOrder.filter(k=>!stdVisible.includes(k)),...stdVisible].reverse();
+  const allKeys=[...layerOrder.filter(k=>k&&!stdVisible.includes(k)),...stdVisible].reverse().filter(Boolean);
   inner.innerHTML='';
   allKeys.forEach(key=>{
     const {icon,name}=getLayerLabel(key);
