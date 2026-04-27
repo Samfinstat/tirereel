@@ -1807,6 +1807,38 @@ function keyLabel(k){
 
 // Register bounding box helper
 
+// Global hover/selection draw function (called from drawFrame and global draw fns)
+function drawHoverG(key,x,y,w,h,ctx,s){
+  const isHov = hovered===key || drag?.key===key;
+  const isSel = selectedEl===key;
+  if(!isHov && !isSel) return;
+  ctx.save();
+  ctx.strokeStyle = isSel ? 'rgba(245,197,24,0.9)' : 'rgba(245,197,24,0.45)';
+  ctx.lineWidth   = 1.5*s;
+  ctx.setLineDash([3*s,3*s]);
+  ctx.strokeRect(x-2*s, y-2*s, w+4*s, h+4*s);
+  ctx.setLineDash([]);
+  ctx.restore();
+  if(isSel){
+    const hr=HANDLE_R*s;
+    const handles=[
+      {hx:x,   hy:y,   hk:'nw'},{hx:x+w/2,hy:y,   hk:'n'},{hx:x+w,hy:y,   hk:'ne'},
+      {hx:x+w, hy:y+h/2,hk:'e'},{hx:x+w,hy:y+h,  hk:'se'},{hx:x+w/2,hy:y+h,hk:'s'},
+      {hx:x,   hy:y+h, hk:'sw'},{hx:x,  hy:y+h/2,hk:'w'},
+    ];
+    const CURSOR={nw:'nw-resize',n:'n-resize',ne:'ne-resize',e:'e-resize',se:'se-resize',s:'s-resize',sw:'sw-resize',w:'w-resize'};
+    handles.forEach(hd=>{
+      ctx.save();
+      ctx.fillStyle='#fff'; ctx.strokeStyle='#f5c518'; ctx.lineWidth=1.5*s;
+      ctx.beginPath(); ctx.arc(hd.hx,hd.hy,hr,0,Math.PI*2); ctx.fill(); ctx.stroke();
+      ctx.restore();
+      BOXES['elh_'+key+'_'+hd.hk]={x:hd.hx-hr*1.5,y:hd.hy-hr*1.5,w:hr*3,h:hr*3,
+        isElHandle:true,elKey:key,hk:hd.hk,hCur:CURSOR[hd.hk]};
+    });
+  }
+}
+
+
 function regBox(key, x,y,w,h){ BOXES[key]={x,y,w,h}; }
 
 
@@ -2211,260 +2243,7 @@ function drawFrame(cv,cw,ch,gt,vidSrc){
 
   // ── Standard block draw functions (closures capture local vars) ────────────
 
-  function drawHover(key,x,y,w,h){
-
-    const isHov  = hovered===key || drag?.key===key;
-
-    const isSel  = selectedEl===key;
-
-    if(!isHov && !isSel) return;
-
-    ctx.save();
-
-    ctx.strokeStyle = isSel ? 'rgba(245,197,24,0.9)' : 'rgba(245,197,24,0.45)';
-
-    ctx.lineWidth   = 1.5*s;
-
-    ctx.setLineDash([3*s,3*s]);
-
-    ctx.strokeRect(x-2*s, y-2*s, w+4*s, h+4*s);
-
-    ctx.setLineDash([]);
-
-    ctx.restore();
-
-
-
-    if(isSel){
-
-      // Draw 4 corner handles + 4 edge handles
-
-      const hr = HANDLE_R*s;
-
-      const handles=[
-
-        {hx:x,   hy:y,   hk:'nw'},{hx:x+w/2,hy:y,   hk:'n'},{hx:x+w,hy:y,   hk:'ne'},
-
-        {hx:x+w, hy:y+h/2,hk:'e'},{hx:x+w,hy:y+h,  hk:'se'},{hx:x+w/2,hy:y+h,hk:'s'},
-
-        {hx:x,   hy:y+h, hk:'sw'},{hx:x,  hy:y+h/2,hk:'w'},
-
-      ];
-
-      const CURSOR={nw:'nw-resize',n:'n-resize',ne:'ne-resize',e:'e-resize',se:'se-resize',s:'s-resize',sw:'sw-resize',w:'w-resize'};
-
-      handles.forEach(hd=>{
-
-        ctx.save();
-
-        ctx.fillStyle='#fff'; ctx.strokeStyle='#f5c518'; ctx.lineWidth=1.5*s;
-
-        ctx.beginPath(); ctx.arc(hd.hx,hd.hy,hr,0,Math.PI*2); ctx.fill(); ctx.stroke();
-
-        ctx.restore();
-
-        BOXES['elh_'+key+'_'+hd.hk]={x:hd.hx-hr*1.5,y:hd.hy-hr*1.5,w:hr*3,h:hr*3,
-
-          isElHandle:true, elKey:key, hk:hd.hk, hCur:CURSOR[hd.hk]};
-
-      });
-
-  function drawStdTire(){
-    if(!tireMask||!vis('tire')) return;
-    const tr=Math.min(tireW/tireMask.width,tireH2/tireMask.height)*tireS;
-    const tw=tireMask.width*tr, tha=tireMask.height*tr;
-    const tx=tireX+(tireW-tw)/2, ty=tireY;
-    regBox('tire',tx,ty,tw,tha);
-    drawHover('tire',tx,ty,tw,tha);
-    ctx.save();
-    ctx.shadowColor='rgba(0,0,0,0.85)';ctx.shadowBlur=22*s;
-    ctx.shadowOffsetX=-4*s;ctx.shadowOffsetY=12*s;
-    ctx.drawImage(tireMask,tx,ty,tw,tha);
-    ctx.restore();
-  }
-
-  function drawStdBrand(){
-    if(!brand||!vis('brand')) return;
-    const a=elemAnim('ae_brand','at_brand','ao_brand');
-    const bx=px('brand'),by=py('brand');
-    ctx.font=F.brand.font;
-    const bw=ctx.measureText(brand.toUpperCase()).width+6*s;
-    const bh=brandH||F.brand.px*1.6;
-    regBox('brand',bx,by,bw,bh);
-    drawHover('brand',bx,by,bw,bh);
-    withAnim(a,()=>{
-      ctx.font=F.brand.font;ctx.fillStyle='rgba(255,255,255,0.5)';
-      ctx.textAlign='left';ctx.fillText(brand.toUpperCase(),bx,by+F.brand.px);
-    });
-  }
-
-  function drawStdDisc(){
-    if(!disc||!vis('disc')) return;
-    const a=elemAnim('ae_brand','at_brand','ao_brand');
-    withAnim(a,()=>{
-      ctx.font=F.brand.font;
-      const mw=ctx.measureText(disc).width;
-      const dbw=mw+16*s,dbh=F.brand.px*1.8;
-      const dbx=px('disc'),dby=py('disc');
-      regBox('disc',dbx,dby,dbw,dbh);
-      drawHover('disc',dbx,dby,dbw,dbh);
-      ctx.fillStyle='#cc1111';rr(ctx,dbx,dby,dbw,dbh,5*s);ctx.fill();
-      ctx.fillStyle='#fff';ctx.textAlign='center';
-      ctx.fillText(disc,dbx+dbw/2,dby+dbh*0.73);
-    });
-  }
-
-  function drawStdType(){
-    if(!vis('type')) return;
-    const a=elemAnim('ae_type','at_type','ao_type');
-    const tx2=px('type'),ty2=py('type');
-    ctx.font=F.type.font;
-    const tw2=ctx.measureText(typeText).width;
-    regBox('type',tx2,ty2,tw2,typeH);
-    drawHover('type',tx2,ty2,tw2,typeH);
-    withAnim(a,(an)=>{
-      ctx.font=F.type.font;ctx.fillStyle='#fff';ctx.textAlign='left';
-      if(an.effect==='typewriter'){
-        ctx.fillText(typeText.slice(0,Math.ceil(an.p*typeText.length)),tx2,ty2+F.type.px);
-      } else {
-        ctx.fillText(typeText,tx2,ty2+F.type.px);
-      }
-    });
-  }
-
-  function drawStdBadge(){
-    if(!vis('badge')) return;
-    const a=elemAnim('ae_size','at_size','ao_size');
-    const bx=px('badge'),by=py('badge');
-    ctx.font=F.size.font;
-    const sbw=Math.max(ctx.measureText(sizeText).width+30*s,120*s);
-    regBox('badge',bx,by,sbw,badgeH);
-    drawHover('badge',bx,by,sbw,badgeH);
-    withAnim(a,()=>{
-      const sbg=ctx.createLinearGradient(bx,by,bx+sbw,by);
-      sbg.addColorStop(0,th.badge);sbg.addColorStop(1,th.badgeL);
-      ctx.fillStyle=sbg;rr(ctx,bx,by,sbw,badgeH,8*s);ctx.fill();
-      ctx.fillStyle='rgba(255,255,255,0.07)';rr(ctx,bx,by,sbw,badgeH*0.48,8*s);ctx.fill();
-      ctx.font=F.size.font;ctx.fillStyle=th.txt;ctx.textAlign='center';
-      ctx.fillText(sizeText,bx+sbw/2,by+badgeH*0.70);
-    });
-  }
-
-  function drawStdSub(){
-    if(!sub||!subH||!vis('sub')) return;
-    const a=elemAnim('ae_sub','at_sub','ao_sub');
-    const bx=px('sub'),by=py('sub');
-    ctx.font=F.sub.font;
-    const sw=Math.max(ctx.measureText(sub.toUpperCase()).width+24*s,60*s);
-    regBox('sub',bx,by,sw,subH);
-    drawHover('sub',bx,by,sw,subH);
-    withAnim(a,()=>{
-      ctx.fillStyle='rgba(255,255,255,0.07)';rr(ctx,bx,by,sw,subH,5*s);ctx.fill();
-      ctx.font=F.sub.font;ctx.fillStyle='rgba(255,255,255,0.55)';ctx.textAlign='center';
-      ctx.fillText(sub.toUpperCase(),bx+sw/2,by+subH*0.74);
-    });
-  }
-
-  function drawStdFeats(){
-    if(!vis('feats')) return;
-    const baseDelay=parseFloat(document.getElementById('at_feat')?.value||'4');
-    const featOut=parseFloat(document.getElementById('ao_feat')?.value||'0');
-    const effect=document.getElementById('ae_feat')?.value||'slideLeft';
-    const fx2=px('feats'),fy2=py('feats');
-    regBox('feats',fx2,fy2,LEFTWID-PAD,featsTotal||featRowH);
-    drawHover('feats',fx2,fy2,LEFTWID-PAD,featsTotal||featRowH);
-    activeFeat.forEach((feat,i)=>{
-      const delay=baseDelay+i*0.35;
-      let featAlpha=1,featP=1;
-      if(gt>0.01){
-        if(featOut>0&&gt>=featOut){
-          const t2=gt-featOut;const p2=Math.min(1,t2/animFadeDur);
-          featAlpha=1-(p2<0.5?2*p2*p2:-1+(4-2*p2)*p2);
-          if(featAlpha<=0)return;
-        } else {
-          const t=Math.max(0,gt-delay);
-          featP=Math.min(1,t/animFadeDur);
-          featAlpha=featP<0.5?2*featP*featP:-1+(4-2*featP)*featP;
-          if(featP<=0)return;
-        }
-      }
-      let alpha=featAlpha,ox=0,oy=0,sc=1;
-      switch(effect){
-        case 'fade':break;
-        case 'slideLeft':ox=(1-featAlpha)*-60*s;break;
-        case 'slideUp':oy=(1-featAlpha)*30*s;break;
-        case 'slideDown':oy=(1-featAlpha)*-30*s;break;
-        case 'zoom':sc=0.6+featAlpha*0.4;break;
-      }
-      ctx.save();ctx.globalAlpha=alpha;ctx.translate(ox,oy);
-      if(sc!==1){ctx.translate(fx2,fy2+i*(featRowH+featGap)+featRowH/2);ctx.scale(sc,sc);ctx.translate(-fx2,-(fy2+i*(featRowH+featGap)+featRowH/2));}
-      const fy=fy2+i*(featRowH+featGap);
-      const dotR=Math.max(3*s,F.feat.px*0.32);
-      ctx.font=F.feat.font;
-      const displayFeat=effect==='typewriter'?feat.slice(0,Math.ceil(featP*feat.length)):feat;
-      const textW=ctx.measureText(displayFeat).width;
-      const fw=textW+dotR*2+20*s+8*s;
-      ctx.fillStyle=th.feat;rr(ctx,fx2,fy,fw,featRowH,5*s);ctx.fill();
-      ctx.fillStyle=th.dot;ctx.beginPath();ctx.arc(fx2+dotR+5*s,fy+featRowH/2,dotR,0,Math.PI*2);ctx.fill();
-      ctx.font=F.feat.font;ctx.fillStyle='rgba(255,255,255,0.9)';ctx.textAlign='left';
-      ctx.fillText(displayFeat,fx2+dotR*2+12*s,fy+featRowH*0.68);
-      ctx.restore();
-    });
-  }
-
-  // Font size slider IDs per element key
-
-  const EL_SIZE_SLIDER = {
-
-    brand:'fs_brand', type:'fs_type', badge:'fs_size',
-
-    sub:'fs_sub', feats:'fs_feat',
-
-  };
-
-
-
-
-  // ── 8-10. Unified layer draw — ALL elements via layerOrder ──────────────────
-
-  // Register any new user elements not yet in layerOrder
-  customTexts.forEach(t=>{ const k='ct_'+t.id; if(!layerOrder.includes(k)) layerOrder.push(k); });
-  shapeElements.forEach(e=>{ const k='sh_'+e.id; if(!layerOrder.includes(k)) layerOrder.push(k); });
-  canvasShapes.forEach(s=>{ const k='sv_'+s.id; if(!layerOrder.includes(k)) layerOrder.push(k); });
-
-  // Register standard blocks that are visible but not yet in layerOrder
-  const STD_KEYS_ORDER=['tire','feats','sub','badge','disc','type','brand'];
-  STD_KEYS_ORDER.forEach(k=>{
-    if(vis(k) && !layerOrder.includes(k)) layerOrder.unshift(k);
-  });
-
-  // Draw EVERYTHING in layerOrder (bottom → top)
-  layerOrder.forEach(key=>{
-    if(!key) return;
-    if(key==='tire')  { drawStdTire(); }
-    else if(key==='brand') { drawStdBrand(); }
-    else if(key==='disc')  { drawStdDisc(); }
-    else if(key==='type')  { drawStdType(); }
-    else if(key==='badge') { drawStdBadge(); }
-    else if(key==='sub')   { drawStdSub(); }
-    else if(key==='feats') { drawStdFeats(); }
-    else if(key.startsWith('ct_')){ const t=customTexts.find(t=>'ct_'+t.id===key); if(t) drawCustomText(t,ctx,cw,ch,s); }
-    else if(key.startsWith('sh_')){ const e=shapeElements.find(e=>'sh_'+e.id===key); if(e) drawShapeElement(e,ctx,cw,ch,s,key); }
-    else if(key.startsWith('sv_')){ const sh=canvasShapes.find(s2=>'sv_'+s2.id===key); if(sh) drawCanvasShape(ctx,sh,cw,ch,s); }
-  });
-
-  // ── Snap guides ───────────────────────────────────────────────────────────
-
-  drawSnapLines(ctx, cw, ch);
-
-
-
-  // 9. Bottom bar
-
-  ctx.fillStyle = th.line; ctx.fillRect(0, ch-3*s, cw, 3*s);
-
-}
-}
+  function drawHoverG(key,x,y,w,h){ drawHoverG(key,x,y,w,h,ctx,s); }
 }
 
 
@@ -3343,22 +3122,22 @@ function drawShapeElement(el, ctx, cw, ch, s, key){
       ctx.arcTo(ex+bw,ey+bh,ex+bw-rr2,ey+bh,rr2);ctx.lineTo(ex+rr2,ey+bh);
       ctx.arcTo(ex,ey+bh,ex,ey+bh-rr2,rr2);ctx.lineTo(ex,ey+rr2);
       ctx.arcTo(ex,ey,ex+rr2,ey,rr2);ctx.closePath();ctx.fill();
-      regBox(key,ex,ey,bw,bh); drawHover(key,ex,ey,bw,bh);
+      regBox(key,ex,ey,bw,bh); drawHoverG(key,ex,ey,bw,bh,ctx,s);
     } else {
-      regBox(key,ex,ey,tw||50*s,el.size*s*1.4); drawHover(key,ex,ey,tw||50*s,el.size*s*1.4);
+      regBox(key,ex,ey,tw||50*s,el.size*s*1.4); drawHoverG(key,ex,ey,tw||50*s,el.size*s*1.4,ctx,s);
     }
     ctx.font=weight; ctx.fillStyle=el.textColor||'#fff'; ctx.textAlign='left';
     ctx.shadowColor='rgba(0,0,0,0.5)';ctx.shadowBlur=3*s;
     ctx.fillText(el.text,ex+px2,ey+(el.size||24)*s+py2-py2*0.15);
   } else if(el.shape==='line'){
     const lw2=(el.width||0.5)*cw;
-    regBox(key,ex,ey-4*s,lw2,8*s); drawHover(key,ex,ey-4*s,lw2,8*s);
+    regBox(key,ex,ey-4*s,lw2,8*s); drawHoverG(key,ex,ey-4*s,lw2,8*s,ctx,s);
     ctx.strokeStyle=el.lineColor||'rgba(255,255,255,0.4)';ctx.lineWidth=(el.lineWidth||2)*s;
     ctx.setLineDash([]);ctx.beginPath();ctx.moveTo(ex,ey);ctx.lineTo(ex+lw2,ey);ctx.stroke();
   } else if(el.shape==='rect'){
     const rw=(el.width||0.5)*cw, rh=(el.height||0.08)*ch;
     const rr2=Math.min((el.radius||0)*s,rh/2);
-    regBox(key,ex,ey,rw,rh); drawHover(key,ex,ey,rw,rh);
+    regBox(key,ex,ey,rw,rh); drawHoverG(key,ex,ey,rw,rh,ctx,s);
     ctx.fillStyle=el.fillColor||'rgba(0,0,0,0.5)';
     ctx.beginPath();ctx.moveTo(ex+rr2,ey);ctx.lineTo(ex+rw-rr2,ey);
     ctx.arcTo(ex+rw,ey,ex+rw,ey+rr2,rr2);ctx.lineTo(ex+rw,ey+rh-rr2);
