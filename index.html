@@ -249,17 +249,6 @@ select{cursor:pointer}select option{background:#141520}
       </div>
     </div>
     <div class="tip c" style="margin-top:8px">💡 Шаблон задаёт начальное расположение блоков. Редактируйте данные в разделах ниже.</div>
-
-    <!-- Варианты -->
-    <div style="margin-top:12px;border-top:1px solid rgba(255,255,255,0.06);padding-top:10px">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-        <span style="font-size:10px;color:#666;text-transform:uppercase;letter-spacing:.06em">Мои варианты</span>
-        <button onclick="saveCurrentAsVariant()" style="background:rgba(245,197,24,0.12);border:1px solid rgba(245,197,24,0.3);border-radius:5px;color:#f5c518;font-size:10px;font-weight:600;padding:3px 9px;cursor:pointer">+ Сохранить</button>
-      </div>
-      <div id="variantsList">
-        <div style="font-size:10px;color:#444;padding:4px 0">Нет сохранённых вариантов</div>
-      </div>
-    </div>
   <!-- Preview modal -->
 <div id="previewModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;display:none;align-items:center;justify-content:center;flex-direction:column;gap:12px">
   <div style="position:relative">
@@ -1006,9 +995,6 @@ let shapeIdSeq     = 0;
 let canvasShapes   = [];
 let _drawGt = 0.001; // current frame time, available to all draw helpers
 let layerOrder = []; // z-order for user elements
-let savedVariants = []; // [{id, name, ts, state}]
-let variantIdSeq = 0;
-let activeVariantId = null; // id of currently loaded variant (null = unsaved)
 
 let shapeSeqId     = 0;
 
@@ -1992,10 +1978,7 @@ function fnt(nameId, sizeId, weight, s){
 
 
 function drawFrame(cv,cw,ch,gt,vidSrc){
-  if(!cv) return;
-  _drawGt = gt;
-  // Ensure all DEFAULT_POS keys exist in EP
-  Object.keys(DEFAULT_POS).forEach(k=>{ if(!EP[k]) EP[k]=JSON.parse(JSON.stringify(DEFAULT_POS[k])); });
+  _drawGt = gt; // make gt available to drawCustomText
 
   const ctx = cv.getContext('2d');
 
@@ -2196,8 +2179,9 @@ function drawFrame(cv,cw,ch,gt,vidSrc){
 
   // Convert EP fractions → canvas pixels for each element's top-left
 
-  const px = k => (EP[k]?.x ?? DEFAULT_POS[k]?.x ?? 0.02) * cw;
-  const py = k => (EP[k]?.y ?? DEFAULT_POS[k]?.y ?? 0.1) * ch;
+  const px = k => EP[k].x * cw;
+
+  const py = k => EP[k].y * ch;
 
 
 
@@ -2210,64 +2194,6 @@ function drawFrame(cv,cw,ch,gt,vidSrc){
 
 
   // ── Standard block draw functions (closures capture local vars) ────────────
-
-  function drawHover(key,x,y,w,h){
-
-    const isHov  = hovered===key || drag?.key===key;
-
-    const isSel  = selectedEl===key;
-
-    if(!isHov && !isSel) return;
-
-    ctx.save();
-
-    ctx.strokeStyle = isSel ? 'rgba(245,197,24,0.9)' : 'rgba(245,197,24,0.45)';
-
-    ctx.lineWidth   = 1.5*s;
-
-    ctx.setLineDash([3*s,3*s]);
-
-    ctx.strokeRect(x-2*s, y-2*s, w+4*s, h+4*s);
-
-    ctx.setLineDash([]);
-
-    ctx.restore();
-
-
-
-    if(isSel){
-
-      // Draw 4 corner handles + 4 edge handles
-
-      const hr = HANDLE_R*s;
-
-      const handles=[
-
-        {hx:x,   hy:y,   hk:'nw'},{hx:x+w/2,hy:y,   hk:'n'},{hx:x+w,hy:y,   hk:'ne'},
-
-        {hx:x+w, hy:y+h/2,hk:'e'},{hx:x+w,hy:y+h,  hk:'se'},{hx:x+w/2,hy:y+h,hk:'s'},
-
-        {hx:x,   hy:y+h, hk:'sw'},{hx:x,  hy:y+h/2,hk:'w'},
-
-      ];
-
-      const CURSOR={nw:'nw-resize',n:'n-resize',ne:'ne-resize',e:'e-resize',se:'se-resize',s:'s-resize',sw:'sw-resize',w:'w-resize'};
-
-      handles.forEach(hd=>{
-
-        ctx.save();
-
-        ctx.fillStyle='#fff'; ctx.strokeStyle='#f5c518'; ctx.lineWidth=1.5*s;
-
-        ctx.beginPath(); ctx.arc(hd.hx,hd.hy,hr,0,Math.PI*2); ctx.fill(); ctx.stroke();
-
-        ctx.restore();
-
-        BOXES['elh_'+key+'_'+hd.hk]={x:hd.hx-hr*1.5,y:hd.hy-hr*1.5,w:hr*3,h:hr*3,
-
-          isElHandle:true, elKey:key, hk:hd.hk, hCur:CURSOR[hd.hk]};
-
-      });
 
   function drawStdTire(){
     if(!tireMask||!vis('tire')) return;
@@ -2424,6 +2350,68 @@ function drawFrame(cv,cw,ch,gt,vidSrc){
 
 
 
+  function drawHover(key,x,y,w,h){
+
+    const isHov  = hovered===key || drag?.key===key;
+
+    const isSel  = selectedEl===key;
+
+    if(!isHov && !isSel) return;
+
+    ctx.save();
+
+    ctx.strokeStyle = isSel ? 'rgba(245,197,24,0.9)' : 'rgba(245,197,24,0.45)';
+
+    ctx.lineWidth   = 1.5*s;
+
+    ctx.setLineDash([3*s,3*s]);
+
+    ctx.strokeRect(x-2*s, y-2*s, w+4*s, h+4*s);
+
+    ctx.setLineDash([]);
+
+    ctx.restore();
+
+
+
+    if(isSel){
+
+      // Draw 4 corner handles + 4 edge handles
+
+      const hr = HANDLE_R*s;
+
+      const handles=[
+
+        {hx:x,   hy:y,   hk:'nw'},{hx:x+w/2,hy:y,   hk:'n'},{hx:x+w,hy:y,   hk:'ne'},
+
+        {hx:x+w, hy:y+h/2,hk:'e'},{hx:x+w,hy:y+h,  hk:'se'},{hx:x+w/2,hy:y+h,hk:'s'},
+
+        {hx:x,   hy:y+h, hk:'sw'},{hx:x,  hy:y+h/2,hk:'w'},
+
+      ];
+
+      const CURSOR={nw:'nw-resize',n:'n-resize',ne:'ne-resize',e:'e-resize',se:'se-resize',s:'s-resize',sw:'sw-resize',w:'w-resize'};
+
+      handles.forEach(hd=>{
+
+        ctx.save();
+
+        ctx.fillStyle='#fff'; ctx.strokeStyle='#f5c518'; ctx.lineWidth=1.5*s;
+
+        ctx.beginPath(); ctx.arc(hd.hx,hd.hy,hr,0,Math.PI*2); ctx.fill(); ctx.stroke();
+
+        ctx.restore();
+
+        BOXES['elh_'+key+'_'+hd.hk]={x:hd.hx-hr*1.5,y:hd.hy-hr*1.5,w:hr*3,h:hr*3,
+
+          isElHandle:true, elKey:key, hk:hd.hk, hCur:CURSOR[hd.hk]};
+
+      });
+
+    }
+
+  }
+
 
   // ── 8-10. Unified layer draw — ALL elements via layerOrder ──────────────────
 
@@ -2432,11 +2420,9 @@ function drawFrame(cv,cw,ch,gt,vidSrc){
   shapeElements.forEach(e=>{ const k='sh_'+e.id; if(!layerOrder.includes(k)) layerOrder.push(k); });
   canvasShapes.forEach(s=>{ const k='sv_'+s.id; if(!layerOrder.includes(k)) layerOrder.push(k); });
 
-  // Register standard blocks that are visible but not yet in layerOrder
+  // Register standard blocks that aren't yet in layerOrder
   const STD_KEYS_ORDER=['tire','feats','sub','badge','disc','type','brand'];
-  STD_KEYS_ORDER.forEach(k=>{
-    if(vis(k) && !layerOrder.includes(k)) layerOrder.unshift(k);
-  });
+  STD_KEYS_ORDER.forEach(k=>{ if(!layerOrder.includes(k)) layerOrder.unshift(k); });
 
   // Draw EVERYTHING in layerOrder (bottom → top)
   layerOrder.forEach(key=>{
@@ -2464,8 +2450,6 @@ function drawFrame(cv,cw,ch,gt,vidSrc){
   ctx.fillStyle = th.line; ctx.fillRect(0, ch-3*s, cw, 3*s);
 
 }
-}
-}
 
 
 
@@ -2477,11 +2461,7 @@ let modalRaf  = null;
 // Main canvas runs a CONTINUOUS design loop at gt=0.001
 // This keeps BOXES updated for drag/hit-test to work at all times
 function designLoop(){
-  try {
-    drawFrame(document.getElementById('prevCv'), FW, FH, 0.001, null);
-  } catch(e) {
-    console.error('drawFrame error:', e);
-  }
+  drawFrame(document.getElementById('prevCv'), FW, FH, 0.001, null);
   prevRaf = requestAnimationFrame(designLoop);
 }
 
@@ -2490,154 +2470,23 @@ function rp(){
   // loop is already running, nothing to restart
 }
 
-// ── Snapshot / Variants system ────────────────────────────────────────────────
-
-function captureState(name){
-  // Capture all editable state into a plain object
-  const fieldIds=['f_type','f_size','f_brand','f_sub','f_disc'];
-  const visIds=['brand','type','badge','sub','disc','feats','tire'];
-  const fields={}, vis2={};
-  fieldIds.forEach(id=>{ const el=document.getElementById(id); if(el) fields[id]=el.value; });
-  visIds.forEach(k=>{ const cb=document.getElementById('vis_'+k); if(cb) vis2[k]=cb.checked; });
-  return {
-    id: ++variantIdSeq,
-    name: name||('Вариант '+variantIdSeq),
-    ts: Date.now(),
-    fields,
-    vis2,
-    feats: JSON.parse(JSON.stringify(feats)),
-    EP: JSON.parse(JSON.stringify(EP)),
-    layerOrder: JSON.parse(JSON.stringify(layerOrder)),
-    customTexts: JSON.parse(JSON.stringify(customTexts)),
-    canvasShapes: JSON.parse(JSON.stringify(canvasShapes)),
-    shapeElements: JSON.parse(JSON.stringify(shapeElements)),
-  };
-}
-
-function restoreState(snap){
-  // Restore fields
-  Object.entries(snap.fields||{}).forEach(([id,val])=>{
-    const el=document.getElementById(id); if(el) el.value=val;
-  });
-  // Restore visibility
-  Object.entries(snap.vis2||{}).forEach(([k,v])=>{
-    const cb=document.getElementById('vis_'+k); if(cb) cb.checked=v;
-  });
-  // Restore data
-  feats = JSON.parse(JSON.stringify(snap.feats||[]));
-  EP    = JSON.parse(JSON.stringify(snap.EP||DEFAULT_POS));
-  layerOrder  = JSON.parse(JSON.stringify(snap.layerOrder||[]));
-  customTexts = JSON.parse(JSON.stringify(snap.customTexts||[]));
-  canvasShapes= JSON.parse(JSON.stringify(snap.canvasShapes||[]));
-  shapeElements=JSON.parse(JSON.stringify(snap.shapeElements||[]));
-  ctxtIdSeq   = customTexts.reduce((m,t)=>Math.max(m,t.id),0);
-  shapeSeqId  = canvasShapes.reduce((m,s)=>Math.max(m,s.id),0);
-  shapeIdSeq  = shapeElements.reduce((m,e)=>Math.max(m,e.id),0);
-  renderFeatList();
-  renderCustomTextList();
-  selectedEl=null; selectedShape=null;
-  setTimeout(updateElProps,0);
-  rp();
-}
-
-function saveCurrentAsVariant(name){
-  const snap = captureState(name);
-  // If activeVariantId exists, update it; else push new
-  const idx = savedVariants.findIndex(v=>v.id===activeVariantId);
-  if(idx>=0){ savedVariants[idx]=snap; savedVariants[idx].id=activeVariantId; }
-  else { savedVariants.push(snap); activeVariantId=snap.id; }
-  renderVariantsList();
-  return snap;
-}
-
-function loadVariant(id){
-  // Save current before switching
-  autoSaveCurrent();
-  const snap = savedVariants.find(v=>v.id===id);
-  if(!snap) return;
-  activeVariantId = id;
-  restoreState(snap);
-  renderVariantsList();
-}
-
-function deleteVariant(id){
-  savedVariants = savedVariants.filter(v=>v.id!==id);
-  if(activeVariantId===id) activeVariantId=null;
-  renderVariantsList();
-}
-
-function autoSaveCurrent(){
-  // Auto-save current unsaved state or update existing variant
-  const idx = savedVariants.findIndex(v=>v.id===activeVariantId);
-  const name = idx>=0 ? savedVariants[idx].name : ('Мой вариант '+(savedVariants.length+1));
-  const snap = captureState(name);
-  snap.id = activeVariantId || ++variantIdSeq;
-  activeVariantId = snap.id;
-  if(idx>=0) savedVariants[idx]=snap;
-  else savedVariants.push(snap);
-}
-
-function renderVariantsList(){
-  const el=document.getElementById('variantsList');
-  if(!el) return;
-  if(savedVariants.length===0){
-    el.innerHTML='<div style="font-size:10px;color:#444;padding:4px 0">Нет сохранённых вариантов</div>';
-    return;
-  }
-  el.innerHTML=savedVariants.map(v=>`
-    <div style="display:flex;align-items:center;gap:6px;padding:5px 8px;border-radius:6px;background:${v.id===activeVariantId?'rgba(245,197,24,0.1)':'rgba(255,255,255,0.03)'};border:1px solid ${v.id===activeVariantId?'rgba(245,197,24,0.3)':'rgba(255,255,255,0.06)'};margin-bottom:4px">
-      <span style="font-size:10px;flex:1;color:${v.id===activeVariantId?'#f5c518':'#888'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${v.name}">${v.id===activeVariantId?'▶ ':''}${v.name}</span>
-      <button onclick="loadVariant(${v.id})" style="background:none;border:1px solid rgba(255,255,255,0.1);border-radius:4px;color:#888;font-size:10px;padding:2px 7px;cursor:pointer;flex-shrink:0" ${v.id===activeVariantId?'disabled style="opacity:0.4;cursor:default"':''}>↩ Открыть</button>
-      <button onclick="deleteVariant(${v.id})" style="background:none;border:none;color:#444;font-size:13px;cursor:pointer;padding:0 2px;flex-shrink:0" title="Удалить">×</button>
-    </div>
-  `).join('');
-}
-
 function applyTemplate(name){
   if(name !== 'wb') return;
-
-  // Auto-save current state before switching (wrapped in try to not block template)
-  try { autoSaveCurrent(); } catch(e){ console.warn('autoSave failed:', e); }
-
-  // Reset all user elements
-  customTexts  = []; ctxtIdSeq  = 0;
-  canvasShapes = []; shapeSeqId = 0;
-  shapeElements= []; shapeIdSeq = 0;
-
-  // Reset positions
   EP = JSON.parse(JSON.stringify(DEFAULT_POS));
-
-  // Set standard block visibility
-  const vis2={brand:true, type:true, badge:true, sub:true, disc:false, feats:true, tire:true};
-  Object.entries(vis2).forEach(([k,v])=>{
+  ['brand','type','badge','sub','feats','tire'].forEach(k=>{
     const cb=document.getElementById('vis_'+k);
-    if(cb) cb.checked=v;
+    if(cb) cb.checked=true;
   });
-
-  // Set field values
-  const fieldVals={f_type:'ШИНА ЛЕТНЯЯ', f_brand:'SAILUN', f_sub:'РЕЗИНА ЛЕТНЯЯ', f_size:'175/65 R14', f_disc:''};
-  Object.entries(fieldVals).forEach(([id,val])=>{
-    const el=document.getElementById(id); if(el) el.value=val;
+  const fields={f_type:'ШИНА ЛЕТНЯЯ',f_brand:'SAILUN',f_sub:'РЕЗИНА ЛЕТНЯЯ',f_size:'175/65 R14'};
+  Object.entries(fields).forEach(([id,val])=>{
+    const el=document.getElementById(id);
+    if(el && !el.value.trim()) el.value=val;
   });
-
-  // Set features
-  feats=['Легкая балансировка','Быстрый отвод воды','Устойчивость на поворотах','Ненаправленный рисунок'];
-  renderFeatList();
-  renderCustomTextList();
-
-  // Explicitly set layerOrder for WB template (bottom → top)
-  layerOrder = ['tire','feats','sub','badge','type','brand'];
-
-  // Save as named variant
-  try {
-    const snap = captureState('🟢 WB Шаблон');
-    savedVariants.push(snap);
-    activeVariantId = snap.id;
-    renderVariantsList();
-  } catch(e){ console.warn('variant save failed:', e); }
-
-  selectedEl = null; selectedShape = null;
-  setTimeout(updateElProps, 0);
+  if(feats.length===0||feats.every(f=>!f.trim())){
+    feats=['Легкая балансировка','Быстрый отвод воды','Устойчивость на поворотах','Ненаправленный рисунок'];
+    renderFeatList();
+  }
+  rp();
 }
 
 // Preview plays in MODAL — main canvas stays editable
