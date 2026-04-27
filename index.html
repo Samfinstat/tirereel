@@ -162,6 +162,7 @@ select{cursor:pointer}select option{background:#141520}
 .btn-dl:hover{background:#254a32}
 .spin{width:10px;height:10px;border:2px solid rgba(245,197,24,.2);border-top-color:#f5c518;border-radius:50%;animation:sp .7s linear infinite;flex-shrink:0}
 @keyframes sp{to{transform:rotate(360deg)}}
+@keyframes slideIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 ::-webkit-scrollbar{width:3px}
 ::-webkit-scrollbar-thumb{background:rgba(255,255,255,.06);border-radius:2px}
 @media(max-width:900px){.layout{grid-template-columns:1fr}.right{position:static;height:auto;border-top:1px solid rgba(255,255,255,0.05)}.left{max-height:none}.uploads-row{grid-template-columns:1fr}}
@@ -382,24 +383,9 @@ select{cursor:pointer}select option{background:#141520}
 
   <div class="panel-bd">
 
-    <!-- Тогглы -->
-
-    <div class="block-toggles">
-
-      <label class="btog"><input type="checkbox" id="vis_type"  checked onchange="rp()"><span>Тип</span></label>
-
-      <label class="btog"><input type="checkbox" id="vis_badge" checked onchange="rp()"><span>Размер</span></label>
-
-      <label class="btog"><input type="checkbox" id="vis_brand" checked onchange="rp()"><span>Бренд</span></label>
-
-      <label class="btog"><input type="checkbox" id="vis_sub"   checked onchange="rp()"><span>Подзагол.</span></label>
-
-      <label class="btog"><input type="checkbox" id="vis_disc"  checked onchange="rp()"><span>Скидка</span></label>
-
-      <label class="btog"><input type="checkbox" id="vis_feats" checked onchange="rp()"><span>Свойства</span></label>
-
-      <label class="btog"><input type="checkbox" id="vis_tire"  checked onchange="rp()"><span>Фото</span></label>
-
+    <!-- Тогглы видимости — управляются через кнопку 👁 Блоки справа -->
+    <div style="font-size:10px;color:#444;margin-bottom:6px;padding:4px 0">
+      Используйте кнопку <b style="color:#f5c518">👁 Блоки</b> справа для скрытия/показа блоков
     </div>
 
     <label class="f" style="margin-top:8px">Тип товара</label>
@@ -836,28 +822,56 @@ select{cursor:pointer}select option{background:#141520}
 
   <!-- Панель генерации -->
 
-  <div class="gen-panel">
-
-    <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
-
-      <button type="button" onclick="resetPositions()"
-
-        style="background:none;border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:#555;font-size:11px;padding:7px 12px;cursor:pointer;white-space:nowrap">
-
-        ↺ Сброс
-
-      </button>
-
-      <button type="button" class="btn" id="genBtn" onclick="startGen()">▶ Сгенерировать видео</button>
-
+  <!-- Hidden blocks restore panel -->
+  <div id="hiddenPanel" style="display:none;border-top:1px solid rgba(255,255,255,0.05);background:#13141f;flex-shrink:0;padding:8px 10px">
+    <div style="font-size:10px;color:#555;margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em">Видимость блоков</div>
+    <div style="display:flex;flex-wrap:wrap;gap:5px">
+      <label style="display:flex;align-items:center;gap:4px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:5px;padding:3px 8px;cursor:pointer;font-size:11px;color:#888;user-select:none">
+        <input type="checkbox" id="vis_type"  checked onchange="rp()" style="accent-color:#f5c518;cursor:pointer;margin:0;width:auto"> Заголовок</label>
+      <label style="display:flex;align-items:center;gap:4px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:5px;padding:3px 8px;cursor:pointer;font-size:11px;color:#888;user-select:none">
+        <input type="checkbox" id="vis_badge" checked onchange="rp()" style="accent-color:#f5c518;cursor:pointer;margin:0;width:auto"> Размер</label>
+      <label style="display:flex;align-items:center;gap:4px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:5px;padding:3px 8px;cursor:pointer;font-size:11px;color:#888;user-select:none">
+        <input type="checkbox" id="vis_brand" checked onchange="rp()" style="accent-color:#f5c518;cursor:pointer;margin:0;width:auto"> Бренд</label>
+      <label style="display:flex;align-items:center;gap:4px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:5px;padding:3px 8px;cursor:pointer;font-size:11px;color:#888;user-select:none">
+        <input type="checkbox" id="vis_sub"   checked onchange="rp()" style="accent-color:#f5c518;cursor:pointer;margin:0;width:auto"> Подзагол.</label>
+      <label style="display:flex;align-items:center;gap:4px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:5px;padding:3px 8px;cursor:pointer;font-size:11px;color:#888;user-select:none">
+        <input type="checkbox" id="vis_disc"  checked onchange="rp()" style="accent-color:#f5c518;cursor:pointer;margin:0;width:auto"> Скидка</label>
+      <label style="display:flex;align-items:center;gap:4px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:5px;padding:3px 8px;cursor:pointer;font-size:11px;color:#888;user-select:none">
+        <input type="checkbox" id="vis_feats" checked onchange="rp()" style="accent-color:#f5c518;cursor:pointer;margin:0;width:auto"> Свойства</label>
+      <label style="display:flex;align-items:center;gap:4px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:5px;padding:3px 8px;cursor:pointer;font-size:11px;color:#888;user-select:none">
+        <input type="checkbox" id="vis_tire"  checked onchange="rp()" style="accent-color:#f5c518;cursor:pointer;margin:0;width:auto"> Фото</label>
     </div>
+  </div>
 
+  <!-- Element properties bar -->
+  <div style="border-top:1px solid rgba(255,255,255,0.05);background:#0d0e14;flex-shrink:0">
+    <div style="display:flex;align-items:center;gap:5px;padding:5px 10px;flex-wrap:wrap;min-height:34px">
+      <span id="elPropsName" style="font-size:10px;color:#555;font-style:italic;min-width:80px">Выберите элемент</span>
+      <div style="width:1px;height:14px;background:rgba(255,255,255,0.08);flex-shrink:0"></div>
+      <span style="font-size:9px;color:#555">Прозр.</span>
+      <input type="range" id="elOpacity" min="10" max="100" value="100"
+             style="-webkit-appearance:none;height:3px;background:rgba(255,255,255,0.1);border-radius:2px;outline:none;border:none;width:65px;cursor:pointer;padding:0;flex-shrink:0"
+             oninput="setElOpacity(+this.value)">
+      <span id="elOpacityVal" style="font-size:9px;color:#f5c518;min-width:28px;font-weight:600">100%</span>
+      <div style="width:1px;height:14px;background:rgba(255,255,255,0.08);flex-shrink:0"></div>
+      <span style="font-size:9px;color:#555">Слой</span>
+      <button type="button" onclick="moveLayerTop()"    title="На передний план" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:4px;color:#888;cursor:pointer;font-size:11px;padding:2px 5px;line-height:1">⤒</button>
+      <button type="button" onclick="moveLayerUp()"     title="Выше"             style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:4px;color:#888;cursor:pointer;font-size:11px;padding:2px 5px;line-height:1">↑</button>
+      <button type="button" onclick="moveLayerDown()"   title="Ниже"             style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:4px;color:#888;cursor:pointer;font-size:11px;padding:2px 5px;line-height:1">↓</button>
+      <button type="button" onclick="moveLayerBottom()" title="На задний план"   style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:4px;color:#888;cursor:pointer;font-size:11px;padding:2px 5px;line-height:1">⤓</button>
+      <div style="width:1px;height:14px;background:rgba(255,255,255,0.08);flex-shrink:0"></div>
+      <button type="button" onclick="resetPositions()" title="Сброс позиций" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:4px;color:#888;cursor:pointer;font-size:11px;padding:2px 5px;line-height:1">↺</button>
+      <button type="button" id="elDelete" onclick="deleteSelected()" title="Удалить (Delete/Backspace)" style="display:none;background:rgba(255,60,60,0.08);border:1px solid rgba(255,100,100,0.2);border-radius:4px;color:#ff6b6b;cursor:pointer;font-size:11px;padding:2px 6px;line-height:1">🗑 Удалить</button>
+      <div style="flex:1"></div>
+      <button type="button" onclick="toggleHiddenPanel()" title="Скрытые блоки" id="hiddenBtn" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:4px;color:#555;cursor:pointer;font-size:10px;padding:2px 7px;line-height:1.4;white-space:nowrap">👁 Блоки</button>
+    </div>
+  </div>
+
+  <div class="gen-panel">
+    <button type="button" class="btn" id="genBtn" onclick="startGen()">▶ Сгенерировать видео</button>
     <div class="prog" id="prog"><div class="pb" id="pb"></div></div>
-
     <div class="st" id="st"></div>
-
     <div id="dlArea"></div>
-
   </div>
 
 
@@ -1336,7 +1350,7 @@ function initDrag(){
 
     if(!key){
 
-      selectedEl=null; selectedShape=null;
+      selectedEl=null; selectedShape=null; setTimeout(updateElProps,0);
 
       document.getElementById('shapeEditor').style.display='none';
 
@@ -1464,9 +1478,8 @@ function initDrag(){
 
     // Set selectedEl for standard elements and custom texts
 
-    if(!key.startsWith('sh_')) selectedEl=key;
+    if(!key.startsWith("sh_")){selectedEl=key;}else{selectedEl=null;} setTimeout(updateElProps,0);
 
-    else selectedEl=null;
 
     if(!EP[key]) EP[key]={x:fx,y:fy};
 
@@ -2825,55 +2838,66 @@ async function startGen(){
 
 
 async function genVideo(){
+  const dur = parseInt(v('f_dur')) || 10;
+  const totF = FPS * dur;
+  const frameMs = 1000 / FPS; // ~41.67ms per frame at 24fps
 
-  const dur=parseInt(v('f_dur'))||10;
+  const cv = document.createElement('canvas');
+  cv.width = FW; cv.height = FH;
 
-  const totF=FPS*dur;
+  // Seek background video to start
+  if(bgVid){
+    bgVid.currentTime = 0;
+    await new Promise(r=>{bgVid.onseeked=r; setTimeout(r,500);});
+    bgVid.play().catch(()=>{});
+  }
 
-  const cv=document.createElement('canvas');cv.width=FW;cv.height=FH;
+  const mime = MediaRecorder.isTypeSupported('video/webm;codecs=vp9')
+    ? 'video/webm;codecs=vp9' : 'video/webm';
 
-  if(bgVid){bgVid.currentTime=0;await new Promise(r=>{bgVid.onseeked=r;setTimeout(r,500);});bgVid.play().catch(()=>{});}
+  const stream = cv.captureStream(FPS);
+  const rec = new MediaRecorder(stream, {mimeType:mime, videoBitsPerSecond:12000000});
+  const chunks = [];
+  rec.ondataavailable = e => { if(e.data.size>0) chunks.push(e.data); };
 
-  const mime=MediaRecorder.isTypeSupported('video/webm;codecs=vp9')?'video/webm;codecs=vp9':'video/webm';
-
-  const stream=cv.captureStream(FPS);
-
-  const rec=new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:10000000});
-
-  const chunks=[];
-
-  rec.ondataavailable=e=>{if(e.data.size>0)chunks.push(e.data);};
-
-  return new Promise((resolve,reject)=>{
-
+  return new Promise((resolve, reject) => {
     rec.start(100);
+    const bar = document.getElementById('pb');
+    let f = 0, gt = 0;
+    let lastTime = null;
+    let accumulated = 0;
 
-    let f=0,gt=0;
+    // Use requestAnimationFrame timed loop so canvas capture gets real frames
+    function tick(now){
+      if(lastTime === null) lastTime = now;
+      accumulated += now - lastTime;
+      lastTime = now;
 
-    const bar=document.getElementById('pb');
+      // Render as many frames as needed to keep up with real time
+      while(accumulated >= frameMs && f < totF){
+        gt = (f + 1) / FPS;
+        drawFrame(cv, FW, FH, gt, bgVid);
+        f++;
+        accumulated -= frameMs;
+        bar.style.width = Math.round(f / totF * 95) + '%';
+      }
 
-    function frame(){
-
-      gt+=1/FPS;
-
-      drawFrame(cv,FW,FH,gt,bgVid);
-
-      f++;bar.style.width=Math.round(f/totF*95)+'%';
-
-      if(f<totF) setTimeout(frame,0);
-
-      else{if(bgVid)bgVid.pause();rec.stop();}
-
+      if(f < totF){
+        requestAnimationFrame(tick);
+      } else {
+        // Draw final frame and stop
+        drawFrame(cv, FW, FH, dur, bgVid);
+        if(bgVid) bgVid.pause();
+        // Give encoder a moment to flush last frames
+        setTimeout(()=>rec.stop(), 200);
+      }
     }
 
-    rec.onstop=()=>resolve(new Blob(chunks,{type:mime}));
+    rec.onstop = () => resolve(new Blob(chunks, {type:mime}));
+    rec.onerror = e => reject(e.error || new Error('Ошибка записи'));
 
-    rec.onerror=e=>reject(e.error||new Error('Ошибка записи'));
-
-    frame();
-
+    requestAnimationFrame(tick);
   });
-
 }
 
 // ── Custom text blocks ────────────────────────────────────────────────────────
@@ -3861,6 +3885,173 @@ function autoLoadAiBg(videoUrl){
 }
 
 
+
+// ── Delete selected element ───────────────────────────────────────────────────
+const STD_BLOCKS = {
+  brand:'Бренд', type:'Заголовок', badge:'Размер/Артикул',
+  sub:'Подзаголовок', disc:'Скидка', feats:'Свойства', tire:'Фото товара'
+};
+
+function deleteSelected(){
+  if(!selectedEl) return;
+
+  // Standard blocks — toggle off via checkbox + show restore notification
+  if(STD_BLOCKS[selectedEl]){
+    const cb = document.getElementById('vis_'+selectedEl);
+    if(cb){ cb.checked=false; rp(); }
+    showRestoreNotice(selectedEl, STD_BLOCKS[selectedEl]);
+    selectedEl=null; setTimeout(updateElProps,0); return;
+  }
+
+  // Custom text
+  if(selectedEl.startsWith('ct_')){
+    removeCustomText(parseInt(selectedEl.replace('ct_','')));
+    selectedEl=null; setTimeout(updateElProps,0); return;
+  }
+
+  // Canvas shape (sv_)
+  if(selectedEl.startsWith('sv_')){
+    const id=parseInt(selectedEl.replace('sv_',''));
+    canvasShapes=canvasShapes.filter(s=>s.id!==id);
+    delete BOXES['sv_'+id]; selectedShape=null;
+    document.getElementById('shapeEditor').style.display='none';
+    selectedEl=null; setTimeout(updateElProps,0); rp(); return;
+  }
+
+  // Template element (sh_)
+  if(selectedEl.startsWith('sh_')){
+    removeShape(parseInt(selectedEl.replace('sh_','')));
+    selectedEl=null; setTimeout(updateElProps,0); return;
+  }
+}
+
+function showRestoreNotice(key, name){
+  // Remove old notice
+  const old=document.getElementById('restoreNotice');
+  if(old) old.remove();
+
+  const n=document.createElement('div');
+  n.id='restoreNotice';
+  n.style.cssText='position:fixed;bottom:80px;right:24px;background:#1a1b26;border:1px solid rgba(245,197,24,0.3);border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:10px;z-index:9999;font-size:12px;color:#ccc;box-shadow:0 4px 20px rgba(0,0,0,0.6);animation:slideIn .2s ease';
+  n.innerHTML=`
+    <span>«${name}» скрыт</span>
+    <button onclick="restoreBlock('${key}')" style="background:rgba(245,197,24,0.15);border:1px solid rgba(245,197,24,0.35);border-radius:5px;color:#f5c518;font-size:11px;font-weight:600;padding:4px 10px;cursor:pointer">↩ Восстановить</button>
+    <button onclick="this.parentElement.remove()" style="background:none;border:none;color:#444;cursor:pointer;font-size:16px;padding:0;line-height:1">×</button>
+  `;
+  document.body.appendChild(n);
+  // Auto-remove after 6 seconds
+  setTimeout(()=>n.remove(), 6000);
+}
+
+function toggleHiddenPanel(){
+  const p=document.getElementById('hiddenPanel');
+  const btn=document.getElementById('hiddenBtn');
+  const open=p.style.display==='none';
+  p.style.display=open?'':'none';
+  btn.style.color=open?'#f5c518':'#555';
+  btn.style.borderColor=open?'rgba(245,197,24,0.35)':'rgba(255,255,255,0.08)';
+}
+
+function restoreBlock(key){
+  const cb=document.getElementById('vis_'+key);
+  if(cb){cb.checked=true;rp();}
+  const n=document.getElementById('restoreNotice');
+  if(n) n.remove();
+}
+
+// Update the properties bar when selection changes
+function updateElProps(){
+  const nameEl   = document.getElementById('elPropsName');
+  const delBtn   = document.getElementById('elDelete');
+  const opSlider = document.getElementById('elOpacity');
+  const opVal    = document.getElementById('elOpacityVal');
+  if(!nameEl) return;
+
+  if(!selectedEl){
+    nameEl.textContent='Выберите элемент';
+    if(delBtn) delBtn.style.display='none';
+    return;
+  }
+
+  nameEl.textContent = keyLabel(selectedEl);
+
+  // Show delete button for everything
+  if(delBtn) delBtn.style.display='';
+
+  // Get opacity
+  let op=100;
+  if(selectedEl.startsWith('ct_')){
+    const t=customTexts.find(t=>t.id===parseInt(selectedEl.replace('ct_','')));
+    if(t) op=t.opacity||100;
+  } else if(selectedEl.startsWith('sv_')){
+    const s=canvasShapes.find(s=>s.id===parseInt(selectedEl.replace('sv_','')));
+    if(s) op=s.opacity||100;
+  } else if(selectedEl.startsWith('sh_')){
+    const s=shapeElements.find(s=>s.id===parseInt(selectedEl.replace('sh_','')));
+    if(s) op=s.opacity||100;
+  }
+  if(opSlider){opSlider.value=op;}
+  if(opVal){opVal.textContent=op+'%';}
+}
+
+function setElOpacity(val){
+  if(document.getElementById('elOpacityVal'))
+    document.getElementById('elOpacityVal').textContent=val+'%';
+  if(!selectedEl) return;
+  if(selectedEl.startsWith('ct_')){
+    const t=customTexts.find(t=>t.id===parseInt(selectedEl.replace('ct_','')));
+    if(t){t.opacity=val;}
+  } else if(selectedEl.startsWith('sv_')){
+    const s=canvasShapes.find(s=>s.id===parseInt(selectedEl.replace('sv_','')));
+    if(s) s.opacity=val;
+  } else if(selectedEl.startsWith('sh_')){
+    const s=shapeElements.find(s=>s.id===parseInt(selectedEl.replace('sh_','')));
+    if(s) s.opacity=val;
+  }
+  rp();
+}
+
+// Layer controls
+function moveLayerUp(){
+  if(!selectedEl) return;
+  const i=layerOrder.indexOf(selectedEl);
+  if(i<layerOrder.length-1){[layerOrder[i],layerOrder[i+1]]=[layerOrder[i+1],layerOrder[i]];}
+  rp();
+}
+function moveLayerDown(){
+  if(!selectedEl) return;
+  const i=layerOrder.indexOf(selectedEl);
+  if(i>0){[layerOrder[i],layerOrder[i-1]]=[layerOrder[i-1],layerOrder[i]];}
+  rp();
+}
+function moveLayerTop(){
+  if(!selectedEl) return;
+  layerOrder=layerOrder.filter(k=>k!==selectedEl);layerOrder.push(selectedEl);rp();
+}
+function moveLayerBottom(){
+  if(!selectedEl) return;
+  layerOrder=layerOrder.filter(k=>k!==selectedEl);layerOrder.unshift(selectedEl);rp();
+}
+
+// ── Keyboard shortcuts ────────────────────────────────────────────────────────
+document.addEventListener('keydown', e=>{
+  // Delete / Backspace — delete selected element
+  if((e.key==='Delete'||e.key==='Backspace') && selectedEl){
+    // Don't fire when typing in an input/textarea
+    const tag=document.activeElement?.tagName?.toLowerCase();
+    if(tag==='input'||tag==='textarea'||tag==='select') return;
+    e.preventDefault();
+    deleteSelected();
+  }
+  // Escape — deselect
+  if(e.key==='Escape'){
+    selectedEl=null; selectedShape=null; setTimeout(updateElProps,0);
+    document.getElementById('shapeEditor').style.display='none';
+    updateElProps(); rp();
+  }
+});
+
+let layerOrder = [];
 
 function setSt(h,c){const el=document.getElementById('st');el.className='st '+c;el.innerHTML=h;}
 
