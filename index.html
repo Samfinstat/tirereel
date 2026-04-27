@@ -105,6 +105,13 @@ select{cursor:pointer}select option{background:#141520}
 .tmpl-card:hover{border-color:rgba(245,197,24,.35);background:rgba(245,197,24,.05);transform:translateY(-1px)}
 .tmpl-preview{width:100%;height:30px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;overflow:hidden;flex-shrink:0}
 .tmpl-name{font-size:8px;color:#444;text-transform:uppercase;letter-spacing:.05em;white-space:nowrap}
+.tmpl-layout-card{background:#1a1b26;border:1.5px solid rgba(255,255,255,0.08);border-radius:8px;padding:8px;cursor:pointer;transition:all .15s;text-align:center}
+.tmpl-layout-card:hover:not(.soon){border-color:rgba(245,197,24,0.4);background:rgba(245,197,24,0.05)}
+.tmpl-layout-card.active{border-color:rgba(77,201,77,0.5);background:rgba(77,201,77,0.06)}
+.tmpl-layout-card.soon{cursor:default;opacity:0.6}
+.tl-preview{background:#0d0e14;border-radius:5px;padding:6px;margin-bottom:5px;min-height:48px;display:flex;flex-direction:column;align-items:flex-start}
+.tl-name{font-size:9px;color:#888;text-transform:uppercase;letter-spacing:.04em}
+.tmpl-layout-card.active .tl-name{color:#ccc}
 .tmpl-card:hover .tmpl-name{color:#777}
 .shape-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
 .shape-card{background:#141520;border:1px solid rgba(255,255,255,0.06);border-radius:6px;padding:6px 3px;cursor:pointer;transition:all .12s;display:flex;flex-direction:column;align-items:center;gap:3px}
@@ -154,6 +161,9 @@ select{cursor:pointer}select option{background:#141520}
 .btn{flex:1;padding:10px;background:#f5c518;color:#0d0e14;border:none;border-radius:6px;font-family:'Oswald',sans-serif;font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:background .2s}
 .btn:hover{background:#ffe066}
 .btn:disabled{background:#1a1b26;color:#444;cursor:not-allowed}
+.btn-prev{flex:1;padding:10px;background:rgba(255,255,255,0.07);color:#ccc;border:1px solid rgba(255,255,255,0.12);border-radius:6px;font-family:'Oswald',sans-serif;font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:all .2s}
+.btn-prev:hover{background:rgba(255,255,255,0.12);color:#fff}
+.btn-prev.playing{background:rgba(245,197,24,0.12);color:#f5c518;border-color:rgba(245,197,24,0.35)}
 .st{margin-top:6px;font-size:10px;text-align:center;min-height:12px;display:flex;align-items:center;justify-content:center;gap:5px;color:#555}
 .st.err{color:#ff6b6b}.st.ok{color:#4caf88}
 .prog{height:2px;background:rgba(255,255,255,.04);border-radius:1px;margin-top:5px;overflow:hidden;display:none}
@@ -162,6 +172,7 @@ select{cursor:pointer}select option{background:#141520}
 .btn-dl:hover{background:#254a32}
 .spin{width:10px;height:10px;border:2px solid rgba(245,197,24,.2);border-top-color:#f5c518;border-radius:50%;animation:sp .7s linear infinite;flex-shrink:0}
 @keyframes sp{to{transform:rotate(360deg)}}
+#f_dur::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:#f5c518;cursor:pointer}
 @keyframes slideIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 ::-webkit-scrollbar{width:3px}
 ::-webkit-scrollbar-thumb{background:rgba(255,255,255,.06);border-radius:2px}
@@ -191,7 +202,73 @@ select{cursor:pointer}select option{background:#141520}
 
 
 
-<!-- 1. Фон -->
+<!-- 0. Шаблоны -->
+<div class="panel open" id="p_tmpl">
+  <div class="panel-hd" onclick="togglePanel('p_tmpl')">
+    <span class="p-icon">📋</span><span class="p-title">Шаблон карточки</span><span class="p-arr">▾</span>
+  </div>
+  <div class="panel-bd">
+    <div style="font-size:10px;color:#555;margin-bottom:8px">Выберите шаблон — заполните данные — настройте</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div class="tmpl-layout-card active" onclick="applyTemplate('wb')">
+        <div class="tl-preview">
+          <div style="font-size:8px;font-weight:700;color:#fff;margin-bottom:2px">ШИНА ЛЕТНЯЯ</div>
+          <div style="background:#2d8a2d;border-radius:3px;padding:1px 4px;font-size:7px;color:#7fff7f;margin-bottom:2px;display:inline-block">175/65 R14</div>
+          <div style="font-size:6px;color:#4dc94d">• Лёгкая балансировка</div>
+          <div style="font-size:6px;color:#4dc94d">• Отвод воды</div>
+        </div>
+        <div class="tl-name">🟢 WB — Шины/Диски</div>
+        <div style="font-size:8px;color:#4dc94d;text-align:center">✓ Активен</div>
+      </div>
+      <div class="tmpl-layout-card soon">
+        <div class="tl-preview" style="opacity:0.35">
+          <div style="font-size:8px;font-weight:700;color:#fff;margin-bottom:2px">ДИСК R17</div>
+          <div style="background:#1a3399;border-radius:3px;padding:1px 4px;font-size:7px;color:#88aaff;margin-bottom:2px;display:inline-block">5x114.3</div>
+          <div style="font-size:6px;color:#88aaff">• ET45 / ЦО 67.1</div>
+        </div>
+        <div class="tl-name">🔵 Диски</div>
+        <div style="font-size:8px;color:#444;text-align:center">Скоро</div>
+      </div>
+      <div class="tmpl-layout-card soon">
+        <div class="tl-preview" style="opacity:0.35">
+          <div style="font-size:8px;font-weight:700;color:#fff;margin-bottom:2px">АККУМУЛЯТОР</div>
+          <div style="background:#aa1818;border-radius:3px;padding:1px 4px;font-size:7px;color:#ff8888;margin-bottom:2px;display:inline-block">60 Ач</div>
+          <div style="font-size:6px;color:#ff8888">• 540 А пуск</div>
+        </div>
+        <div class="tl-name">🔴 Аккумуляторы</div>
+        <div style="font-size:8px;color:#444;text-align:center">Скоро</div>
+      </div>
+      <div class="tmpl-layout-card soon">
+        <div class="tl-preview" style="opacity:0.35">
+          <div style="font-size:8px;font-weight:700;color:#fff;margin-bottom:2px">ЗАПЧАСТЬ</div>
+          <div style="background:#7a5e00;border-radius:3px;padding:1px 4px;font-size:7px;color:#ffe566;margin-bottom:2px;display:inline-block">OEM 12345</div>
+          <div style="font-size:6px;color:#ffe566">• Оригинал</div>
+        </div>
+        <div class="tl-name">🟡 Запчасти</div>
+        <div style="font-size:8px;color:#444;text-align:center">Скоро</div>
+      </div>
+    </div>
+    <div class="tip c" style="margin-top:8px">💡 Шаблон задаёт начальное расположение блоков. Редактируйте данные в разделах ниже.</div>
+  <!-- Preview modal -->
+<div id="previewModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;display:none;align-items:center;justify-content:center;flex-direction:column;gap:12px">
+  <div style="position:relative">
+    <canvas id="prevModalCv" style="border-radius:12px;border:1.5px solid rgba(255,255,255,0.1);box-shadow:0 16px 60px rgba(0,0,0,.9);display:block;max-height:85vh;max-width:90vw"></canvas>
+    <!-- Progress bar -->
+    <div style="position:absolute;bottom:0;left:0;right:0;height:3px;background:rgba(255,255,255,0.1);border-radius:0 0 12px 12px;overflow:hidden">
+      <div id="prevModalPb" style="height:100%;background:#f5c518;width:0%;transition:width .1s linear"></div>
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;gap:16px">
+    <span id="prevModalTime" style="font-size:12px;color:#888;min-width:50px">0.0 с</span>
+    <button onclick="stopPreviewModal()" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15);border-radius:8px;color:#fff;font-family:'Oswald',sans-serif;font-size:13px;font-weight:600;letter-spacing:.06em;padding:8px 20px;cursor:pointer">■ Закрыть</button>
+    <span style="font-size:11px;color:#555">Нажмите Esc или кнопку для закрытия</span>
+  </div>
+</div>
+
+</div>
+</div>
+
+<!-- 0. Шаблоны added above -->
 
 <div class="panel open" id="p_bg">
 
@@ -574,18 +651,6 @@ select{cursor:pointer}select option{background:#141520}
 
         </select></div>
 
-      <div><label class="f">Длительность</label>
-
-        <select id="f_dur">
-
-          <option value="8">8 сек</option>
-
-          <option value="10" selected>10 сек</option>
-
-          <option value="12">12 сек</option>
-
-        </select></div>
-
     </div>
 
     <div style="font-size:10px;color:#555;margin:8px 0 4px;letter-spacing:.04em">ПОЛЕ · ШРИФТ · РАЗМЕР</div>
@@ -668,81 +733,86 @@ select{cursor:pointer}select option{background:#141520}
 
   <div class="panel-bd">
 
-    <div style="font-size:10px;color:#555;margin-bottom:6px">БЛОК · ЭФФЕКТ · ЗАДЕРЖКА</div>
+    <div style="font-size:10px;color:#555;margin-bottom:8px;letter-spacing:.04em">БЛОК · ЭФФЕКТ · ПОЯВЛЕНИЕ · ИСЧЕЗНОВЕНИЕ</div>
 
-    <div class="anim-row">
+    <!-- CSS for timeline rows -->
+    <style>
+    .tl-row{display:grid;grid-template-columns:60px 1fr;gap:4px;margin-bottom:8px;align-items:start}
+    .tl-label{font-size:10px;color:#666;padding-top:6px;letter-spacing:.03em}
+    .tl-controls{display:flex;flex-direction:column;gap:4px}
+    .tl-line{display:flex;align-items:center;gap:4px}
+    .tl-tag{font-size:9px;color:#444;width:20px;flex-shrink:0;letter-spacing:.03em}
+    .tl-tag.in{color:#4dc94d}
+    .tl-tag.out{color:#ff6b6b}
+    .tl-sl{-webkit-appearance:none;flex:1;height:3px;border-radius:2px;outline:none;border:none;cursor:pointer;padding:0}
+    .tl-sl.in-sl{background:rgba(77,201,77,0.2)}
+    .tl-sl.in-sl::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;border-radius:50%;background:#4dc94d;cursor:pointer}
+    .tl-sl.out-sl{background:rgba(255,107,107,0.2)}
+    .tl-sl.out-sl::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;border-radius:50%;background:#ff6b6b;cursor:pointer}
+    .tl-val{font-size:9px;font-weight:600;min-width:30px;text-align:right}
+    .tl-val.in{color:#4dc94d}
+    .tl-val.out{color:#ff6b6b}
+    .tl-eff{font-size:10px;padding:3px 5px;height:22px}
+    </style>
 
-      <span class="alabel">Бренд</span>
-
-      <select id="ae_brand" onchange="rp()"><option value="fade">Плавное</option><option value="slideLeft">← Слева</option><option value="slideUp">↑ Снизу</option><option value="slideDown">↓ Сверху</option><option value="zoom">Масштаб</option><option value="typewriter">Печать</option></select>
-
-      <input type="range" id="at_brand" min="0" max="8" step="0.5" value="0.5" oninput="document.getElementById('av_brand').textContent=this.value+'с';rp()">
-
-      <span class="aval" id="av_brand">0.5с</span>
-
+    <!-- Макрос для блока -->
+    <div class="tl-row">
+      <span class="tl-label">Бренд</span>
+      <div class="tl-controls">
+        <select id="ae_brand" class="tl-eff" onchange="rp()"><option value="fade">Плавное</option><option value="slideLeft">← Слева</option><option value="slideUp">↑ Снизу</option><option value="slideDown">↓ Сверху</option><option value="zoom">Масштаб</option><option value="typewriter">Печать</option></select>
+        <div class="tl-line"><span class="tl-tag in">▶</span><input type="range" id="at_brand" class="tl-sl in-sl" min="0" max="29" step="0.5" value="0.5" oninput="document.getElementById('av_brand').textContent=this.value+'с';rp()"><span class="tl-val in" id="av_brand">0.5с</span></div>
+        <div class="tl-line"><span class="tl-tag out">■</span><input type="range" id="ao_brand" class="tl-sl out-sl" min="0" max="30" step="0.5" value="0" oninput="document.getElementById('aov_brand').textContent=+this.value===0?'до конца':this.value+'с';rp()"><span class="tl-val out" id="aov_brand">до конца</span></div>
+      </div>
     </div>
 
-    <div class="anim-row">
-
-      <span class="alabel">Тип</span>
-
-      <select id="ae_type" onchange="rp()"><option value="fade">Плавное</option><option value="slideLeft">← Слева</option><option value="slideUp">↑ Снизу</option><option value="slideDown">↓ Сверху</option><option value="zoom">Масштаб</option><option value="typewriter">Печать</option></select>
-
-      <input type="range" id="at_type" min="0" max="8" step="0.5" value="1.5" oninput="document.getElementById('av_type').textContent=this.value+'с';rp()">
-
-      <span class="aval" id="av_type">1.5с</span>
-
+    <div class="tl-row">
+      <span class="tl-label">Тип/Загол.</span>
+      <div class="tl-controls">
+        <select id="ae_type" class="tl-eff" onchange="rp()"><option value="fade">Плавное</option><option value="slideLeft">← Слева</option><option value="slideUp">↑ Снизу</option><option value="slideDown">↓ Сверху</option><option value="zoom">Масштаб</option><option value="typewriter">Печать</option></select>
+        <div class="tl-line"><span class="tl-tag in">▶</span><input type="range" id="at_type" class="tl-sl in-sl" min="0" max="29" step="0.5" value="1.5" oninput="document.getElementById('av_type').textContent=this.value+'с';rp()"><span class="tl-val in" id="av_type">1.5с</span></div>
+        <div class="tl-line"><span class="tl-tag out">■</span><input type="range" id="ao_type" class="tl-sl out-sl" min="0" max="30" step="0.5" value="0" oninput="document.getElementById('aov_type').textContent=+this.value===0?'до конца':this.value+'с';rp()"><span class="tl-val out" id="aov_type">до конца</span></div>
+      </div>
     </div>
 
-    <div class="anim-row">
-
-      <span class="alabel">Размер</span>
-
-      <select id="ae_size" onchange="rp()"><option value="fade">Плавное</option><option value="slideLeft">← Слева</option><option value="slideUp">↑ Снизу</option><option value="slideDown">↓ Сверху</option><option value="zoom">Масштаб</option><option value="typewriter">Печать</option></select>
-
-      <input type="range" id="at_size" min="0" max="8" step="0.5" value="2.5" oninput="document.getElementById('av_size').textContent=this.value+'с';rp()">
-
-      <span class="aval" id="av_size">2.5с</span>
-
+    <div class="tl-row">
+      <span class="tl-label">Размер</span>
+      <div class="tl-controls">
+        <select id="ae_size" class="tl-eff" onchange="rp()"><option value="fade">Плавное</option><option value="slideLeft">← Слева</option><option value="slideUp">↑ Снизу</option><option value="slideDown">↓ Сверху</option><option value="zoom">Масштаб</option><option value="typewriter">Печать</option></select>
+        <div class="tl-line"><span class="tl-tag in">▶</span><input type="range" id="at_size" class="tl-sl in-sl" min="0" max="29" step="0.5" value="2.5" oninput="document.getElementById('av_size').textContent=this.value+'с';rp()"><span class="tl-val in" id="av_size">2.5с</span></div>
+        <div class="tl-line"><span class="tl-tag out">■</span><input type="range" id="ao_size" class="tl-sl out-sl" min="0" max="30" step="0.5" value="0" oninput="document.getElementById('aov_size').textContent=+this.value===0?'до конца':this.value+'с';rp()"><span class="tl-val out" id="aov_size">до конца</span></div>
+      </div>
     </div>
 
-    <div class="anim-row">
-
-      <span class="alabel">Подзагол.</span>
-
-      <select id="ae_sub" onchange="rp()"><option value="fade">Плавное</option><option value="slideLeft">← Слева</option><option value="slideUp">↑ Снизу</option><option value="slideDown">↓ Сверху</option><option value="zoom">Масштаб</option><option value="typewriter">Печать</option></select>
-
-      <input type="range" id="at_sub" min="0" max="8" step="0.5" value="3.0" oninput="document.getElementById('av_sub').textContent=this.value+'с';rp()">
-
-      <span class="aval" id="av_sub">3.0с</span>
-
+    <div class="tl-row">
+      <span class="tl-label">Подзагол.</span>
+      <div class="tl-controls">
+        <select id="ae_sub" class="tl-eff" onchange="rp()"><option value="fade">Плавное</option><option value="slideLeft">← Слева</option><option value="slideUp">↑ Снизу</option><option value="slideDown">↓ Сверху</option><option value="zoom">Масштаб</option><option value="typewriter">Печать</option></select>
+        <div class="tl-line"><span class="tl-tag in">▶</span><input type="range" id="at_sub" class="tl-sl in-sl" min="0" max="29" step="0.5" value="3.0" oninput="document.getElementById('av_sub').textContent=this.value+'с';rp()"><span class="tl-val in" id="av_sub">3.0с</span></div>
+        <div class="tl-line"><span class="tl-tag out">■</span><input type="range" id="ao_sub" class="tl-sl out-sl" min="0" max="30" step="0.5" value="0" oninput="document.getElementById('aov_sub').textContent=+this.value===0?'до конца':this.value+'с';rp()"><span class="tl-val out" id="aov_sub">до конца</span></div>
+      </div>
     </div>
 
-    <div class="anim-row">
-
-      <span class="alabel">Свойства</span>
-
-      <select id="ae_feat" onchange="rp()"><option value="fade">Плавное</option><option value="slideLeft">← Слева</option><option value="slideUp">↑ Снизу</option><option value="slideDown">↓ Сверху</option><option value="zoom">Масштаб</option><option value="typewriter">Печать</option></select>
-
-      <input type="range" id="at_feat" min="0" max="8" step="0.5" value="4.0" oninput="document.getElementById('av_feat').textContent=this.value+'с';rp()">
-
-      <span class="aval" id="av_feat">4.0с</span>
-
+    <div class="tl-row">
+      <span class="tl-label">Свойства</span>
+      <div class="tl-controls">
+        <select id="ae_feat" class="tl-eff" onchange="rp()"><option value="fade">Плавное</option><option value="slideLeft">← Слева</option><option value="slideUp">↑ Снизу</option><option value="slideDown">↓ Сверху</option><option value="zoom">Масштаб</option><option value="typewriter">Печать</option></select>
+        <div class="tl-line"><span class="tl-tag in">▶</span><input type="range" id="at_feat" class="tl-sl in-sl" min="0" max="29" step="0.5" value="4.0" oninput="document.getElementById('av_feat').textContent=this.value+'с';rp()"><span class="tl-val in" id="av_feat">4.0с</span></div>
+        <div class="tl-line"><span class="tl-tag out">■</span><input type="range" id="ao_feat" class="tl-sl out-sl" min="0" max="30" step="0.5" value="0" oninput="document.getElementById('aov_feat').textContent=+this.value===0?'до конца':this.value+'с';rp()"><span class="tl-val out" id="aov_feat">до конца</span></div>
+      </div>
     </div>
 
-    <label class="f" style="margin-top:8px">Длительность эффекта</label>
-
+    <label class="f" style="margin-top:4px">Длительность эффекта</label>
     <select id="anim_dur" onchange="rp()">
-
       <option value="0.3">Быстро (0.3 с)</option>
-
       <option value="0.5" selected>Нормально (0.5 с)</option>
-
       <option value="0.8">Медленно (0.8 с)</option>
-
       <option value="1.2">Очень медленно (1.2 с)</option>
-
     </select>
+
+    <div style="font-size:10px;color:#444;margin-top:8px;line-height:1.5">
+      🟢 <b>▶</b> — появляется в указанное время<br>
+      🔴 <b>■</b> — исчезает (0 = остаётся до конца)
+    </div>
 
   </div>
 
@@ -814,7 +884,7 @@ select{cursor:pointer}select option{background:#141520}
 
   <div class="prev-wrap">
 
-    <canvas id="prevCv" width="540" height="960"></canvas>
+    <canvas id="prevCv" width="540" height="960" tabindex="0"></canvas>
 
   </div>
 
@@ -863,12 +933,38 @@ select{cursor:pointer}select option{background:#141520}
       <button type="button" onclick="resetPositions()" title="Сброс позиций" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:4px;color:#888;cursor:pointer;font-size:11px;padding:2px 5px;line-height:1">↺</button>
       <button type="button" id="elDelete" onclick="deleteSelected()" title="Удалить (Delete/Backspace)" style="display:none;background:rgba(255,60,60,0.08);border:1px solid rgba(255,100,100,0.2);border-radius:4px;color:#ff6b6b;cursor:pointer;font-size:11px;padding:2px 6px;line-height:1">🗑 Удалить</button>
       <div style="flex:1"></div>
+      <!-- Layer list -->
+      <div style="position:relative">
+        <button type="button" id="layerListBtn" onclick="toggleLayerList()" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:4px;color:#666;cursor:pointer;font-size:10px;padding:2px 7px;line-height:1.4;white-space:nowrap">☰ Слои</button>
+        <div id="layerList" style="display:none;position:absolute;bottom:calc(100% + 6px);right:0;background:#13141f;border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:6px;min-width:220px;max-height:280px;overflow-y:auto;z-index:9999;box-shadow:0 8px 32px rgba(0,0,0,.8)">
+          <div style="font-size:10px;color:#444;padding:2px 6px 6px;border-bottom:1px solid rgba(255,255,255,0.06);margin-bottom:4px;display:flex;justify-content:space-between;align-items:center">
+            <span>ПОРЯДОК СЛОЁВ (верх → низ)</span>
+            <span style="color:#555;font-size:9px">тяните для перестановки</span>
+          </div>
+          <div id="layerListInner"></div>
+        </div>
+      </div>
+      <div style="flex:1"></div>
       <button type="button" onclick="toggleHiddenPanel()" title="Скрытые блоки" id="hiddenBtn" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:4px;color:#555;cursor:pointer;font-size:10px;padding:2px 7px;line-height:1.4;white-space:nowrap">👁 Блоки</button>
     </div>
   </div>
 
   <div class="gen-panel">
-    <button type="button" class="btn" id="genBtn" onclick="startGen()">▶ Сгенерировать видео</button>
+    <!-- Длительность видео — главный контрол -->
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;background:#13141f;border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:8px 12px">
+      <span style="font-size:11px;color:#888;white-space:nowrap">⏱ Длина видео</span>
+      <input type="range" id="f_dur" min="3" max="30" step="1" value="10"
+             style="-webkit-appearance:none;flex:1;height:4px;background:rgba(255,255,255,0.1);border-radius:2px;outline:none;border:none;cursor:pointer"
+             oninput="onDurChange(this.value)">
+      <span id="f_dur_val" style="font-size:13px;font-weight:700;color:#f5c518;min-width:36px;text-align:right">10 с</span>
+      <span style="font-size:9px;color:#444;white-space:nowrap">макс 30 с</span>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button type="button" class="btn-prev" id="prevBtn" onclick="togglePreview()">
+        ▶ Предпросмотр
+      </button>
+      <button type="button" class="btn" id="genBtn" onclick="startGen()">⬇ Сгенерировать</button>
+    </div>
     <div class="prog" id="prog"><div class="pb" id="pb"></div></div>
     <div class="st" id="st"></div>
     <div id="dlArea"></div>
@@ -897,6 +993,8 @@ let shapeElements  = [];
 let shapeIdSeq     = 0;
 
 let canvasShapes   = [];
+let _drawGt = 0.001; // current frame time, available to all draw helpers
+let layerOrder = []; // z-order for user elements
 
 let shapeSeqId     = 0;
 
@@ -904,7 +1002,7 @@ let selectedShape  = null;
 
 let selectedEl     = null; // key of selected standard element
 
-const HANDLE_R     = 6;
+const HANDLE_R     = 7; // handle radius in canvas px (larger = easier to grab)
 
 
 
@@ -1226,7 +1324,7 @@ function calcSnap(key, rawX, rawY){
 
   snapLines = lines;
 
-  return {x: Math.max(0, Math.min(1, snapX)), y: Math.max(0, Math.min(1, snapY))};
+  return {x: Math.max(-0.5, Math.min(1.5, snapX)), y: Math.max(-0.5, Math.min(1.5, snapY))};
 
 }
 
@@ -1315,23 +1413,22 @@ function initDrag(){
 
 
   function hitTest(fx,fy){
-
     const cx2 = fx * cv.width, cy2 = fy * cv.height;
-
     const keys = Object.keys(BOXES).reverse();
-
+    // First pass: check handles (they have priority and bigger hit area)
     for(const k of keys){
-
       const b = BOXES[k];
-
-      if(!b) continue;
-
-      if(cx2>=b.x && cx2<=b.x+b.w && cy2>=b.y && cy2<=b.y+b.h) return k;
-
+      if(!b || (!b.isHandle && !b.isElHandle)) continue;
+      const pad = HANDLE_R * (cv.width/FW) * 1.5; // extra generous hit area
+      if(cx2>=b.x-pad && cx2<=b.x+b.w+pad && cy2>=b.y-pad && cy2<=b.y+b.h+pad) return k;
     }
-
+    // Second pass: check bodies
+    for(const k of keys){
+      const b = BOXES[k];
+      if(!b || b.isHandle || b.isElHandle) continue;
+      if(cx2>=b.x && cx2<=b.x+b.w && cy2>=b.y && cy2<=b.y+b.h) return k;
+    }
     return null;
-
   }
 
 
@@ -1399,18 +1496,23 @@ function initDrag(){
         // Get current raw font size
 
         const EL_SIZE_SLIDER={brand:'fs_brand',type:'fs_type',badge:'fs_size',sub:'fs_sub',feats:'fs_feat'};
-
         const sliderId=EL_SIZE_SLIDER[elKey];
-
-        const curSize=sliderId?parseInt(document.getElementById(sliderId)?.value||'20'):20;
-
-        drag={mode:'elResize',key,elKey,hk:b.hk,
-
-          startFX:fx,startFY:fy,
-
-          startW:box.w,startH:box.h,
-
-          startSize:curSize,sliderId};
+        // For sh_ elements, get size from element object directly
+        let curSize=20, shResizeEl=null;
+        if(sliderId) curSize=parseInt(document.getElementById(sliderId)?.value||'20');
+        else if(elKey.startsWith('sh_')){
+          const shEl=shapeElements.find(e=>e.id===parseInt(elKey.replace('sh_','')));
+          if(shEl){
+            curSize=shEl.size||24;
+            // rect/line use dimensional resize
+            if(shEl.shape==='rect'||shEl.shape==='line') shResizeEl=shEl;
+          }
+        }
+        drag={mode:shResizeEl?'shElResize':'elResize',key,elKey,hk:b.hk,
+          startFX:fx,startFY:fy, lastFX:fx, lastFY:fy,
+          startW:box.w/FW, startH:box.h/FH,
+          startX:EP[elKey]?.x||0, startY:EP[elKey]?.y||0,
+          startSize:curSize, exactSize:curSize, sliderId, shEl:shResizeEl};
 
         cv.style.cursor=b.hCur||'se-resize';
 
@@ -1438,7 +1540,11 @@ function initDrag(){
 
         const ct=customTexts.find(t=>t.id===ctId);
 
-        if(ct) drag={mode:'ctResize',key,ctKey,hk:b.hk,startFX:fx,startFY:fy,startSize:ct.size,ct};
+        if(ct) drag={mode:'ctResize',key,ctKey,hk:b.hk,
+          startFX:fx,startFY:fy, lastFX:fx, lastFY:fy,
+          startW:box?.w||50, startH:box?.h||30,
+          startX:EP[ctKey]?.x||0, startY:EP[ctKey]?.y||0,
+          startSize:ct.size, exactSize:ct.size, ct};
 
         cv.style.cursor=b.hCur||'se-resize';
 
@@ -1451,23 +1557,16 @@ function initDrag(){
 
 
     // Shape move
-
     if(key.startsWith('sv_')){
-
       const shId=parseInt(key.replace('sv_',''));
-
       selectShape(shId);
-
-      selectedEl=null;
-
+      selectedEl = key; // ← was null, now correctly set
+      setTimeout(updateElProps, 0);
+      cv.focus();
       const sh=canvasShapes.find(s=>s.id===shId);
-
       if(sh) drag={mode:'shMove',key,startFX:fx,startFY:fy,startX:sh.x,startY:sh.y};
-
       cv.style.cursor='grabbing';
-
       return;
-
     }
 
 
@@ -1478,7 +1577,8 @@ function initDrag(){
 
     // Set selectedEl for standard elements and custom texts
 
-    if(!key.startsWith("sh_")){selectedEl=key;}else{selectedEl=null;} setTimeout(updateElProps,0);
+    selectedEl=key; setTimeout(updateElProps,0); // all elements can be selected
+    cv.focus(); // so Delete key works without clicking canvas explicitly
 
 
     if(!EP[key]) EP[key]={x:fx,y:fy};
@@ -1505,76 +1605,86 @@ function initDrag(){
 
 
 
+      // ── Resize helpers ──────────────────────────────────────────────────────
+      // Convert fraction delta to canvas pixels and back
+      const dxPx = dx * FW; // delta in canvas pixels
+      const dyPx = dy * FH;
+
       if(drag.mode==='resize'){
-
-        // Shape resize
-
+        // Free resize for canvas shapes — no clamping, can go outside canvas
         const sh=canvasShapes.find(s=>s.id===drag.shId);
-
         if(!sh) return;
-
         const hk=drag.hk;
-
-        let nx=drag.startX,ny=drag.startY,nw=drag.startW,nh=drag.startH;
-
-        if(hk.includes('e'))  nw=Math.max(0.02,drag.startW+dx);
-
-        if(hk.includes('s'))  nh=Math.max(0.02,drag.startH+dy);
-
-        if(hk.includes('w')){ nw=Math.max(0.02,drag.startW-dx); nx=drag.startX+drag.startW-nw; }
-
-        if(hk.includes('n')){ nh=Math.max(0.02,drag.startH-dy); ny=drag.startY+drag.startH-nh; }
-
+        let nx=drag.startX, ny=drag.startY, nw=drag.startW, nh=drag.startH;
+        const MIN=0.01; // minimum 1% of canvas
+        if(hk.includes('e'))  nw = Math.max(MIN, drag.startW + dx);
+        if(hk.includes('s'))  nh = Math.max(MIN, drag.startH + dy);
+        if(hk.includes('w')){ nw = Math.max(MIN, drag.startW - dx); nx = drag.startX + drag.startW - nw; }
+        if(hk.includes('n')){ nh = Math.max(MIN, drag.startH - dy); ny = drag.startY + drag.startH - nh; }
         sh.x=nx; sh.y=ny; sh.w=nw; sh.h=nh;
 
-
-
-      } else if(drag.mode==='elResize'){
-
-        // Standard element font resize — use diagonal delta
-
-        const delta = (dx+dy)/2;
-
-        const scaleFactor = (drag.startW + delta*FW) / Math.max(drag.startW, 1);
-
-        let newSize = Math.round(drag.startSize * scaleFactor);
-
-        newSize = Math.max(6, Math.min(200, newSize));
-
-        if(drag.sliderId){
-
-          const sl=document.getElementById(drag.sliderId);
-
-          if(sl){
-
-            sl.value=newSize;
-
-            const valEl=document.getElementById(drag.sliderId.replace('fs_','fv_'));
-
-            if(valEl) valEl.textContent=newSize+'px';
-
-          }
-
+      } else if(drag.mode==='shElResize'){
+        // Rect/line sh_ element — free dimensional resize
+        const el=drag.shEl;
+        if(el){
+          const hk=drag.hk;
+          let nw=drag.startW, nh=drag.startH, nx=drag.startX, ny=drag.startY;
+          if(hk.includes('e'))  nw=Math.max(0.02, drag.startW+dx);
+          if(hk.includes('s'))  nh=Math.max(0.01, drag.startH+dy);
+          if(hk.includes('w')){ nw=Math.max(0.02, drag.startW-dx); nx=drag.startX+drag.startW-nw; }
+          if(hk.includes('n')){ nh=Math.max(0.01, drag.startH-dy); ny=drag.startY+drag.startH-nh; }
+          el.width=nw; el.height=nh;
+          if(EP[drag.elKey]){ EP[drag.elKey].x=nx; EP[drag.elKey].y=ny; }
         }
 
+      } else if(drag.mode==='shElResize'){
+        const el=drag.shEl;
+        if(el){
+          const hk=drag.hk;
+          let nw=drag.startW,nh=drag.startH,nx=drag.startX,ny=drag.startY;
+          if(hk.includes('e'))  nw=Math.max(0.02,drag.startW+dx);
+          if(hk.includes('s'))  nh=Math.max(0.01,drag.startH+dy);
+          if(hk.includes('w')){ nw=Math.max(0.02,drag.startW-dx); nx=drag.startX+drag.startW-nw; }
+          if(hk.includes('n')){ nh=Math.max(0.01,drag.startH-dy); ny=drag.startY+drag.startH-nh; }
+          el.width=nw; el.height=nh;
+          if(EP[drag.elKey]){ EP[drag.elKey].x=nx; EP[drag.elKey].y=ny; }
+        }
 
+      } else if(drag.mode==='elResize'){
+        // Incremental accumulation — avoids rounding killing small drags
+        const hk=drag.hk;
+        const idxPx=(fx-(drag.lastFX||drag.startFX))*FW;
+        const idyPx=(fy-(drag.lastFY||drag.startFY))*FH;
+        drag.lastFX=fx; drag.lastFY=fy;
+        let incDelta=0;
+        if(hk.includes('e')) incDelta+=idxPx;
+        if(hk.includes('s')) incDelta+=idyPx;
+        if(hk.includes('w')) incDelta-=idxPx;
+        if(hk.includes('n')) incDelta-=idyPx;
+        const prevExact=drag.exactSize||drag.startSize;
+        drag.exactSize=Math.max(6,Math.min(90,prevExact+incDelta*prevExact/50));
+        const clamped=Math.round(drag.exactSize);
+        if(drag.sliderId){
+          const sl=document.getElementById(drag.sliderId);
+          if(sl){
+            sl.value=clamped;
+            const valEl=document.getElementById(drag.sliderId.replace('fs_','fv_'));
+            if(valEl) valEl.textContent=clamped+'px';
+          }
+        }
 
       } else if(drag.mode==='ctResize'){
-
-        // Custom text font resize
-
-        const delta=(dx+dy)/2;
-
-        const box=BOXES[drag.ctKey];
-
-        const scaleFactor=(box?(box.w+delta*FW)/Math.max(box.w,1):1+delta);
-
-        let newSize=Math.round(drag.startSize*scaleFactor);
-
-        newSize=Math.max(6,Math.min(200,newSize));
-
-        drag.ct.size=newSize;
-
+        const hk=drag.hk;
+        const idxPx2=(fx-(drag.lastFX||drag.startFX))*FW;
+        const idyPx2=(fy-(drag.lastFY||drag.startFY))*FH;
+        drag.lastFX=fx; drag.lastFY=fy;
+        let inc2=0;
+        if(hk.includes('e')) inc2+=idxPx2;
+        if(hk.includes('s')) inc2+=idyPx2;
+        if(hk.includes('w')) inc2-=idxPx2;
+        if(hk.includes('n')) inc2-=idyPx2;
+        drag.exactSize=Math.max(6,Math.min(90,(drag.exactSize||drag.startSize)+inc2*(drag.exactSize||drag.startSize)/50));
+        drag.ct.size=Math.round(drag.exactSize);
         renderCustomTextList();
 
 
@@ -1599,7 +1709,7 @@ function initDrag(){
 
           const sh=canvasShapes.find(s=>s.id===parseInt(drag.key.replace('sv_','')));
 
-          if(sh){ sh.x=Math.max(0,Math.min(1,rawX)); sh.y=Math.max(0,Math.min(1,rawY)); }
+          if(sh){ sh.x=rawX; sh.y=rawY; }
 
           EP[drag.key]={x:sh?.x||rawX,y:sh?.y||rawY};
 
@@ -1664,6 +1774,10 @@ function initDrag(){
   cv.addEventListener('touchmove',  onMove, {passive:false});
 
   cv.addEventListener('touchend',   onUp);
+  cv.addEventListener("keydown", e=>{
+    if((e.key==="Delete"||e.key==="Backspace") && selectedEl){ e.preventDefault(); deleteSelected(); }
+    if(e.key==="Escape"){ selectedEl=null; selectedShape=null; setTimeout(updateElProps,0); }
+  });
 
 }
 
@@ -1728,29 +1842,19 @@ function he(t){const d=document.createElement('div');d.textContent=t;return d.in
 // Load background video
 
 function loadBg(f){
-
   if(!f)return;
-
   const url=URL.createObjectURL(f);
-
   const vid=document.createElement('video');
-
   vid.src=url;vid.loop=true;vid.muted=true;vid.playsInline=true;
-
   vid.onloadeddata=()=>{
-
-    bgVid=vid;vid.play().catch(()=>{});
-
+    bgVid=vid;
+    // Don't autoplay — just seek to frame 0 for thumbnail
+    vid.currentTime=0;
     const b=document.getElementById('bgBox');
-
     b.classList.add('filled');
-
     b.querySelector('.tt').textContent='✅ '+f.name;
-
     rp();
-
   };vid.load();
-
 }
 
 
@@ -1874,6 +1978,7 @@ function fnt(nameId, sizeId, weight, s){
 
 
 function drawFrame(cv,cw,ch,gt,vidSrc){
+  _drawGt = gt; // make gt available to drawCustomText
 
   const ctx = cv.getContext('2d');
 
@@ -1903,46 +2008,39 @@ function drawFrame(cv,cw,ch,gt,vidSrc){
 
 
 
-  // Returns {alpha, offsetX, offsetY, scale} for a given element at time gt
+  // Returns {alpha, ox, oy, sc, p, effect} supporting timeIn + timeOut
+  function elemAnim(typeId, delayId, outId){
+    if(gt<=0.01) return {alpha:1, ox:0, oy:0, sc:1, p:1, effect:"fade"};
+    const effect   = document.getElementById(typeId)?.value || 'fade';
+    const timeIn   = parseFloat(document.getElementById(delayId)?.value || '0');
+    const timeOut  = outId ? parseFloat(document.getElementById(outId)?.value || '0') : 0;
+    const dur      = getDur();
+    const fadeOut  = timeOut > 0 && timeOut <= dur ? timeOut : 0; // 0 = until end
 
-  function elemAnim(typeId, delayId, cx, cy2){
-
-    const effect = document.getElementById(typeId)?.value || 'fade';
-
-    const delay  = parseFloat(document.getElementById(delayId)?.value || '0');
-
-    const t      = Math.max(0, gt - delay);          // local time after delay
-
-    const p      = Math.min(1, t / animFadeDur);     // 0→1 progress
-
-    const ease   = p < 0.5 ? 2*p*p : -1+(4-2*p)*p; // ease-in-out
-
-
-
-    let alpha=ease, ox=0, oy=0, sc=1;
-
-    if(p <= 0) return {alpha:0, ox:0, oy:0, sc:1};
-
-
-
-    switch(effect){
-
-      case 'fade':     alpha=ease; break;
-
-      case 'slideLeft':ox=(1-ease)*-60*s; alpha=ease; break;
-
-      case 'slideUp':  oy=(1-ease)*40*s;  alpha=ease; break;
-
-      case 'slideDown':oy=(1-ease)*-40*s; alpha=ease; break;
-
-      case 'zoom':     sc=0.6+ease*0.4;   alpha=ease; break;
-
-      case 'typewriter': alpha=1; break; // handled separately
-
+    // Fade-out: start fading animFadeDur before timeOut
+    if(fadeOut > 0 && gt >= fadeOut){
+      const t2 = gt - fadeOut;
+      const p2 = Math.min(1, t2 / animFadeDur);
+      const a  = 1 - (p2 < 0.5 ? 2*p2*p2 : -1+(4-2*p2)*p2);
+      if(a <= 0) return {alpha:0, ox:0, oy:0, sc:1, p:1, effect};
+      return {alpha:a, ox:0, oy:0, sc:1, p:1, effect};
     }
 
+    // Fade-in
+    const t = Math.max(0, gt - timeIn);
+    const p = Math.min(1, t / animFadeDur);
+    if(p <= 0) return {alpha:0, ox:0, oy:0, sc:1};
+    const ease = p < 0.5 ? 2*p*p : -1+(4-2*p)*p;
+    let alpha=ease, ox=0, oy=0, sc=1;
+    switch(effect){
+      case 'fade':     break;
+      case 'slideLeft':ox=(1-ease)*-60*s; break;
+      case 'slideUp':  oy=(1-ease)*40*s;  break;
+      case 'slideDown':oy=(1-ease)*-40*s; break;
+      case 'zoom':     sc=0.6+ease*0.4;   break;
+      case 'typewriter': alpha=1; break;
+    }
     return {alpha, ox, oy, sc, p, effect};
-
   }
 
 
@@ -2217,7 +2315,7 @@ function drawFrame(cv,cw,ch,gt,vidSrc){
 
   if(brand && vis('brand')){
 
-    const a = elemAnim('ae_brand','at_brand');
+    const a = elemAnim('ae_brand','at_brand','ao_brand');
 
     const bx=px('brand'), by=py('brand');
 
@@ -2247,7 +2345,7 @@ function drawFrame(cv,cw,ch,gt,vidSrc){
 
   if(disc && vis('disc')){
 
-    const a = elemAnim('ae_brand','at_brand');
+    const a = elemAnim('ae_brand','at_brand','ao_brand');
 
     withAnim(a,()=>{
 
@@ -2279,7 +2377,7 @@ function drawFrame(cv,cw,ch,gt,vidSrc){
 
   if(vis('type')){
 
-    const a=elemAnim('ae_type','at_type');
+    const a=elemAnim('ae_type','at_type','ao_type');
 
     const tx=px('type'), ty2=py('type');
 
@@ -2317,7 +2415,7 @@ function drawFrame(cv,cw,ch,gt,vidSrc){
 
   if(vis('badge')){
 
-    const a=elemAnim('ae_size','at_size');
+    const a=elemAnim('ae_size','at_size','ao_size');
 
     const bx=px('badge'), by=py('badge');
 
@@ -2353,7 +2451,7 @@ function drawFrame(cv,cw,ch,gt,vidSrc){
 
   if(sub && subH>0 && vis('sub')){
 
-    const a=elemAnim('ae_sub','at_sub');
+    const a=elemAnim('ae_sub','at_sub','ao_sub');
 
     const bx=px('sub'), by=py('sub');
 
@@ -2384,7 +2482,7 @@ function drawFrame(cv,cw,ch,gt,vidSrc){
   if(vis('feats')){
 
     const baseDelay=parseFloat(document.getElementById('at_feat')?.value||'4');
-
+    const featOut=parseFloat(document.getElementById('ao_feat')?.value||'0');
     const effect=document.getElementById('ae_feat')?.value||'slideLeft';
 
     const fx2=px('feats'), fy2=py('feats');
@@ -2396,29 +2494,29 @@ function drawFrame(cv,cw,ch,gt,vidSrc){
     activeFeat.forEach((feat,i)=>{
 
       const delay=baseDelay+i*0.35;
+      // Timeline alpha for features (design mode = always visible)
+      let featAlpha=1, featP=1;
+      if(gt > 0.01){
+        if(featOut>0 && gt>=featOut){
+          const t2=gt-featOut; const p2=Math.min(1,t2/animFadeDur);
+          featAlpha=1-(p2<0.5?2*p2*p2:-1+(4-2*p2)*p2);
+          if(featAlpha<=0) return;
+        } else {
+          const t=Math.max(0,gt-delay);
+          featP=Math.min(1,t/animFadeDur);
+          featAlpha=featP<0.5?2*featP*featP:-1+(4-2*featP)*featP;
+          if(featP<=0) return;
+        }
+      }
 
-      const t=Math.max(0,gt-delay);
-
-      const p=Math.min(1,t/animFadeDur);
-
-      const ease=p<0.5?2*p*p:-1+(4-2*p)*p;
-
-      if(p<=0)return;
-
-      let alpha=ease,ox=0,oy=0,sc=1;
+      let alpha=featAlpha, ox=0, oy=0, sc=1;
 
       switch(effect){
-
         case 'fade':break;
-
-        case 'slideLeft':ox=(1-ease)*-60*s;break;
-
-        case 'slideUp':oy=(1-ease)*30*s;break;
-
-        case 'slideDown':oy=(1-ease)*-30*s;break;
-
-        case 'zoom':sc=0.6+ease*0.4;break;
-
+        case 'slideLeft':ox=(1-featAlpha)*-60*s;break;
+        case 'slideUp':oy=(1-featAlpha)*30*s;break;
+        case 'slideDown':oy=(1-featAlpha)*-30*s;break;
+        case 'zoom':sc=0.6+featAlpha*0.4;break;
       }
 
       ctx.save();ctx.globalAlpha=alpha;ctx.translate(ox,oy);
@@ -2435,7 +2533,7 @@ function drawFrame(cv,cw,ch,gt,vidSrc){
 
       const textPad = dotR*2 + 20*s;
 
-      const displayFeat = effect==='typewriter' ? feat.slice(0,Math.ceil(p*feat.length)) : feat;
+      const displayFeat = effect==='typewriter' ? feat.slice(0,Math.ceil(featP*feat.length)) : feat;
 
       const textW = ctx.measureText(displayFeat).width;
 
@@ -2471,289 +2569,26 @@ function drawFrame(cv,cw,ch,gt,vidSrc){
 
 
 
-  // ── 8. Custom text blocks ─────────────────────────────────────────────────
+  // ── 8-10. Unified layer draw (layerOrder controls z-order) ─────────────────
 
-  customTexts.forEach(t=>{
+  // Ensure all user elements are registered in layerOrder
+  customTexts.forEach(t=>{ const k='ct_'+t.id; if(!layerOrder.includes(k)) layerOrder.push(k); });
+  shapeElements.forEach(e=>{ const k='sh_'+e.id; if(!layerOrder.includes(k)) layerOrder.push(k); });
+  canvasShapes.forEach(s=>{ const k='sv_'+s.id; if(!layerOrder.includes(k)) layerOrder.push(k); });
 
-    const key = 'ct_'+t.id;
+  // Draw standard blocks first (they are always "below" user elements unless reordered)
+  // (Standard blocks: brand, disc, type, badge, sub, feats, tire — drawn in sections 3-7 above)
 
-    if(!EP[key]) EP[key]={x:t.x, y:t.y};
-
-    const cx2=EP[key].x*cw, cy2=EP[key].y*ch;
-
-    const weight=(t.bold?'bold ':'')+(t.italic?'italic ':'');
-
-    const px2=Math.max(8, Math.round(t.size*s));
-
-    const fontStr=`${weight}${px2}px '${t.font}',sans-serif`;
-
-    const lh=px2*1.35;
-
-    const opacity=(t.opacity||100)/100;
-
-
-
-    ctx.save();
-
-    ctx.globalAlpha=opacity;
-
-    ctx.font=fontStr;
-
-    ctx.fillStyle=t.color;
-
-    ctx.textAlign=t.align||'left';
-
-
-
-    if(t.shadow){
-
-      ctx.shadowColor='rgba(0,0,0,0.75)';
-
-      ctx.shadowBlur=px2*0.4;
-
-      ctx.shadowOffsetX=px2*0.06;
-
-      ctx.shadowOffsetY=px2*0.06;
-
+  // Draw user elements in layerOrder (bottom → top)
+  layerOrder.forEach(key=>{
+    if(key.startsWith('ct_')){
+      const t=customTexts.find(t=>'ct_'+t.id===key); if(t) drawCustomText(t,ctx,cw,ch,s);
+    } else if(key.startsWith('sh_')){
+      const e=shapeElements.find(e=>'sh_'+e.id===key); if(e) drawShapeElement(e,ctx,cw,ch,s,key);
+    } else if(key.startsWith('sv_')){
+      const sh=canvasShapes.find(s=>'sv_'+s.id===key); if(sh) drawCanvasShape(ctx,sh,cw,ch,s);
     }
-
-
-
-    const lines=t.text.split('\n');
-
-    const maxW=lines.reduce((m,l)=>Math.max(m,ctx.measureText(l).width),0);
-
-    let bx=cx2;
-
-    if(t.align==='center') bx=cx2-maxW/2;
-
-    if(t.align==='right')  bx=cx2-maxW;
-
-
-
-    // Register bounding box
-
-    const ctBx=bx-5*s, ctBy=cy2-lh*0.95;
-
-    const ctBw=(maxW||50*s)+10*s, ctBh=lh*lines.length+6*s;
-
-    regBox(key, ctBx, ctBy, ctBw, ctBh);
-
-
-
-    // Draw hover/selection outline + handles
-
-    const ctSel = selectedEl===key;
-
-    const ctHov = hovered===key||drag?.key===key;
-
-    if(ctHov||ctSel){
-
-      ctx.save();
-
-      ctx.strokeStyle=ctSel?'rgba(245,197,24,0.9)':'rgba(245,197,24,0.5)';
-
-      ctx.lineWidth=1.5*s;ctx.setLineDash([3*s,3*s]);
-
-      ctx.strokeRect(ctBx,ctBy,ctBw,ctBh);ctx.setLineDash([]);ctx.restore();
-
-    }
-
-    if(ctSel){
-
-      const hr=HANDLE_R*s;
-
-      [[ctBx,ctBy,'nw'],[ctBx+ctBw,ctBy,'ne'],[ctBx+ctBw,ctBy+ctBh,'se'],[ctBx,ctBy+ctBh,'sw']].forEach(([hx,hy,hk])=>{
-
-        ctx.save();ctx.fillStyle='#fff';ctx.strokeStyle='#f5c518';ctx.lineWidth=1.5*s;
-
-        ctx.beginPath();ctx.arc(hx,hy,hr,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.restore();
-
-        BOXES['cth_'+key+'_'+hk]={x:hx-hr*1.5,y:hy-hr*1.5,w:hr*3,h:hr*3,isElHandle:true,ctKey:key,hk,hCur:'se-resize'};
-
-      });
-
-    }
-
-
-
-    lines.forEach((line,i)=>{
-
-      const ly=cy2+i*lh;
-
-      ctx.fillText(line, cx2, ly);
-
-
-
-      // Underline
-
-      if(t.underline){
-
-        const lw=ctx.measureText(line).width;
-
-        const ux=t.align==='center'?cx2-lw/2:t.align==='right'?cx2-lw:cx2;
-
-        ctx.save();ctx.shadowBlur=0;ctx.shadowOffsetX=0;ctx.shadowOffsetY=0;
-
-        ctx.fillRect(ux, ly+px2*0.15, lw, Math.max(1, px2*0.07));
-
-        ctx.restore();
-
-      }
-
-      // Strikethrough
-
-      if(t.strike){
-
-        const lw=ctx.measureText(line).width;
-
-        const sx2=t.align==='center'?cx2-lw/2:t.align==='right'?cx2-lw:cx2;
-
-        ctx.save();ctx.shadowBlur=0;ctx.shadowOffsetX=0;ctx.shadowOffsetY=0;
-
-        ctx.fillRect(sx2, ly-px2*0.3, lw, Math.max(1, px2*0.07));
-
-        ctx.restore();
-
-      }
-
-    });
-
-
-
-    ctx.restore();
-
   });
-
-
-
-  // ── 9. Shape / template elements ─────────────────────────────────────────
-
-  shapeElements.forEach(el=>{
-
-    const key='sh_'+el.id;
-
-    if(!EP[key]) EP[key]={x:el.x,y:el.y};
-
-    const ex=EP[key].x*cw, ey=EP[key].y*ch;
-
-    const op=(el.opacity||100)/100;
-
-    ctx.save(); ctx.globalAlpha=op;
-
-
-
-    if(el.shape==='badge'||el.shape==='text'){
-
-      const weight=(el.bold?'bold ':'')+Math.round((el.size||24)*s)+'px \''+el.font+'\',sans-serif';
-
-      ctx.font=weight;
-
-      const tw=ctx.measureText(el.text).width;
-
-      const px2=(el.padX||0)*s, py2=(el.padY||0)*s;
-
-      const bw=tw+px2*2, bh=(el.size||24)*s+(py2*2);
-
-      if(el.bgColor){
-
-        ctx.fillStyle=el.bgColor;
-
-        const rr2=Math.min((el.radius||0)*s, bh/2);
-
-        ctx.beginPath();ctx.moveTo(ex+rr2,ey);ctx.lineTo(ex+bw-rr2,ey);
-
-        ctx.arcTo(ex+bw,ey,ex+bw,ey+rr2,rr2);ctx.lineTo(ex+bw,ey+bh-rr2);
-
-        ctx.arcTo(ex+bw,ey+bh,ex+bw-rr2,ey+bh,rr2);ctx.lineTo(ex+rr2,ey+bh);
-
-        ctx.arcTo(ex,ey+bh,ex,ey+bh-rr2,rr2);ctx.lineTo(ex,ey+rr2);
-
-        ctx.arcTo(ex,ey,ex+rr2,ey,rr2);ctx.closePath();ctx.fill();
-
-        regBox(key,ex,ey,bw,bh);
-
-        drawHover(key,ex,ey,bw,bh);
-
-      } else {
-
-        regBox(key,ex,ey-el.size*s,tw,el.size*s*1.2);
-
-        drawHover(key,ex,ey-el.size*s,tw,el.size*s*1.2);
-
-      }
-
-      ctx.font=weight;
-
-      ctx.fillStyle=el.textColor||'#fff';
-
-      ctx.textAlign='left';
-
-      ctx.shadowColor='rgba(0,0,0,0.5)';ctx.shadowBlur=3*s;
-
-      ctx.fillText(el.text,ex+px2,ey+(el.size||24)*s+py2-py2*0.15);
-
-
-
-    } else if(el.shape==='line'){
-
-      const lw2=(el.width||0.5)*cw;
-
-      regBox(key,ex,ey-4*s,lw2,8*s);
-
-      drawHover(key,ex,ey-4*s,lw2,8*s);
-
-      ctx.strokeStyle=el.lineColor||'rgba(255,255,255,0.4)';
-
-      ctx.lineWidth=(el.lineWidth||2)*s;
-
-      ctx.setLineDash([]); ctx.beginPath();
-
-      ctx.moveTo(ex,ey); ctx.lineTo(ex+lw2,ey); ctx.stroke();
-
-
-
-    } else if(el.shape==='rect'){
-
-      const rw=(el.width||0.5)*cw, rh=(el.height||0.08)*ch;
-
-      const rr2=Math.min((el.radius||0)*s, rh/2);
-
-      regBox(key,ex,ey,rw,rh);
-
-      drawHover(key,ex,ey,rw,rh);
-
-      ctx.fillStyle=el.fillColor||'rgba(0,0,0,0.5)';
-
-      ctx.beginPath();ctx.moveTo(ex+rr2,ey);ctx.lineTo(ex+rw-rr2,ey);
-
-      ctx.arcTo(ex+rw,ey,ex+rw,ey+rr2,rr2);ctx.lineTo(ex+rw,ey+rh-rr2);
-
-      ctx.arcTo(ex+rw,ey+rh,ex+rw-rr2,ey+rh,rr2);ctx.lineTo(ex+rr2,ey+rh);
-
-      ctx.arcTo(ex,ey+rh,ex,ey+rh-rr2,rr2);ctx.lineTo(ex,ey+rr2);
-
-      ctx.arcTo(ex,ey,ex+rr2,ey,rr2);ctx.closePath();ctx.fill();
-
-      if(el.strokeColor){
-
-        ctx.strokeStyle=el.strokeColor;ctx.lineWidth=1.5*s;ctx.stroke();
-
-      }
-
-    }
-
-    ctx.restore();
-
-  });
-
-
-
-  // ── 10. Canvas shapes (resizable) ────────────────────────────────────────
-
-  canvasShapes.forEach(sh=>drawCanvasShape(ctx,sh,cw,ch,s));
-
-
 
   // ── Snap guides ───────────────────────────────────────────────────────────
 
@@ -2771,19 +2606,97 @@ function drawFrame(cv,cw,ch,gt,vidSrc){
 
 // ── Preview loop ──────────────────────────────────────────────────────────────
 
-function rp(){cancelAnimationFrame(prevRaf);animT=0;loop();}
+let isPlaying = false;
+let modalRaf  = null;
 
-function loop(){
-
-  animT+=0.018;
-
-  drawFrame(document.getElementById('prevCv'),FW,FH,animT,bgVid);
-
-  prevRaf=requestAnimationFrame(loop);
-
+// Main canvas runs a CONTINUOUS design loop at gt=0.001
+// This keeps BOXES updated for drag/hit-test to work at all times
+function designLoop(){
+  drawFrame(document.getElementById('prevCv'), FW, FH, 0.001, null);
+  prevRaf = requestAnimationFrame(designLoop);
 }
 
-loop();
+// rp() just resets — loop is always running
+function rp(){
+  // loop is already running, nothing to restart
+}
+
+function applyTemplate(name){
+  if(name !== 'wb') return;
+  EP = JSON.parse(JSON.stringify(DEFAULT_POS));
+  ['brand','type','badge','sub','feats','tire'].forEach(k=>{
+    const cb=document.getElementById('vis_'+k);
+    if(cb) cb.checked=true;
+  });
+  const fields={f_type:'ШИНА ЛЕТНЯЯ',f_brand:'SAILUN',f_sub:'РЕЗИНА ЛЕТНЯЯ',f_size:'175/65 R14'};
+  Object.entries(fields).forEach(([id,val])=>{
+    const el=document.getElementById(id);
+    if(el && !el.value.trim()) el.value=val;
+  });
+  if(feats.length===0||feats.every(f=>!f.trim())){
+    feats=['Легкая балансировка','Быстрый отвод воды','Устойчивость на поворотах','Ненаправленный рисунок'];
+    renderFeatList();
+  }
+  rp();
+}
+
+// Preview plays in MODAL — main canvas stays editable
+function togglePreview(){
+  if(isPlaying){ stopPreviewModal(); } else { openPreviewModal(); }
+}
+
+function openPreviewModal(){
+  const modal = document.getElementById('previewModal');
+  const cv    = document.getElementById('prevModalCv');
+  if(!modal||!cv) return;
+  // Size modal canvas
+  const maxH = window.innerHeight*0.82, maxW = window.innerWidth*0.88;
+  const ratio = FW/FH;
+  let cw=maxH*ratio, ch=maxH;
+  if(cw>maxW){cw=maxW;ch=maxW/ratio;}
+  cv.width=FW; cv.height=FH;
+  cv.style.width=Math.round(cw)+'px'; cv.style.height=Math.round(ch)+'px';
+  modal.style.display='flex';
+  isPlaying=true; animT=0;
+  const btn=document.getElementById('prevBtn');
+  if(btn){btn.textContent='■ Стоп';btn.classList.add('playing');}
+  if(bgVid){bgVid.currentTime=0;bgVid.play().catch(()=>{});}
+  loopModal();
+}
+
+function stopPreviewModal(){
+  isPlaying=false;
+  cancelAnimationFrame(modalRaf);modalRaf=null;
+  if(bgVid) bgVid.pause();
+  const modal=document.getElementById('previewModal');
+  if(modal) modal.style.display='none';
+  const btn=document.getElementById('prevBtn');
+  if(btn){btn.textContent='▶ Предпросмотр';btn.classList.remove('playing');}
+  // Make sure design loop is running
+  cancelAnimationFrame(prevRaf);
+  designLoop();
+}
+
+function loopModal(){
+  if(!isPlaying) return;
+  const dur=getDur();
+  animT+=0.016;
+  const pb=document.getElementById('prevModalPb');
+  const pt=document.getElementById('prevModalTime');
+  if(pb) pb.style.width=Math.min(100,(animT/dur)*100)+'%';
+  if(pt) pt.textContent=Math.min(animT,dur).toFixed(1)+' с';
+  drawFrame(document.getElementById('prevModalCv'),FW,FH,animT,bgVid);
+  if(animT>=dur+0.3){stopPreviewModal();return;}
+  modalRaf=requestAnimationFrame(loopModal);
+}
+
+// Esc closes modal
+window.addEventListener('keydown',e=>{
+  if(e.key==='Escape'&&isPlaying) stopPreviewModal();
+});
+
+// Start continuous design loop
+designLoop();
 
 initDrag();
 
@@ -2805,7 +2718,7 @@ async function startGen(){
 
   const btn=document.getElementById('genBtn');btn.disabled=true;
 
-  cancelAnimationFrame(prevRaf);prevRaf=null;
+  cancelAnimationFrame(prevRaf); prevRaf=null;
 
   document.getElementById('dlArea').innerHTML='';
 
@@ -2831,21 +2744,20 @@ async function startGen(){
 
   }catch(e){setSt('❌ '+e.message,'err');}
 
-  btn.disabled=false;loop();
+  btn.disabled=false; designLoop();
 
 }
 
 
 
 async function genVideo(){
-  const dur = parseInt(v('f_dur')) || 10;
+  const dur = getDur();
   const totF = FPS * dur;
-  const frameMs = 1000 / FPS; // ~41.67ms per frame at 24fps
+  const frameMs = 1000 / FPS;
 
   const cv = document.createElement('canvas');
   cv.width = FW; cv.height = FH;
 
-  // Seek background video to start
   if(bgVid){
     bgVid.currentTime = 0;
     await new Promise(r=>{bgVid.onseeked=r; setTimeout(r,500);});
@@ -2854,7 +2766,6 @@ async function genVideo(){
 
   const mime = MediaRecorder.isTypeSupported('video/webm;codecs=vp9')
     ? 'video/webm;codecs=vp9' : 'video/webm';
-
   const stream = cv.captureStream(FPS);
   const rec = new MediaRecorder(stream, {mimeType:mime, videoBitsPerSecond:12000000});
   const chunks = [];
@@ -2863,19 +2774,17 @@ async function genVideo(){
   return new Promise((resolve, reject) => {
     rec.start(100);
     const bar = document.getElementById('pb');
-    let f = 0, gt = 0;
+    let f = 0;
     let lastTime = null;
     let accumulated = 0;
 
-    // Use requestAnimationFrame timed loop so canvas capture gets real frames
     function tick(now){
       if(lastTime === null) lastTime = now;
       accumulated += now - lastTime;
       lastTime = now;
 
-      // Render as many frames as needed to keep up with real time
       while(accumulated >= frameMs && f < totF){
-        gt = (f + 1) / FPS;
+        const gt = (f + 1) / FPS;
         drawFrame(cv, FW, FH, gt, bgVid);
         f++;
         accumulated -= frameMs;
@@ -2885,17 +2794,14 @@ async function genVideo(){
       if(f < totF){
         requestAnimationFrame(tick);
       } else {
-        // Draw final frame and stop
         drawFrame(cv, FW, FH, dur, bgVid);
         if(bgVid) bgVid.pause();
-        // Give encoder a moment to flush last frames
         setTimeout(()=>rec.stop(), 200);
       }
     }
 
     rec.onstop = () => resolve(new Blob(chunks, {type:mime}));
     rec.onerror = e => reject(e.error || new Error('Ошибка записи'));
-
     requestAnimationFrame(tick);
   });
 }
@@ -2912,7 +2818,7 @@ function addCustomText(){
 
     bold:false, italic:false, underline:false, strike:false,
 
-    align:'left', opacity:100, lineHeight:1.3,
+    align:"left", opacity:100, lineHeight:1.3, timeIn:0, timeOut:0,
 
     x: 0.05 + Math.random()*0.3, y: 0.45 + Math.random()*0.2,
 
@@ -3113,6 +3019,15 @@ function renderCustomTextList(){
           placeholder="Введите текст..."
 
           oninput="ctChange(${t.id},'text',this.value)">${he(t.text)}</textarea>
+        <!-- Timeline -->
+        <div style="display:flex;gap:5px;margin-top:6px;align-items:center;flex-wrap:wrap">
+          <span style="font-size:9px;color:#4dc94d">▶</span>
+          <input type="range" min="0" max="29" step="0.5" value="${t.timeIn||0}" style="-webkit-appearance:none;width:65px;height:3px;background:rgba(77,201,77,0.2);border-radius:2px;outline:none;border:none;cursor:pointer" oninput="ctChange(${t.id},'timeIn',+this.value);this.nextElementSibling.textContent=this.value+'с'">
+          <span style="font-size:9px;color:#4dc94d;min-width:24px">${t.timeIn||0}с</span>
+          <span style="font-size:9px;color:#ff6b6b">■</span>
+          <input type="range" min="0" max="30" step="0.5" value="${t.timeOut||0}" style="-webkit-appearance:none;width:65px;height:3px;background:rgba(255,107,107,0.2);border-radius:2px;outline:none;border:none;cursor:pointer" oninput="ctChange(${t.id},'timeOut',+this.value);this.nextElementSibling.textContent=+this.value===0?'до конца':this.value+'с'">
+          <span style="font-size:9px;color:#ff6b6b;min-width:44px">${!t.timeOut?'до конца':t.timeOut+'с'}</span>
+        </div>
 
       </div>
 
@@ -3283,27 +3198,21 @@ function addCanvasShape(type, color){
 
 
 function selectShape(id){
-
   selectedShape = id;
+  selectedEl = 'sv_'+id;
 
   const sh = canvasShapes.find(s=>s.id===id);
-
   if(!sh) return;
 
   document.getElementById('shapeEditor').style.display='';
-
   document.getElementById('shapeEditorTitle').textContent = SHAPE_DEFS.find(d=>d.type===sh.type)?.label||'Фигура';
-
   document.getElementById('sp_fill').value   = sh.fill.startsWith('#')?sh.fill:'#3a7af0';
-
   document.getElementById('sp_stroke').value = sh.stroke.startsWith('#')?sh.stroke:'#ffffff';
-
   document.getElementById('sp_strokeW').value= sh.strokeW||0;
-
   document.getElementById('sp_opacity').value= sh.opacity||100;
-
   document.getElementById('sp_radius').value = sh.radius||0;
 
+  setTimeout(updateElProps, 0);
 }
 
 
@@ -3366,6 +3275,105 @@ function renderShapeGrid(){
 
 }
 
+
+
+// ── Draw a custom text block ──────────────────────────────────────────────────
+function drawCustomText(t, ctx, cw, ch, s){
+  const key='ct_'+t.id;
+  if(!EP[key]) EP[key]={x:t.x,y:t.y};
+  const cx2=EP[key].x*cw, cy2=EP[key].y*ch;
+  const weight=(t.bold?'bold ':'')+(t.italic?'italic ':'');
+  const px2=Math.max(8,Math.round(t.size*s));
+  const fontStr=`${weight}${px2}px '${t.font}',sans-serif`;
+  const lh=px2*1.35;
+  const tIn=t.timeIn||0, tOut=t.timeOut||0;
+  const gt=_drawGt||0.001; // use current frame gt
+  const animFadeDur=parseFloat(document.getElementById('anim_dur')?.value||'0.5');
+  let timeAlpha=1;
+  if(gt>0.01){
+    if(tOut>0&&gt>=tOut){const p2=Math.min(1,(gt-tOut)/animFadeDur);timeAlpha=1-(p2<0.5?2*p2*p2:-1+(4-2*p2)*p2);}
+    else if(gt<tIn){timeAlpha=0;}
+    else{const p2=Math.min(1,(gt-tIn)/animFadeDur);timeAlpha=p2<0.5?2*p2*p2:-1+(4-2*p2)*p2;}
+  }
+  if(timeAlpha<=0) return;
+  const opacity=(t.opacity||100)/100*timeAlpha;
+  ctx.save(); ctx.globalAlpha=opacity;
+  ctx.font=fontStr; ctx.fillStyle=t.color; ctx.textAlign=t.align||'left';
+  if(t.shadow){ctx.shadowColor='rgba(0,0,0,0.75)';ctx.shadowBlur=px2*0.4;ctx.shadowOffsetX=px2*0.06;ctx.shadowOffsetY=px2*0.06;}
+  const lines=t.text.split('\n');
+  const maxW=lines.reduce((m,l)=>Math.max(m,ctx.measureText(l).width),0);
+  let bx=cx2; if(t.align==='center')bx=cx2-maxW/2; if(t.align==='right')bx=cx2-maxW;
+  const ctBx=bx-5*s, ctBy=cy2-lh*0.95, ctBw=(maxW||50*s)+10*s, ctBh=lh*lines.length+6*s;
+  regBox(key,ctBx,ctBy,ctBw,ctBh);
+  const ctSel=selectedEl===key, ctHov=hovered===key||drag?.key===key;
+  if(ctHov||ctSel){
+    ctx.save();ctx.strokeStyle=ctSel?'rgba(245,197,24,0.9)':'rgba(245,197,24,0.5)';
+    ctx.lineWidth=1.5*s;ctx.setLineDash([3*s,3*s]);ctx.strokeRect(ctBx,ctBy,ctBw,ctBh);ctx.setLineDash([]);ctx.restore();
+  }
+  if(ctSel){
+    const hr=HANDLE_R*s;
+    [[ctBx,ctBy,'nw'],[ctBx+ctBw,ctBy,'ne'],[ctBx+ctBw,ctBy+ctBh,'se'],[ctBx,ctBy+ctBh,'sw']].forEach(([hx,hy,hk])=>{
+      ctx.save();ctx.fillStyle='#fff';ctx.strokeStyle='#f5c518';ctx.lineWidth=1.5*s;
+      ctx.beginPath();ctx.arc(hx,hy,hr,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.restore();
+      BOXES['cth_'+key+'_'+hk]={x:hx-hr*1.5,y:hy-hr*1.5,w:hr*3,h:hr*3,isElHandle:true,ctKey:key,hk,hCur:'se-resize'};
+    });
+  }
+  lines.forEach((line,i)=>{
+    const ly=cy2+i*lh; ctx.fillText(line,cx2,ly);
+    if(t.underline){const lw=ctx.measureText(line).width;const ux=t.align==='center'?cx2-lw/2:t.align==='right'?cx2-lw:cx2;ctx.save();ctx.shadowBlur=0;ctx.fillRect(ux,ly+px2*0.15,lw,Math.max(1,px2*0.07));ctx.restore();}
+    if(t.strike){const lw=ctx.measureText(line).width;const sx=t.align==='center'?cx2-lw/2:t.align==='right'?cx2-lw:cx2;ctx.save();ctx.shadowBlur=0;ctx.fillRect(sx,ly-px2*0.3,lw,Math.max(1,px2*0.07));ctx.restore();}
+  });
+  ctx.restore();
+}
+
+// ── Draw a template/shape element (sh_) ───────────────────────────────────────
+function drawShapeElement(el, ctx, cw, ch, s, key){
+  if(!EP[key]) EP[key]={x:el.x,y:el.y};
+  const ex=EP[key].x*cw, ey=EP[key].y*ch;
+  const op=(el.opacity||100)/100;
+  ctx.save(); ctx.globalAlpha=op;
+  if(el.shape==='badge'||el.shape==='text'){
+    const weight=(el.bold?'bold ':'')+Math.round((el.size||24)*s)+'px \''+el.font+'\',sans-serif';
+    ctx.font=weight;
+    const tw=ctx.measureText(el.text).width;
+    const px2=(el.padX||0)*s, py2=(el.padY||0)*s;
+    const bw=tw+px2*2, bh=(el.size||24)*s+(py2*2);
+    if(el.bgColor){
+      ctx.fillStyle=el.bgColor;
+      const rr2=Math.min((el.radius||0)*s,bh/2);
+      ctx.beginPath();ctx.moveTo(ex+rr2,ey);ctx.lineTo(ex+bw-rr2,ey);
+      ctx.arcTo(ex+bw,ey,ex+bw,ey+rr2,rr2);ctx.lineTo(ex+bw,ey+bh-rr2);
+      ctx.arcTo(ex+bw,ey+bh,ex+bw-rr2,ey+bh,rr2);ctx.lineTo(ex+rr2,ey+bh);
+      ctx.arcTo(ex,ey+bh,ex,ey+bh-rr2,rr2);ctx.lineTo(ex,ey+rr2);
+      ctx.arcTo(ex,ey,ex+rr2,ey,rr2);ctx.closePath();ctx.fill();
+      regBox(key,ex,ey,bw,bh); drawHover(key,ex,ey,bw,bh);
+    } else {
+      regBox(key,ex,ey,tw||50*s,el.size*s*1.4); drawHover(key,ex,ey,tw||50*s,el.size*s*1.4);
+    }
+    ctx.font=weight; ctx.fillStyle=el.textColor||'#fff'; ctx.textAlign='left';
+    ctx.shadowColor='rgba(0,0,0,0.5)';ctx.shadowBlur=3*s;
+    ctx.fillText(el.text,ex+px2,ey+(el.size||24)*s+py2-py2*0.15);
+  } else if(el.shape==='line'){
+    const lw2=(el.width||0.5)*cw;
+    regBox(key,ex,ey-4*s,lw2,8*s); drawHover(key,ex,ey-4*s,lw2,8*s);
+    ctx.strokeStyle=el.lineColor||'rgba(255,255,255,0.4)';ctx.lineWidth=(el.lineWidth||2)*s;
+    ctx.setLineDash([]);ctx.beginPath();ctx.moveTo(ex,ey);ctx.lineTo(ex+lw2,ey);ctx.stroke();
+  } else if(el.shape==='rect'){
+    const rw=(el.width||0.5)*cw, rh=(el.height||0.08)*ch;
+    const rr2=Math.min((el.radius||0)*s,rh/2);
+    regBox(key,ex,ey,rw,rh); drawHover(key,ex,ey,rw,rh);
+    ctx.fillStyle=el.fillColor||'rgba(0,0,0,0.5)';
+    ctx.beginPath();ctx.moveTo(ex+rr2,ey);ctx.lineTo(ex+rw-rr2,ey);
+    ctx.arcTo(ex+rw,ey,ex+rw,ey+rr2,rr2);ctx.lineTo(ex+rw,ey+rh-rr2);
+    ctx.arcTo(ex+rw,ey+rh,ex+rw-rr2,ey+rh,rr2);ctx.lineTo(ex+rr2,ey+rh);
+    ctx.arcTo(ex,ey+rh,ex,ey+rh-rr2,rr2);ctx.lineTo(ex,ey+rr2);
+    ctx.arcTo(ex,ey,ex+rr2,ey,rr2);ctx.closePath();ctx.fill();
+    if(el.strokeColor){ctx.strokeStyle=el.strokeColor;ctx.lineWidth=1.5*s;ctx.stroke();}
+  }
+  ctx.restore();
+}
+
+// Global gt for use in drawCustomText (set at start of each drawFrame call)
 
 
 // ── Draw a single canvas shape ─────────────────────────────────────────────
@@ -3960,6 +3968,88 @@ function restoreBlock(key){
 }
 
 // Update the properties bar when selection changes
+function toggleLayerList(){
+  const list=document.getElementById('layerList');
+  const btn=document.getElementById('layerListBtn');
+  if(!list) return;
+  const open=list.style.display==='none';
+  if(!open){list.style.display='none';btn.style.color='#555';return;}
+  renderLayerPanel();
+  list.style.display='block';
+  btn.style.color='#f5c518';
+}
+
+function getLayerLabel(key){
+  const icons={tire:'🖼',brand:'🔤',type:'📝',badge:'🏷',sub:'✏️',disc:'🏷',feats:'✅'};
+  const names={tire:'Фото товара',brand:'Бренд',type:'Заголовок',badge:'Размер',sub:'Подзаголовок',disc:'Скидка',feats:'Свойства'};
+  if(names[key]) return {icon:icons[key]||'■',name:names[key]};
+  if(key.startsWith('ct_')){const t=customTexts.find(t=>'ct_'+t.id===key);return {icon:'✍',name:'Текст: '+(t?.text?.slice(0,14)||'...')};}
+  if(key.startsWith('sv_')){const sh=canvasShapes.find(s=>'sv_'+s.id===key);return {icon:'⬛',name:SHAPE_DEFS.find(d=>d.type===sh?.type)?.label||'Фигура'};}
+  if(key.startsWith('sh_')){const e=shapeElements.find(e=>'sh_'+e.id===key);return {icon:'⭐',name:e?.text?.slice(0,14)||e?.shape||'Элемент'};}
+  return {icon:'■',name:key};
+}
+
+let layerDragKey=null;
+
+function renderLayerPanel(){
+  const inner=document.getElementById('layerListInner');
+  if(!inner) return;
+  // Ensure user elements are in layerOrder
+  customTexts.forEach(t=>{const k='ct_'+t.id;if(!layerOrder.includes(k))layerOrder.push(k);});
+  shapeElements.forEach(e=>{const k='sh_'+e.id;if(!layerOrder.includes(k))layerOrder.push(k);});
+  canvasShapes.forEach(s=>{const k='sv_'+s.id;if(!layerOrder.includes(k))layerOrder.push(k);});
+  const stdKeys=['tire','feats','sub','badge','type','brand','disc'];
+  const stdVisible=stdKeys.filter(k=>{const cb=document.getElementById('vis_'+k);return cb&&cb.checked;});
+  const allKeys=[...layerOrder.filter(k=>!stdVisible.includes(k)),...stdVisible].reverse();
+  inner.innerHTML='';
+  allKeys.forEach(key=>{
+    const {icon,name}=getLayerLabel(key);
+    const isSel=selectedEl===key;
+    const isStd=!key.startsWith('ct_')&&!key.startsWith('sv_')&&!key.startsWith('sh_');
+    const d=document.createElement('div');
+    d.dataset.key=key; d.draggable=!isStd;
+    d.style.cssText=`display:flex;align-items:center;gap:6px;padding:5px 8px;border-radius:6px;cursor:${isStd?'default':'grab'};font-size:11px;color:${isSel?'#f5c518':'#888'};background:${isSel?'rgba(245,197,24,0.08)':'rgba(255,255,255,0.02)'};border:1px solid ${isSel?'rgba(245,197,24,0.2)':'rgba(255,255,255,0.04)'};margin-bottom:2px;user-select:none`;
+    d.innerHTML=`<span style="font-size:12px;flex-shrink:0">${icon}</span><span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${name}</span>${isStd?'<span style="font-size:9px;color:#333">базовый</span>':'<span style="font-size:9px;color:#444">⠿</span>'}`;
+    d.addEventListener('click',()=>{selectElFromList(key);renderLayerPanel();});
+    if(!isStd){
+      d.addEventListener('dragstart',e=>{layerDragKey=key;e.dataTransfer.effectAllowed='move';d.style.opacity='0.4';});
+      d.addEventListener('dragend',()=>{layerDragKey=null;d.style.opacity='1';renderLayerPanel();});
+      d.addEventListener('dragover',e=>{e.preventDefault();d.style.borderColor='rgba(245,197,24,0.5)';});
+      d.addEventListener('dragleave',()=>{d.style.borderColor=isSel?'rgba(245,197,24,0.2)':'rgba(255,255,255,0.04)';});
+      d.addEventListener('drop',e=>{
+        e.preventDefault();
+        if(layerDragKey&&layerDragKey!==key){
+          const from=layerOrder.indexOf(layerDragKey);
+          const to=layerOrder.indexOf(key);
+          if(from!==-1&&to!==-1){layerOrder.splice(from,1);layerOrder.splice(to,0,layerDragKey);}
+        }
+        renderLayerPanel();
+      });
+    }
+    inner.appendChild(d);
+  });
+}
+
+
+function selectElFromList(key){
+  selectedEl=key;
+  setTimeout(updateElProps,0);
+  document.getElementById('layerList').style.display='none';
+  // If it's a shape, also set selectedShape
+  if(key.startsWith('sv_')){
+    const id=parseInt(key.replace('sv_',''));
+    selectShape(id);
+  }
+}
+
+// Close layer list on outside click
+document.addEventListener('click',e=>{
+  if(!e.target.closest('#layerListBtn')&&!e.target.closest('#layerList')){
+    const l=document.getElementById('layerList');
+    if(l) l.style.display='none';
+  }
+});
+
 function updateElProps(){
   const nameEl   = document.getElementById('elPropsName');
   const delBtn   = document.getElementById('elDelete');
@@ -4051,7 +4141,36 @@ document.addEventListener('keydown', e=>{
   }
 });
 
-let layerOrder = [];
+
+
+// ── Duration control ──────────────────────────────────────────────────────────
+function onDurChange(val){
+  val = parseInt(val) || 10;
+  document.getElementById('f_dur_val').textContent = val + ' с';
+
+  // Animation delay sliders max = duration - 0.5s (so last block has time to appear)
+  const maxDelay = Math.max(1, val - 1);
+  const animSliders = ['at_brand','at_type','at_size','at_sub','at_feat'];
+  animSliders.forEach(id=>{
+    const sl = document.getElementById(id);
+    if(!sl) return;
+    sl.max = maxDelay;
+    // Clamp current value if it exceeds new max
+    if(parseFloat(sl.value) > maxDelay){
+      sl.value = maxDelay;
+      const valId = id.replace('at_','av_');
+      const valEl = document.getElementById(valId);
+      if(valEl) valEl.textContent = maxDelay + 'с';
+    }
+  });
+
+  // Also scale default delay distribution across full duration
+  // e.g. at 10s: 0.5, 1.5, 2.5, 3.0, 4.0
+  // at 20s: proportionally doubled
+  rp();
+}
+
+function getDur(){ return parseInt(document.getElementById('f_dur')?.value) || 10; }
 
 function setSt(h,c){const el=document.getElementById('st');el.className='st '+c;el.innerHTML=h;}
 
