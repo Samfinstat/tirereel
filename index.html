@@ -329,6 +329,16 @@ select{cursor:pointer}select option{background:#141520}
 
       <div class="tip c" style="margin-top:6px">💡 Фото на белом фоне — фон удалится авто</div>
 
+      <!-- Дополнительные фото -->
+      <div style="margin-top:8px;display:flex;align-items:center;justify-content:space-between">
+        <span style="font-size:10px;color:#555;text-transform:uppercase;letter-spacing:.05em">Доп. фото товара</span>
+        <label style="background:rgba(245,197,24,0.12);border:1px solid rgba(245,197,24,0.3);border-radius:5px;color:#f5c518;font-size:10px;font-weight:600;padding:3px 9px;cursor:pointer">
+          + Добавить
+          <input type="file" accept="image/*" multiple style="display:none" onchange="loadExtraPhotos(this.files)">
+        </label>
+      </div>
+      <div id="extraPhotosList" style="display:flex;flex-direction:column;gap:4px;margin-top:6px"></div>
+
     </div>
 
     <div id="panel_ai" style="display:none">
@@ -1031,9 +1041,13 @@ let shapeIdSeq     = 0;
 let canvasShapes   = [];
 let _drawGt = 0.001; // current frame time, available to all draw helpers
 let layerOrder = []; // z-order for user elements
-let savedVariants = []; // [{id, name, ts, state}]
+let savedVariants = [];
 let variantIdSeq = 0;
-let activeVariantId = null; // id of currently loaded variant (null = unsaved)
+let activeVariantId = null;
+
+// Extra product photos (multiple)
+let extraPhotos = [];   // [{id, img, x, y, w, h, opacity}]
+let extraPhotoSeq = 0;
 
 let shapeSeqId     = 0;
 
@@ -1546,6 +1560,18 @@ function initDrag(){
           cv.style.cursor=b.hCur||'se-resize';
           return;
         }
+        if(elKey.startsWith('ep_')){
+          const epId=parseInt(elKey.replace('ep_',''));
+          const ep=extraPhotos.find(p=>p.id===epId);
+          if(ep){
+            drag={mode:'epResize',key,elKey,hk:b.hk,
+              startFX:fx,startFY:fy,
+              startW:ep.w||0.45,startH:ep.h||0.45,
+              startX:EP[elKey]?.x||ep.x,startY:EP[elKey]?.y||ep.y,ep};
+            cv.style.cursor=b.hCur||'se-resize';
+          }
+          return;
+        }
         if(sliderId) curSize=parseInt(document.getElementById(sliderId)?.value||'20');
         else if(elKey.startsWith('sh_')){
           const shEl=shapeElements.find(e=>e.id===parseInt(elKey.replace('sh_','')));
@@ -1669,6 +1695,19 @@ function initDrag(){
         if(hk.includes('w')){ nw = Math.max(MIN, drag.startW - dx); nx = drag.startX + drag.startW - nw; }
         if(hk.includes('n')){ nh = Math.max(MIN, drag.startH - dy); ny = drag.startY + drag.startH - nh; }
         sh.x=nx; sh.y=ny; sh.w=nw; sh.h=nh;
+
+      } else if(drag.mode==='epResize'){
+        const hk=drag.hk, ep=drag.ep;
+        if(ep){
+          let nw=drag.startW,nh=drag.startH,nx=drag.startX,ny=drag.startY;
+          const MIN=0.04;
+          if(hk.includes('e'))  nw=Math.max(MIN,drag.startW+dx);
+          if(hk.includes('s'))  nh=Math.max(MIN,drag.startH+dy);
+          if(hk.includes('w')){ nw=Math.max(MIN,drag.startW-dx); nx=drag.startX+drag.startW-nw; }
+          if(hk.includes('n')){ nh=Math.max(MIN,drag.startH-dy); ny=drag.startY+drag.startH-nh; }
+          ep.w=nw; ep.h=nh;
+          if(EP[drag.elKey]){ EP[drag.elKey].x=nx; EP[drag.elKey].y=ny; }
+        }
 
       } else if(drag.mode==='tireResize'){
         const hk=drag.hk;
@@ -1843,7 +1882,10 @@ function initDrag(){
 
 function keyLabel(k){
 
-  return {tire:'Фото шины',brand:'Бренд',disc:'Скидка',type:'Заголовок',badge:'Размер',sub:'Подзаголовок',feats:'Характеристики'}[k]||k;
+  const base={tire:'Фото шины',brand:'Бренд',disc:'Скидка',type:'Заголовок',badge:'Размер',sub:'Подзаголовок',feats:'Характеристики'};
+  if(base[k]) return base[k];
+  if(k?.startsWith('ep_')) return 'Доп. фото '+k.replace('ep_','');
+  return k;
 
 }
 
@@ -1952,25 +1994,56 @@ function loadBg(f){
 // Load tire image + remove white bg
 
 function loadTire(f){
-
   if(!f)return;
-
   const url=URL.createObjectURL(f);
-
   const img=new Image();
-
   img.onload=()=>{
-
     tireImg=img;tireMask=removeWhiteBg(img);
-
     const b=document.getElementById('tireBox');
-
     b.classList.add('filled');b.querySelector('.tt').textContent='✅ '+f.name;
-
     rp();
-
   };img.src=url;
+}
 
+function loadExtraPhotos(files){
+  if(!files||!files.length) return;
+  Array.from(files).slice(0,6).forEach(f=>{
+    const url=URL.createObjectURL(f);
+    const img=new Image();
+    img.onload=()=>{
+      const id=++extraPhotoSeq;
+      const processed=removeWhiteBg(img);
+      extraPhotos.push({
+        id, img:processed,
+        x:0.05+Math.random()*0.2, y:0.3+Math.random()*0.3,
+        w:0.45, h:0.45, opacity:100,
+      });
+      EP['ep_'+id]={x:extraPhotos[extraPhotos.length-1].x, y:extraPhotos[extraPhotos.length-1].y};
+      layerOrder.push('ep_'+id);
+      renderExtraPhotosList();
+    };img.src=url;
+  });
+}
+
+function removeExtraPhoto(id){
+  extraPhotos=extraPhotos.filter(p=>p.id!==id);
+  layerOrder=layerOrder.filter(k=>k!=='ep_'+id);
+  delete EP['ep_'+id]; delete BOXES['ep_'+id];
+  renderExtraPhotosList();
+}
+
+function renderExtraPhotosList(){
+  const el=document.getElementById('extraPhotosList');
+  if(!el) return;
+  if(!extraPhotos.length){el.innerHTML='';return;}
+  el.innerHTML=extraPhotos.map(p=>`
+    <div style="display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.04);border-radius:5px;padding:4px 7px;font-size:11px;color:#888">
+      <span style="flex:1">📸 Фото ${p.id}</span>
+      <input type="range" min="10" max="100" value="${p.opacity||100}" style="-webkit-appearance:none;width:60px;height:3px;background:rgba(255,255,255,0.1);border-radius:2px;outline:none;border:none;cursor:pointer"
+             oninput="extraPhotos.find(x=>x.id===${p.id}).opacity=+this.value" title="Прозрачность">
+      <button onclick="removeExtraPhoto(${p.id})" style="background:none;border:none;color:#ff6b6b;cursor:pointer;font-size:13px;padding:0;line-height:1">×</button>
+    </div>
+  `).join('');
 }
 
 
@@ -2335,6 +2408,7 @@ function drawFrame(cv,cw,ch,gt,vidSrc){
   customTexts.forEach(t=>{ const k='ct_'+t.id; if(!layerOrder.includes(k)) layerOrder.push(k); });
   shapeElements.forEach(e=>{ const k='sh_'+e.id; if(!layerOrder.includes(k)) layerOrder.push(k); });
   canvasShapes.forEach(s2=>{ const k='sv_'+s2.id; if(!layerOrder.includes(k)) layerOrder.push(k); });
+  extraPhotos.forEach(p=>{ const k='ep_'+p.id; if(!layerOrder.includes(k)) layerOrder.push(k); });
 
   layerOrder.forEach(key=>{
     if(!key) return;
@@ -2349,6 +2423,22 @@ function drawFrame(cv,cw,ch,gt,vidSrc){
       else if(key.startsWith('ct_')){ const t=customTexts.find(t=>'ct_'+t.id===key); if(t) drawCustomText(t,ctx,cw,ch,s); }
       else if(key.startsWith('sh_')){ const e=shapeElements.find(e=>'sh_'+e.id===key); if(e) drawShapeElement(e,ctx,cw,ch,s,key); }
       else if(key.startsWith('sv_')){ const sh=canvasShapes.find(s2=>'sv_'+s2.id===key); if(sh) drawCanvasShape(ctx,sh,cw,ch,s); }
+      else if(key.startsWith('ep_')){
+        const id=parseInt(key.replace('ep_',''));
+        const ep=extraPhotos.find(p=>p.id===id);
+        if(ep&&ep.img){
+          if(!EP[key]) EP[key]={x:ep.x,y:ep.y};
+          if(!ep.w) ep.w=0.45; if(!ep.h) ep.h=0.45;
+          const ex=EP[key].x*cw, ey=EP[key].y*ch;
+          const ew=ep.w*cw, eh=ep.h*ch;
+          regBox(key,ex,ey,ew,eh);
+          drawHoverG(key,ex,ey,ew,eh,ctx,s);
+          ctx.save(); ctx.globalAlpha=(ep.opacity||100)/100;
+          ctx.shadowColor='rgba(0,0,0,0.7)'; ctx.shadowBlur=14*s;
+          ctx.drawImage(ep.img,ex,ey,ew,eh);
+          ctx.restore();
+        }
+      }
     } catch(err){ console.warn('draw error for key', key, err); }
   });
 
@@ -2465,7 +2555,8 @@ async function captureState(name){
     customTexts: JSON.parse(JSON.stringify(customTexts)),
     canvasShapes: JSON.parse(JSON.stringify(canvasShapes)),
     shapeElements: JSON.parse(JSON.stringify(shapeElements)),
-    tireImg64: imageToBase64(tireMask),   // фото товара
+    tireImg64: imageToBase64(tireMask),
+    extraPhotos64: extraPhotos.map(p=>({...p,img:undefined,b64:imageToBase64(p.img)})),
     bgImg64: null, // видео не сохраняем (слишком большое)
   };
 }
@@ -2490,20 +2581,32 @@ async function restoreState(snap){
   shapeSeqId   = canvasShapes.reduce((m,s)=>Math.max(m,s.id),0);
   shapeIdSeq   = shapeElements.reduce((m,e)=>Math.max(m,e.id),0);
 
-  // Restore product photo
+  // ALWAYS clear current photo first, then restore from snap
+  tireMask = null; tireImg = null;
+  const tireBox=document.getElementById('tireBox');
+  if(tireBox){ tireBox.classList.remove('filled'); const tt=tireBox.querySelector('.tt'); if(tt) tt.textContent='Загрузить'; }
+
   if(snap.tireImg64){
     const img = await base64ToImage(snap.tireImg64);
     if(img){
-      tireMask = img;
-      tireImg  = img;
-      // Update upload box UI
-      const box=document.getElementById('tireBox');
-      if(box){ box.classList.add('filled'); const tt=box.querySelector('.tt'); if(tt) tt.textContent='✅ Фото загружено'; }
+      tireMask = img; tireImg = img;
+      if(tireBox){ tireBox.classList.add('filled'); const tt=tireBox.querySelector('.tt'); if(tt) tt.textContent='✅ Фото загружено'; }
     }
+  }
+
+  // Restore extra photos
+  extraPhotos = [];
+  if(snap.extraPhotos64 && snap.extraPhotos64.length){
+    for(const ep64 of snap.extraPhotos64){
+      const img=await base64ToImage(ep64.b64);
+      if(img) extraPhotos.push({...ep64, img, b64:undefined});
+    }
+    extraPhotoSeq=extraPhotos.reduce((m,p)=>Math.max(m,p.id),0);
   }
 
   renderFeatList();
   renderCustomTextList();
+  renderExtraPhotosList();
   selectedEl=null; selectedShape=null;
   setTimeout(updateElProps,0);
 }
