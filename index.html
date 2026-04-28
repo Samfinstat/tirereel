@@ -1998,10 +1998,14 @@ function loadTire(f){
   const url=URL.createObjectURL(f);
   const img=new Image();
   img.onload=()=>{
-    tireImg=img;tireMask=removeWhiteBg(img);
+    tireImg=img; tireMask=img; // no white bg removal — show as-is
     const b=document.getElementById('tireBox');
-    b.classList.add('filled');b.querySelector('.tt').textContent='✅ '+f.name;
-    rp();
+    b.classList.add('filled'); b.querySelector('.tt').textContent='✅ '+f.name;
+    // Make sure tire is visible and in layerOrder
+    const cb=document.getElementById('vis_tire');
+    if(cb) cb.checked=true;
+    if(!EP['tire']) EP['tire']=JSON.parse(JSON.stringify(DEFAULT_POS.tire));
+    if(!layerOrder.includes('tire')) layerOrder.unshift('tire');
   };img.src=url;
 }
 
@@ -2012,14 +2016,13 @@ function loadExtraPhotos(files){
     const img=new Image();
     img.onload=()=>{
       const id=++extraPhotoSeq;
-      const processed=removeWhiteBg(img);
       extraPhotos.push({
-        id, img:processed,
+        id, img, // no white bg removal
         x:0.05+Math.random()*0.2, y:0.3+Math.random()*0.3,
-        w:0.45, h:0.45, opacity:100,
+        w:0.45, h:0.45, opacity:100, timeIn:0, timeOut:0,
       });
       EP['ep_'+id]={x:extraPhotos[extraPhotos.length-1].x, y:extraPhotos[extraPhotos.length-1].y};
-      layerOrder.push('ep_'+id);
+      if(!layerOrder.includes('ep_'+id)) layerOrder.push('ep_'+id);
       renderExtraPhotosList();
     };img.src=url;
   });
@@ -2037,11 +2040,27 @@ function renderExtraPhotosList(){
   if(!el) return;
   if(!extraPhotos.length){el.innerHTML='';return;}
   el.innerHTML=extraPhotos.map(p=>`
-    <div style="display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.04);border-radius:5px;padding:4px 7px;font-size:11px;color:#888">
-      <span style="flex:1">📸 Фото ${p.id}</span>
-      <input type="range" min="10" max="100" value="${p.opacity||100}" style="-webkit-appearance:none;width:60px;height:3px;background:rgba(255,255,255,0.1);border-radius:2px;outline:none;border:none;cursor:pointer"
-             oninput="extraPhotos.find(x=>x.id===${p.id}).opacity=+this.value" title="Прозрачность">
-      <button onclick="removeExtraPhoto(${p.id})" style="background:none;border:none;color:#ff6b6b;cursor:pointer;font-size:13px;padding:0;line-height:1">×</button>
+    <div style="background:rgba(255,255,255,0.04);border-radius:6px;padding:6px 8px;margin-bottom:4px">
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+        <span style="flex:1;font-size:11px;color:#888">📸 Фото ${p.id}</span>
+        <span style="font-size:9px;color:#555">Прозр.</span>
+        <input type="range" min="10" max="100" value="${p.opacity||100}"
+               style="-webkit-appearance:none;width:55px;height:3px;background:rgba(255,255,255,0.1);border-radius:2px;outline:none;border:none;cursor:pointer"
+               oninput="extraPhotos.find(x=>x.id===${p.id}).opacity=+this.value">
+        <button onclick="removeExtraPhoto(${p.id})" style="background:none;border:none;color:#ff6b6b;cursor:pointer;font-size:13px;padding:0;line-height:1">×</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:4px">
+        <span style="font-size:9px;color:#4dc94d;width:14px">▶</span>
+        <input type="range" min="0" max="29" step="0.5" value="${p.timeIn||0}"
+               style="-webkit-appearance:none;flex:1;height:3px;background:rgba(77,201,77,0.2);border-radius:2px;outline:none;border:none;cursor:pointer"
+               oninput="extraPhotos.find(x=>x.id===${p.id}).timeIn=+this.value;this.nextElementSibling.textContent=this.value+'с'">
+        <span style="font-size:9px;color:#4dc94d;min-width:24px">${p.timeIn||0}с</span>
+        <span style="font-size:9px;color:#ff6b6b;width:14px">■</span>
+        <input type="range" min="0" max="30" step="0.5" value="${p.timeOut||0}"
+               style="-webkit-appearance:none;flex:1;height:3px;background:rgba(255,107,107,0.2);border-radius:2px;outline:none;border:none;cursor:pointer"
+               oninput="extraPhotos.find(x=>x.id===${p.id}).timeOut=+this.value;this.nextElementSibling.textContent=+this.value===0?'до конца':this.value+'с'">
+        <span style="font-size:9px;color:#ff6b6b;min-width:44px">${!p.timeOut?'до конца':p.timeOut+'с'}</span>
+      </div>
     </div>
   `).join('');
 }
@@ -2429,11 +2448,25 @@ function drawFrame(cv,cw,ch,gt,vidSrc){
         if(ep&&ep.img){
           if(!EP[key]) EP[key]={x:ep.x,y:ep.y};
           if(!ep.w) ep.w=0.45; if(!ep.h) ep.h=0.45;
+          // Timeline alpha
+          const tIn=ep.timeIn||0, tOut=ep.timeOut||0;
+          let epAlpha=(ep.opacity||100)/100;
+          if(gt>0.01){
+            if(tOut>0&&gt>=tOut){
+              const p2=Math.min(1,(gt-tOut)/animFadeDur);
+              epAlpha*=1-(p2<0.5?2*p2*p2:-1+(4-2*p2)*p2);
+            } else if(gt<tIn){ epAlpha=0; }
+            else {
+              const p2=Math.min(1,(gt-tIn)/animFadeDur);
+              epAlpha*=p2<0.5?2*p2*p2:-1+(4-2*p2)*p2;
+            }
+          }
+          if(epAlpha<=0) return;
           const ex=EP[key].x*cw, ey=EP[key].y*ch;
           const ew=ep.w*cw, eh=ep.h*ch;
           regBox(key,ex,ey,ew,eh);
           drawHoverG(key,ex,ey,ew,eh,ctx,s);
-          ctx.save(); ctx.globalAlpha=(ep.opacity||100)/100;
+          ctx.save(); ctx.globalAlpha=epAlpha;
           ctx.shadowColor='rgba(0,0,0,0.7)'; ctx.shadowBlur=14*s;
           ctx.drawImage(ep.img,ex,ey,ew,eh);
           ctx.restore();
