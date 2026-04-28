@@ -812,6 +812,29 @@ select{cursor:pointer}select option{background:#141520}
       </div>
     </div>
 
+    <!-- Фото товара -->
+    <div class="tl-row">
+      <span class="tl-label">📸 Фото</span>
+      <div class="tl-controls">
+        <div class="tl-line">
+          <span class="tl-label" style="font-size:9px;color:#555;width:44px">Прозр.</span>
+          <input type="range" min="10" max="100" value="100" class="tl-sl in-sl"
+                 oninput="setTireProp('opacity',+this.value);this.nextElementSibling.textContent=this.value+'%'">
+          <span class="tl-val in">100%</span>
+        </div>
+        <div class="tl-line"><span class="tl-tag in">▶</span>
+          <input type="range" min="0" max="29" step="0.5" value="0" class="tl-sl in-sl"
+                 oninput="setTireProp('timeIn',+this.value);this.nextElementSibling.textContent=this.value+'с'">
+          <span class="tl-val in">0с</span>
+        </div>
+        <div class="tl-line"><span class="tl-tag out">■</span>
+          <input type="range" min="0" max="30" step="0.5" value="0" class="tl-sl out-sl"
+                 oninput="setTireProp('timeOut',+this.value);this.nextElementSibling.textContent=+this.value===0?'до конца':this.value+'с'">
+          <span class="tl-val out">до конца</span>
+        </div>
+      </div>
+    </div>
+
     <label class="f" style="margin-top:4px">Длительность эффекта</label>
     <select id="anim_dur" onchange="rp()">
       <option value="0.3">Быстро (0.3 с)</option>
@@ -2146,13 +2169,34 @@ function drawFrame(cv,cw,ch,gt,vidSrc){
   function drawStdTire(){
     if(!tireMask||!vis('tire')) return;
     if(!EP['tire']) EP['tire']=JSON.parse(JSON.stringify(DEFAULT_POS.tire));
-    if(!EP['tire'].w) EP['tire'].w=0.55;
-    if(!EP['tire'].h) EP['tire'].h=0.55;
+    if(!EP['tire'].w)       EP['tire'].w=0.55;
+    if(!EP['tire'].h)       EP['tire'].h=0.55;
+    if(!EP['tire'].opacity) EP['tire'].opacity=100;
+    if(EP['tire'].timeIn===undefined) EP['tire'].timeIn=0;
+    if(EP['tire'].timeOut===undefined) EP['tire'].timeOut=0;
+
+    // Timeline alpha (design mode = always visible)
+    let tireAlpha = (EP['tire'].opacity||100)/100;
+    if(gt > 0.01){
+      const tIn=EP['tire'].timeIn||0, tOut=EP['tire'].timeOut||0;
+      if(tOut>0 && gt>=tOut){
+        const p2=Math.min(1,(gt-tOut)/animFadeDur);
+        tireAlpha*=1-(p2<0.5?2*p2*p2:-1+(4-2*p2)*p2);
+      } else if(gt<tIn){
+        tireAlpha=0;
+      } else {
+        const p2=Math.min(1,(gt-tIn)/animFadeDur);
+        tireAlpha*=p2<0.5?2*p2*p2:-1+(4-2*p2)*p2;
+      }
+    }
+    if(tireAlpha<=0) return;
+
     const tx=EP['tire'].x*cw, ty=EP['tire'].y*ch;
     const tw=EP['tire'].w*cw, tha=EP['tire'].h*ch;
     regBox('tire',tx,ty,tw,tha);
     drawHoverG('tire',tx,ty,tw,tha,ctx,s);
     ctx.save();
+    ctx.globalAlpha=tireAlpha;
     ctx.shadowColor='rgba(0,0,0,0.85)'; ctx.shadowBlur=22*s;
     ctx.shadowOffsetX=-4*s; ctx.shadowOffsetY=12*s;
     ctx.drawImage(tireMask,tx,ty,tw,tha);
@@ -3928,10 +3972,18 @@ function updateElProps(){
   if(opVal){opVal.textContent=op+'%';}
 }
 
+function setTireProp(prop, val){
+  if(!EP['tire']) EP['tire']={...DEFAULT_POS.tire};
+  EP['tire'][prop]=val;
+}
+
 function setElOpacity(val){
   if(document.getElementById('elOpacityVal'))
     document.getElementById('elOpacityVal').textContent=val+'%';
   if(!selectedEl) return;
+  if(selectedEl==='tire'){
+    setTireProp('opacity', val); return;
+  }
   if(selectedEl.startsWith('ct_')){
     const t=customTexts.find(t=>t.id===parseInt(selectedEl.replace('ct_','')));
     if(t){t.opacity=val;}
