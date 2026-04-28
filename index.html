@@ -2384,6 +2384,48 @@ function rp(){
 
 // ── Snapshot / Variants system ────────────────────────────────────────────────
 
+// ── Session persistence (survives F5, not tab close) ─────────────────────────
+const SESSION_KEY = 'tirecard_session';
+
+function saveSession(){
+  try{
+    const data = JSON.stringify({
+      savedVariants,
+      activeVariantId,
+      variantIdSeq,
+    });
+    sessionStorage.setItem(SESSION_KEY, data);
+  }catch(e){ console.warn('Session save failed:', e); }
+}
+
+function loadSession(){
+  try{
+    const raw = sessionStorage.getItem(SESSION_KEY);
+    if(!raw) return false;
+    const data = JSON.parse(raw);
+    savedVariants   = data.savedVariants   || [];
+    activeVariantId = data.activeVariantId || null;
+    variantIdSeq    = data.variantIdSeq    || 0;
+    // Restore the active variant state if any
+    if(activeVariantId){
+      const snap = savedVariants.find(v=>v.id===activeVariantId);
+      if(snap){
+        restoreState(snap);
+        renderVariantsList();
+        return true;
+      }
+    } else if(savedVariants.length>0){
+      // Restore last variant
+      const last = savedVariants[savedVariants.length-1];
+      restoreState(last);
+      activeVariantId = last.id;
+      renderVariantsList();
+      return true;
+    }
+  }catch(e){ console.warn('Session load failed:', e); }
+  return false;
+}
+
 function captureState(name){
   // Capture all editable state into a plain object
   const fieldIds=['f_type','f_size','f_brand','f_sub','f_disc'];
@@ -2434,32 +2476,32 @@ function restoreState(snap){
 
 function saveCurrentAsVariant(name){
   const snap = captureState(name);
-  // If activeVariantId exists, update it; else push new
   const idx = savedVariants.findIndex(v=>v.id===activeVariantId);
   if(idx>=0){ savedVariants[idx]=snap; savedVariants[idx].id=activeVariantId; }
   else { savedVariants.push(snap); activeVariantId=snap.id; }
   renderVariantsList();
+  saveSession();
   return snap;
 }
 
 function loadVariant(id){
-  // Save current before switching
   autoSaveCurrent();
   const snap = savedVariants.find(v=>v.id===id);
   if(!snap) return;
   activeVariantId = id;
   restoreState(snap);
   renderVariantsList();
+  saveSession();
 }
 
 function deleteVariant(id){
   savedVariants = savedVariants.filter(v=>v.id!==id);
   if(activeVariantId===id) activeVariantId=null;
   renderVariantsList();
+  saveSession();
 }
 
 function autoSaveCurrent(){
-  // Auto-save current unsaved state or update existing variant
   const idx = savedVariants.findIndex(v=>v.id===activeVariantId);
   const name = idx>=0 ? savedVariants[idx].name : ('Мой вариант '+(savedVariants.length+1));
   const snap = captureState(name);
@@ -2467,22 +2509,41 @@ function autoSaveCurrent(){
   activeVariantId = snap.id;
   if(idx>=0) savedVariants[idx]=snap;
   else savedVariants.push(snap);
+  saveSession();
 }
 
 function renderVariantsList(){
   const el=document.getElementById('variantsList');
   if(!el) return;
+
+  const hasSaved=sessionStorage.getItem(SESSION_KEY);
+  const sessionBadge=hasSaved?'<span style="font-size:9px;color:#4dc94d;margin-left:4px">● сессия сохранена</span>':'';
+
   if(savedVariants.length===0){
-    el.innerHTML='<div style="font-size:10px;color:#444;padding:4px 0">Нет сохранённых вариантов</div>';
+    el.innerHTML='<div style="font-size:10px;color:#444;padding:4px 0">Нет сохранённых вариантов'+sessionBadge+'</div>';
     return;
   }
-  el.innerHTML=savedVariants.map(v=>`
-    <div style="display:flex;align-items:center;gap:6px;padding:5px 8px;border-radius:6px;background:${v.id===activeVariantId?'rgba(245,197,24,0.1)':'rgba(255,255,255,0.03)'};border:1px solid ${v.id===activeVariantId?'rgba(245,197,24,0.3)':'rgba(255,255,255,0.06)'};margin-bottom:4px">
-      <span style="font-size:10px;flex:1;color:${v.id===activeVariantId?'#f5c518':'#888'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${v.name}">${v.id===activeVariantId?'▶ ':''}${v.name}</span>
-      <button onclick="loadVariant(${v.id})" style="background:none;border:1px solid rgba(255,255,255,0.1);border-radius:4px;color:#888;font-size:10px;padding:2px 7px;cursor:pointer;flex-shrink:0" ${v.id===activeVariantId?'disabled style="opacity:0.4;cursor:default"':''}>↩ Открыть</button>
-      <button onclick="deleteVariant(${v.id})" style="background:none;border:none;color:#444;font-size:13px;cursor:pointer;padding:0 2px;flex-shrink:0" title="Удалить">×</button>
-    </div>
-  `).join('');
+  el.innerHTML=sessionBadge+savedVariants.map(v=>{
+    const ts=v.ts?new Date(v.ts).toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'}):'';
+    const isActive=v.id===activeVariantId;
+    return `
+    <div style="display:flex;align-items:center;gap:5px;padding:5px 8px;border-radius:6px;background:${isActive?'rgba(245,197,24,0.1)':'rgba(255,255,255,0.03)'};border:1px solid ${isActive?'rgba(245,197,24,0.3)':'rgba(255,255,255,0.06)'};margin-bottom:4px">
+      <div style="flex:1;min-width:0">
+        <div style="font-size:10px;color:${isActive?'#f5c518':'#888'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${v.name}">${isActive?'▶ ':''}${v.name}</div>
+        ${ts?`<div style="font-size:9px;color:#444">${ts}</div>`:''}
+      </div>
+      <button onclick="renameVariant(${v.id})" title="Переименовать" style="background:none;border:none;color:#444;font-size:12px;cursor:pointer;padding:0 2px;flex-shrink:0">✏️</button>
+      <button onclick="loadVariant(${v.id})" style="background:none;border:1px solid rgba(255,255,255,0.1);border-radius:4px;color:#888;font-size:10px;padding:2px 6px;cursor:pointer;flex-shrink:0;${isActive?'opacity:0.4;pointer-events:none':''}">↩</button>
+      <button onclick="deleteVariant(${v.id})" style="background:none;border:none;color:#444;font-size:13px;cursor:pointer;padding:0 2px;flex-shrink:0">×</button>
+    </div>`;
+  }).join('');
+}
+
+function renameVariant(id){
+  const v=savedVariants.find(v=>v.id===id);
+  if(!v) return;
+  const name=prompt('Новое название:', v.name);
+  if(name&&name.trim()){ v.name=name.trim(); renderVariantsList(); saveSession(); }
 }
 
 function applyTemplate(name){
@@ -2597,6 +2658,24 @@ sizeCanvas();
 renderTmplGrid();
 
 renderShapeGrid();
+
+// ── Load session on startup ───────────────────────────────────────────────────
+if(!loadSession()){
+  // No saved session — start fresh, apply default template quietly
+  renderFeatList();
+  renderCustomTextList();
+  renderVariantsList();
+}
+
+// Auto-save to sessionStorage every 30 seconds
+setInterval(()=>{
+  try{ autoSaveCurrent(); } catch(e){}
+}, 30000);
+
+// Also save before page unload (only within same tab)
+window.addEventListener('pagehide', ()=>{
+  try{ autoSaveCurrent(); } catch(e){}
+});
 
 
 
