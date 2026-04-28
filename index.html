@@ -2448,7 +2448,7 @@ function base64ToImage(b64){
   });
 }
 
-function captureState(name){
+async function captureState(name){
   const fieldIds=['f_type','f_size','f_brand','f_sub','f_disc'];
   const visIds=['brand','type','badge','sub','disc','feats','tire'];
   const fields={}, vis2={};
@@ -2508,8 +2508,8 @@ async function restoreState(snap){
   setTimeout(updateElProps,0);
 }
 
-function saveCurrentAsVariant(name){
-  const snap = captureState(name);
+async function saveCurrentAsVariant(name){
+  const snap = await captureState(name);
   const idx = savedVariants.findIndex(v=>v.id===activeVariantId);
   if(idx>=0){ savedVariants[idx]=snap; savedVariants[idx].id=activeVariantId; }
   else { savedVariants.push(snap); activeVariantId=snap.id; }
@@ -2519,7 +2519,7 @@ function saveCurrentAsVariant(name){
 }
 
 async function loadVariant(id){
-  autoSaveCurrent();
+  await autoSaveCurrent();
   const snap = savedVariants.find(v=>v.id===id);
   if(!snap) return;
   activeVariantId = id;
@@ -2535,10 +2535,10 @@ function deleteVariant(id){
   saveSession();
 }
 
-function autoSaveCurrent(){
+async function autoSaveCurrent(){
   const idx = savedVariants.findIndex(v=>v.id===activeVariantId);
   const name = idx>=0 ? savedVariants[idx].name : ('Мой вариант '+(savedVariants.length+1));
-  const snap = captureState(name);
+  const snap = await captureState(name);
   snap.id = activeVariantId || ++variantIdSeq;
   activeVariantId = snap.id;
   if(idx>=0) savedVariants[idx]=snap;
@@ -2580,22 +2580,30 @@ function renameVariant(id){
   if(name&&name.trim()){ v.name=name.trim(); renderVariantsList(); saveSession(); }
 }
 
-function applyTemplate(name){
+async function applyTemplate(name){
   if(name !== 'wb') return;
 
-  // Auto-save current state before switching (wrapped in try to not block template)
-  try { autoSaveCurrent(); } catch(e){ console.warn('autoSave failed:', e); }
+  // Auto-save current state before switching
+  try { await autoSaveCurrent(); } catch(e){ console.warn('autoSave failed:', e); }
 
   // Reset all user elements
   customTexts  = []; ctxtIdSeq  = 0;
   canvasShapes = []; shapeSeqId = 0;
   shapeElements= []; shapeIdSeq = 0;
 
+  // Clear product photo and bg video (template starts clean)
+  tireMask = null; tireImg = null;
+  const tireBox=document.getElementById('tireBox');
+  if(tireBox){ tireBox.classList.remove('filled'); const tt=tireBox.querySelector('.tt'); if(tt) tt.textContent='Загрузить'; }
+  bgVid = null;
+  const bgBox=document.getElementById('bgBox');
+  if(bgBox){ bgBox.classList.remove('filled'); const tt=bgBox.querySelector('.tt'); if(tt) tt.textContent='Загрузить'; }
+
   // Reset positions
   EP = JSON.parse(JSON.stringify(DEFAULT_POS));
 
   // Set standard block visibility
-  const vis2={brand:true, type:true, badge:true, sub:true, disc:false, feats:true, tire:true};
+  const vis2={brand:true, type:true, badge:true, sub:true, disc:false, feats:true, tire:false};
   Object.entries(vis2).forEach(([k,v])=>{
     const cb=document.getElementById('vis_'+k);
     if(cb) cb.checked=v;
@@ -2612,15 +2620,16 @@ function applyTemplate(name){
   renderFeatList();
   renderCustomTextList();
 
-  // Explicitly set layerOrder for WB template (bottom → top)
-  layerOrder = ['tire','feats','sub','badge','type','brand'];
+  // layerOrder without tire (no photo yet)
+  layerOrder = ['feats','sub','badge','type','brand'];
 
   // Save as named variant
   try {
-    const snap = captureState('🟢 WB Шаблон');
+    const snap = await captureState('🟢 WB Шаблон');
     savedVariants.push(snap);
     activeVariantId = snap.id;
     renderVariantsList();
+    saveSession();
   } catch(e){ console.warn('variant save failed:', e); }
 
   selectedEl = null; selectedShape = null;
