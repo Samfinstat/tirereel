@@ -4211,6 +4211,12 @@ function deleteSelected(){
     removeShape(parseInt(selectedEl.replace('sh_','')));
     selectedEl=null; setTimeout(updateElProps,0); return;
   }
+
+  // Extra photo (ep_)
+  if(selectedEl.startsWith('ep_')){
+    removeExtraPhoto(parseInt(selectedEl.replace('ep_','')));
+    selectedEl=null; setTimeout(updateElProps,0); return;
+  }
 }
 
 function showRestoreNotice(key, name){
