@@ -2398,7 +2398,7 @@ function saveSession(){
   }catch(e){ console.warn('Session save failed:', e); }
 }
 
-function loadSession(){
+async function loadSession(){
   try{
     const raw = sessionStorage.getItem(SESSION_KEY);
     if(!raw) return false;
@@ -2410,14 +2410,14 @@ function loadSession(){
     if(activeVariantId){
       const snap = savedVariants.find(v=>v.id===activeVariantId);
       if(snap){
-        restoreState(snap);
+        await restoreState(snap);
         renderVariantsList();
         return true;
       }
     } else if(savedVariants.length>0){
       // Restore last variant
       const last = savedVariants[savedVariants.length-1];
-      restoreState(last);
+      await restoreState(last);
       activeVariantId = last.id;
       renderVariantsList();
       return true;
@@ -2426,8 +2426,29 @@ function loadSession(){
   return false;
 }
 
+// Convert image/canvas to base64 for serialization
+function imageToBase64(img){
+  if(!img) return null;
+  try{
+    const c=document.createElement('canvas');
+    c.width=img.width||img.videoWidth||1;
+    c.height=img.height||img.videoHeight||1;
+    c.getContext('2d').drawImage(img,0,0);
+    return c.toDataURL('image/png');
+  }catch(e){ return null; }
+}
+
+function base64ToImage(b64){
+  return new Promise(res=>{
+    if(!b64){res(null);return;}
+    const img=new Image();
+    img.onload=()=>res(img);
+    img.onerror=()=>res(null);
+    img.src=b64;
+  });
+}
+
 function captureState(name){
-  // Capture all editable state into a plain object
   const fieldIds=['f_type','f_size','f_brand','f_sub','f_disc'];
   const visIds=['brand','type','badge','sub','disc','feats','tire'];
   const fields={}, vis2={};
@@ -2437,18 +2458,19 @@ function captureState(name){
     id: ++variantIdSeq,
     name: name||('Вариант '+variantIdSeq),
     ts: Date.now(),
-    fields,
-    vis2,
+    fields, vis2,
     feats: JSON.parse(JSON.stringify(feats)),
     EP: JSON.parse(JSON.stringify(EP)),
     layerOrder: JSON.parse(JSON.stringify(layerOrder)),
     customTexts: JSON.parse(JSON.stringify(customTexts)),
     canvasShapes: JSON.parse(JSON.stringify(canvasShapes)),
     shapeElements: JSON.parse(JSON.stringify(shapeElements)),
+    tireImg64: imageToBase64(tireMask),   // фото товара
+    bgImg64: null, // видео не сохраняем (слишком большое)
   };
 }
 
-function restoreState(snap){
+async function restoreState(snap){
   // Restore fields
   Object.entries(snap.fields||{}).forEach(([id,val])=>{
     const el=document.getElementById(id); if(el) el.value=val;
@@ -2458,20 +2480,32 @@ function restoreState(snap){
     const cb=document.getElementById('vis_'+k); if(cb) cb.checked=v;
   });
   // Restore data
-  feats = JSON.parse(JSON.stringify(snap.feats||[]));
-  EP    = JSON.parse(JSON.stringify(snap.EP||DEFAULT_POS));
-  layerOrder  = JSON.parse(JSON.stringify(snap.layerOrder||[]));
-  customTexts = JSON.parse(JSON.stringify(snap.customTexts||[]));
-  canvasShapes= JSON.parse(JSON.stringify(snap.canvasShapes||[]));
-  shapeElements=JSON.parse(JSON.stringify(snap.shapeElements||[]));
-  ctxtIdSeq   = customTexts.reduce((m,t)=>Math.max(m,t.id),0);
-  shapeSeqId  = canvasShapes.reduce((m,s)=>Math.max(m,s.id),0);
-  shapeIdSeq  = shapeElements.reduce((m,e)=>Math.max(m,e.id),0);
+  feats        = JSON.parse(JSON.stringify(snap.feats||[]));
+  EP           = JSON.parse(JSON.stringify(snap.EP||DEFAULT_POS));
+  layerOrder   = JSON.parse(JSON.stringify(snap.layerOrder||[]));
+  customTexts  = JSON.parse(JSON.stringify(snap.customTexts||[]));
+  canvasShapes = JSON.parse(JSON.stringify(snap.canvasShapes||[]));
+  shapeElements= JSON.parse(JSON.stringify(snap.shapeElements||[]));
+  ctxtIdSeq    = customTexts.reduce((m,t)=>Math.max(m,t.id),0);
+  shapeSeqId   = canvasShapes.reduce((m,s)=>Math.max(m,s.id),0);
+  shapeIdSeq   = shapeElements.reduce((m,e)=>Math.max(m,e.id),0);
+
+  // Restore product photo
+  if(snap.tireImg64){
+    const img = await base64ToImage(snap.tireImg64);
+    if(img){
+      tireMask = img;
+      tireImg  = img;
+      // Update upload box UI
+      const box=document.getElementById('tireBox');
+      if(box){ box.classList.add('filled'); const tt=box.querySelector('.tt'); if(tt) tt.textContent='✅ Фото загружено'; }
+    }
+  }
+
   renderFeatList();
   renderCustomTextList();
   selectedEl=null; selectedShape=null;
   setTimeout(updateElProps,0);
-  rp();
 }
 
 function saveCurrentAsVariant(name){
@@ -2484,12 +2518,12 @@ function saveCurrentAsVariant(name){
   return snap;
 }
 
-function loadVariant(id){
+async function loadVariant(id){
   autoSaveCurrent();
   const snap = savedVariants.find(v=>v.id===id);
   if(!snap) return;
   activeVariantId = id;
-  restoreState(snap);
+  await restoreState(snap);
   renderVariantsList();
   saveSession();
 }
@@ -2660,12 +2694,14 @@ renderTmplGrid();
 renderShapeGrid();
 
 // ── Load session on startup ───────────────────────────────────────────────────
-if(!loadSession()){
-  // No saved session — start fresh, apply default template quietly
-  renderFeatList();
-  renderCustomTextList();
-  renderVariantsList();
-}
+(async()=>{
+  const restored = await loadSession();
+  if(!restored){
+    renderFeatList();
+    renderCustomTextList();
+    renderVariantsList();
+  }
+})();
 
 // Auto-save to sessionStorage every 30 seconds
 setInterval(()=>{
