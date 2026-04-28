@@ -306,23 +306,25 @@ select{cursor:pointer}select option{background:#141520}
       <div class="uploads-row" style="margin-top:8px">
 
         <div>
-
           <div class="ubl">Фоновое видео</div>
-
           <input type="file" id="bgInput" accept="video/*" style="display:none" onchange="loadBg(this.files[0])">
-
-          <label for="bgInput" class="ubox" id="bgBox"><span class="ic">🎬</span><div class="tt">Загрузить</div><div class="sb">MP4, MOV</div></label>
-
+          <div style="position:relative">
+            <label for="bgInput" class="ubox" id="bgBox"><span class="ic">🎬</span><div class="tt">Загрузить</div><div class="sb">MP4, MOV</div></label>
+            <button id="bgClear" onclick="clearBg()" title="Удалить видео"
+              style="display:none;position:absolute;top:4px;right:4px;background:rgba(255,60,60,0.8);border:none;border-radius:50%;color:#fff;font-size:13px;width:20px;height:20px;cursor:pointer;line-height:1;padding:0;z-index:2">×</button>
+          </div>
+          <video id="bgPreview" muted style="display:none;width:100%;border-radius:5px;margin-top:4px;border:1px solid rgba(255,255,255,0.1);max-height:60px;object-fit:cover"></video>
         </div>
 
         <div>
-
           <div class="ubl">Фото товара</div>
-
           <input type="file" id="tireInput" accept="image/*" style="display:none" onchange="loadTire(this.files[0])">
-
-          <label for="tireInput" class="ubox" id="tireBox"><span class="ic">📸</span><div class="tt">Загрузить</div><div class="sb">JPG, PNG</div></label>
-
+          <div style="position:relative">
+            <label for="tireInput" class="ubox" id="tireBox"><span class="ic">📸</span><div class="tt">Загрузить</div><div class="sb">JPG, PNG</div></label>
+            <button id="tireClear" onclick="clearTire()" title="Удалить фото"
+              style="display:none;position:absolute;top:4px;right:4px;background:rgba(255,60,60,0.8);border:none;border-radius:50%;color:#fff;font-size:13px;width:20px;height:20px;cursor:pointer;line-height:1;padding:0;z-index:2">×</button>
+          </div>
+          <img id="tirePreview" style="display:none;width:100%;border-radius:5px;margin-top:4px;border:1px solid rgba(255,255,255,0.1);max-height:60px;object-fit:contain">
         </div>
 
       </div>
@@ -1980,13 +1982,44 @@ function loadBg(f){
   vid.src=url;vid.loop=true;vid.muted=true;vid.playsInline=true;
   vid.onloadeddata=()=>{
     bgVid=vid;
-    // Don't autoplay — just seek to frame 0 for thumbnail
     vid.currentTime=0;
     const b=document.getElementById('bgBox');
     b.classList.add('filled');
     b.querySelector('.tt').textContent='✅ '+f.name;
-    rp();
+    // Show preview thumbnail
+    const prev=document.getElementById('bgPreview');
+    if(prev){prev.src=url;prev.style.display='block';}
+    const clr=document.getElementById('bgClear');
+    if(clr) clr.style.display='block';
   };vid.load();
+}
+
+function clearBg(){
+  bgVid=null;
+  const b=document.getElementById('bgBox');
+  if(b){b.classList.remove('filled');b.querySelector('.tt').textContent='Загрузить';}
+  const prev=document.getElementById('bgPreview');
+  if(prev){prev.src='';prev.style.display='none';}
+  const clr=document.getElementById('bgClear');
+  if(clr) clr.style.display='none';
+  const inp=document.getElementById('bgInput');
+  if(inp) inp.value='';
+}
+
+function clearTire(){
+  tireMask=null;tireImg=null;
+  const b=document.getElementById('tireBox');
+  if(b){b.classList.remove('filled');b.querySelector('.tt').textContent='Загрузить';}
+  const prev=document.getElementById('tirePreview');
+  if(prev){prev.src='';prev.style.display='none';}
+  const clr=document.getElementById('tireClear');
+  if(clr) clr.style.display='none';
+  const inp=document.getElementById('tireInput');
+  if(inp) inp.value='';
+  // Hide tire block if visible
+  layerOrder=layerOrder.filter(k=>k!=='tire');
+  const cb=document.getElementById('vis_tire');
+  if(cb) cb.checked=false;
 }
 
 
@@ -1998,9 +2031,14 @@ function loadTire(f){
   const url=URL.createObjectURL(f);
   const img=new Image();
   img.onload=()=>{
-    tireImg=img; tireMask=img; // no white bg removal — show as-is
+    tireImg=img; tireMask=img;
     const b=document.getElementById('tireBox');
     b.classList.add('filled'); b.querySelector('.tt').textContent='✅ '+f.name;
+    // Show preview thumbnail
+    const prev=document.getElementById('tirePreview');
+    if(prev){prev.src=url;prev.style.display='block';}
+    const clr=document.getElementById('tireClear');
+    if(clr) clr.style.display='block';
     // Make sure tire is visible and in layerOrder
     const cb=document.getElementById('vis_tire');
     if(cb) cb.checked=true;
@@ -2624,6 +2662,10 @@ async function restoreState(snap){
     if(img){
       tireMask = img; tireImg = img;
       if(tireBox){ tireBox.classList.add('filled'); const tt=tireBox.querySelector('.tt'); if(tt) tt.textContent='✅ Фото загружено'; }
+      const prev=document.getElementById('tirePreview');
+      if(prev){prev.src=snap.tireImg64;prev.style.display='block';}
+      const clr=document.getElementById('tireClear');
+      if(clr) clr.style.display='block';
     }
   }
 
