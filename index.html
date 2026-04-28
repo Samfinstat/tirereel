@@ -2595,13 +2595,21 @@ async function restoreState(snap){
   }
 
   // Restore extra photos
+  // First clean up old ep_ entries
+  Object.keys(BOXES).forEach(k=>{ if(k.startsWith('ep_')) delete BOXES[k]; });
   extraPhotos = [];
+  extraPhotoSeq = 0;
   if(snap.extraPhotos64 && snap.extraPhotos64.length){
     for(const ep64 of snap.extraPhotos64){
       const img=await base64ToImage(ep64.b64);
       if(img) extraPhotos.push({...ep64, img, b64:undefined});
     }
     extraPhotoSeq=extraPhotos.reduce((m,p)=>Math.max(m,p.id),0);
+  // Ensure EP has entries for restored extra photos
+  extraPhotos.forEach(p=>{
+    const k='ep_'+p.id;
+    if(!EP[k]) EP[k]={x:p.x||0.1, y:p.y||0.3};
+  });
   }
 
   renderFeatList();
@@ -2693,6 +2701,10 @@ async function applyTemplate(name){
   customTexts  = []; ctxtIdSeq  = 0;
   canvasShapes = []; shapeSeqId = 0;
   shapeElements= []; shapeIdSeq = 0;
+  extraPhotos  = []; extraPhotoSeq = 0;
+  // Clean layerOrder from user keys
+  layerOrder = layerOrder.filter(k=>['tire','feats','sub','badge','disc','type','brand'].includes(k));
+  renderExtraPhotosList();
 
   // Clear product photo and bg video (template starts clean)
   tireMask = null; tireImg = null;
