@@ -631,8 +631,22 @@ select{cursor:pointer}select option{background:#141520}
           <input type="range" id="sp_opacity" min="10" max="100" value="100" class="cslider" oninput="updateShapeProp('opacity',+this.value)">
 
           <label class="f">Скругление</label>
-
           <input type="range" id="sp_radius" min="0" max="50" value="0" class="cslider" oninput="updateShapeProp('radius',+this.value)">
+
+          <!-- Timeline -->
+          <div style="margin-top:8px;border-top:1px solid rgba(255,255,255,0.06);padding-top:8px">
+            <label class="f">⏱ Таймлайн</label>
+            <div style="display:flex;align-items:center;gap:4px;margin-top:4px">
+              <span style="font-size:9px;color:#4dc94d;width:14px">▶</span>
+              <input type="range" id="sp_timeIn" min="0" max="29" step="0.5" value="0" class="tl-sl in-sl"
+                     oninput="updateShapeProp('timeIn',+this.value);document.getElementById('sp_timeIn_v').textContent=this.value+'с'">
+              <span id="sp_timeIn_v" style="font-size:9px;color:#4dc94d;min-width:24px">0с</span>
+              <span style="font-size:9px;color:#ff6b6b;width:14px">■</span>
+              <input type="range" id="sp_timeOut" min="0" max="30" step="0.5" value="0" class="tl-sl out-sl"
+                     oninput="updateShapeProp('timeOut',+this.value);document.getElementById('sp_timeOut_v').textContent=+this.value===0?'до конца':this.value+'с'">
+              <span id="sp_timeOut_v" style="font-size:9px;color:#ff6b6b;min-width:44px">до конца</span>
+            </div>
+          </div>
 
         </div>
 
@@ -980,6 +994,22 @@ select{cursor:pointer}select option{background:#141520}
       <div style="width:1px;height:14px;background:rgba(255,255,255,0.08);flex-shrink:0"></div>
       <button type="button" onclick="resetPositions()" title="Сброс позиций" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:4px;color:#888;cursor:pointer;font-size:11px;padding:2px 5px;line-height:1">↺</button>
       <button type="button" id="elDelete" onclick="deleteSelected()" title="Удалить (Delete/Backspace)" style="display:none;background:rgba(255,60,60,0.08);border:1px solid rgba(255,100,100,0.2);border-radius:4px;color:#ff6b6b;cursor:pointer;font-size:11px;padding:2px 6px;line-height:1">🗑 Удалить</button>
+
+      <!-- Timeline for selected sh_/sv_ element (appears when selected) -->
+      <div id="elTimeline" style="display:none;align-items:center;gap:4px;flex-wrap:nowrap">
+        <div style="width:1px;height:14px;background:rgba(255,255,255,0.08);flex-shrink:0"></div>
+        <span style="font-size:9px;color:#555">⏱</span>
+        <span style="font-size:9px;color:#4dc94d">▶</span>
+        <input type="range" id="el_timeIn" min="0" max="29" step="0.5" value="0"
+               style="-webkit-appearance:none;width:55px;height:3px;background:rgba(77,201,77,0.2);border-radius:2px;outline:none;border:none;cursor:pointer;padding:0;flex-shrink:0"
+               oninput="setElTimeProp('timeIn',+this.value);document.getElementById('el_timeIn_v').textContent=this.value+'с'">
+        <span id="el_timeIn_v" style="font-size:9px;color:#4dc94d;min-width:20px">0с</span>
+        <span style="font-size:9px;color:#ff6b6b">■</span>
+        <input type="range" id="el_timeOut" min="0" max="30" step="0.5" value="0"
+               style="-webkit-appearance:none;width:55px;height:3px;background:rgba(255,107,107,0.2);border-radius:2px;outline:none;border:none;cursor:pointer;padding:0;flex-shrink:0"
+               oninput="setElTimeProp('timeOut',+this.value);document.getElementById('el_timeOut_v').textContent=+this.value===0?'∞':this.value+'с'">
+        <span id="el_timeOut_v" style="font-size:9px;color:#ff6b6b;min-width:20px">∞</span>
+      </div>
       <div style="flex:1"></div>
       <!-- Layer list -->
       <div style="position:relative">
@@ -3384,6 +3414,7 @@ function addShapeFromTemplate(tpl){
     lineColor:'rgba(255,255,255,0.4)', lineWidth:2,
 
     fillColor:'rgba(0,0,0,0.5)', strokeColor:null, width:0.5, height:0.08,
+    timeIn:0, timeOut:0,
 
   }, tpl);
 
@@ -3504,7 +3535,8 @@ function addCanvasShape(type, color){
 
     opacity: 100,
 
-    radius: type==='rounded' ? 12 : 0,
+    radius: type==="rounded" ? 12 : 0,
+    timeIn: 0, timeOut: 0,
 
   };
 
@@ -3532,6 +3564,10 @@ function selectShape(id){
   document.getElementById('sp_strokeW').value= sh.strokeW||0;
   document.getElementById('sp_opacity').value= sh.opacity||100;
   document.getElementById('sp_radius').value = sh.radius||0;
+  const ti=document.getElementById('sp_timeIn');
+  const to=document.getElementById('sp_timeOut');
+  if(ti){ti.value=sh.timeIn||0;document.getElementById('sp_timeIn_v').textContent=(sh.timeIn||0)+'с';}
+  if(to){to.value=sh.timeOut||0;document.getElementById('sp_timeOut_v').textContent=sh.timeOut>0?sh.timeOut+'с':'до конца';}
 
   setTimeout(updateElProps, 0);
 }
@@ -3648,11 +3684,28 @@ function drawCustomText(t, ctx, cw, ch, s){
 }
 
 // ── Draw a template/shape element (sh_) ───────────────────────────────────────
+// Compute timeline alpha for any element with timeIn/timeOut
+function timelineAlpha(el, gt, fadeDur){
+  if(!gt || gt<=0.01) return (el.opacity||100)/100; // design mode — always visible
+  const tIn=el.timeIn||0, tOut=el.timeOut||0;
+  let base=(el.opacity||100)/100;
+  if(tOut>0 && gt>=tOut){
+    const p2=Math.min(1,(gt-tOut)/fadeDur);
+    return base*(1-(p2<0.5?2*p2*p2:-1+(4-2*p2)*p2));
+  } else if(gt<tIn){ return 0; }
+  else {
+    const p2=Math.min(1,(gt-tIn)/fadeDur);
+    return base*(p2<0.5?2*p2*p2:-1+(4-2*p2)*p2);
+  }
+}
+
 function drawShapeElement(el, ctx, cw, ch, s, key){
   if(!EP[key]) EP[key]={x:el.x,y:el.y};
+  const fadeDur=parseFloat(document.getElementById('anim_dur')?.value||'0.5');
+  const alpha=timelineAlpha(el,_drawGt,fadeDur);
+  if(alpha<=0) return;
   const ex=EP[key].x*cw, ey=EP[key].y*ch;
-  const op=(el.opacity||100)/100;
-  ctx.save(); ctx.globalAlpha=op;
+  ctx.save(); ctx.globalAlpha=alpha;
   if(el.shape==='badge'||el.shape==='text'){
     const weight=(el.bold?'bold ':'')+Math.round((el.size||24)*s)+'px \''+el.font+'\',sans-serif';
     ctx.font=weight;
@@ -3702,14 +3755,12 @@ function drawShapeElement(el, ctx, cw, ch, s, key){
 
 
 function drawCanvasShape(ctx, sh, cw, ch, s){
-
+  const fadeDur=parseFloat(document.getElementById('anim_dur')?.value||'0.5');
+  const alpha=timelineAlpha(sh,_drawGt,fadeDur);
+  if(alpha<=0) return;
   const x=sh.x*cw, y=sh.y*ch, w=sh.w*cw, h=sh.h*ch;
-
-  const op=(sh.opacity||100)/100;
-
   ctx.save();
-
-  ctx.globalAlpha=op;
+  ctx.globalAlpha=alpha;
 
 
 
@@ -4378,6 +4429,20 @@ document.addEventListener('click',e=>{
   }
 });
 
+function setElTimeProp(prop, val){
+  if(!selectedEl) return;
+  if(selectedEl.startsWith('sh_')){
+    const e=shapeElements.find(e=>e.id===parseInt(selectedEl.replace('sh_','')));
+    if(e) e[prop]=val;
+  } else if(selectedEl.startsWith('sv_')){
+    const sh=canvasShapes.find(s=>s.id===parseInt(selectedEl.replace('sv_','')));
+    if(sh) sh[prop]=val;
+  } else if(selectedEl.startsWith('ep_')){
+    const ep=extraPhotos.find(p=>p.id===parseInt(selectedEl.replace('ep_','')));
+    if(ep) ep[prop]=val;
+  }
+}
+
 function updateElProps(){
   const nameEl   = document.getElementById('elPropsName');
   const delBtn   = document.getElementById('elDelete');
@@ -4388,6 +4453,8 @@ function updateElProps(){
   if(!selectedEl){
     nameEl.textContent='Выберите элемент';
     if(delBtn) delBtn.style.display='none';
+    const tlPanel=document.getElementById('elTimeline');
+    if(tlPanel) tlPanel.style.display='none';
     return;
   }
 
@@ -4410,6 +4477,28 @@ function updateElProps(){
   }
   if(opSlider){opSlider.value=op;}
   if(opVal){opVal.textContent=op+'%';}
+
+  // Show timeline for sh_, sv_, ep_ elements
+  const tlPanel=document.getElementById('elTimeline');
+  const hasTimeline=selectedEl&&(selectedEl.startsWith('sh_')||selectedEl.startsWith('sv_')||selectedEl.startsWith('ep_'));
+  if(tlPanel) tlPanel.style.display=hasTimeline?'flex':'none';
+
+  if(hasTimeline){
+    let el2=null;
+    if(selectedEl.startsWith('sh_')) el2=shapeElements.find(e=>e.id===parseInt(selectedEl.replace('sh_','')));
+    else if(selectedEl.startsWith('sv_')) el2=canvasShapes.find(s=>s.id===parseInt(selectedEl.replace('sv_','')));
+    else if(selectedEl.startsWith('ep_')) el2=extraPhotos.find(p=>p.id===parseInt(selectedEl.replace('ep_','')));
+    if(el2){
+      const ti=document.getElementById('el_timeIn');
+      const to=document.getElementById('el_timeOut');
+      const tiv=document.getElementById('el_timeIn_v');
+      const tov=document.getElementById('el_timeOut_v');
+      if(ti){ti.value=el2.timeIn||0;}
+      if(tiv){tiv.textContent=(el2.timeIn||0)+'с';}
+      if(to){to.value=el2.timeOut||0;}
+      if(tov){tov.textContent=el2.timeOut>0?el2.timeOut+'с':'∞';}
+    }
+  }
 }
 
 function setTireProp(prop, val){
